@@ -39,14 +39,7 @@ public class Creature
    * 
    * The root block will always have ID=0
    */
-  
-  public static final float JOINT_ANGLE_MIN = -(float)(Math.PI/2.0);
-  public static final float JOINT_ANGLE_MAX =  (float)(Math.PI/2.0);
-  
-  //Maxinium angular speed of the hinge joint in Radians per second. 
-  //This value is so high that almost always the limiting factor will be the 
-  //supplied impulse with acting on the block mass.
-  public static final float JOINT_MAX_ANGULAR_SPEED = 1000f; 
+ 
   
   private final PhysicsSpace physicsSpace; 
   private final Node jMonkeyRootNode;
@@ -58,17 +51,31 @@ public class Creature
   
   private float elapsedSimulationTime;
   
-  public Creature(PhysicsSpace physicsSpace, Node jMonkeyRootNode, Vector3f rootCenter, Vector3f rootSize)
+  public Creature(PhysicsSpace physicsSpace, Node jMonkeyRootNode)
   {
+    
     this.physicsSpace = physicsSpace;
     this.jMonkeyRootNode = jMonkeyRootNode;
-    Block root = new Block(physicsSpace, jMonkeyRootNode, body.size(), rootCenter, rootSize);
-    body.add(root);
   }
  
+  public Block addRoot(Vector3f rootCenter, Vector3f rootSize)
+  {
+    if (!body.isEmpty()) 
+    { throw new IllegalArgumentException("This creature already has a root.");
+    }
+    
+    Block root = new Block(physicsSpace, jMonkeyRootNode, body.size(), rootCenter, rootSize);
+    body.add(root);
+
+    return root;
+  }
  
   public Block addBlock(Vector3f center, Vector3f size, Block parent, Vector3f pivotA, Vector3f pivotB, Vector3f axisA, Vector3f axisB)
   {
+    if (body.isEmpty()) 
+    { throw new IllegalArgumentException("Must call addRoot() before calling addBlock()");
+    }
+    
     Block block = new Block(physicsSpace, jMonkeyRootNode, body.size(), center, size);
     body.add(block);
     
@@ -78,7 +85,7 @@ public class Creature
     HingeJoint joint = new HingeJoint(controlA, controlB, pivotA, pivotB, axisA, axisB);
     joint.setCollisionBetweenLinkedBodys(false);
     
-    joint.setLimit(JOINT_ANGLE_MIN, JOINT_ANGLE_MAX);
+    joint.setLimit(PhysicsConstants.JOINT_ANGLE_MIN, PhysicsConstants.JOINT_ANGLE_MAX);
     block.setJointToParent(parent, joint);
     
     physicsSpace.add(joint);
@@ -103,10 +110,19 @@ public class Creature
    *
    * @param id of the child box.
    * @return the joint angle in radians +- deflection the zero point defined by the 
-   * block orientations at the time.
+   * block orientations at the time the blocks were joined.
    */
   public final float getJointAngle(int id)
   { return body.get(id).getJoint().getHingeAngle();
+  }
+  
+  
+  //Returns the lowest y value of the bounding box of the block with the given id.
+  public final float getHeight(int id)
+  { 
+    BoundingBox box = (BoundingBox) body.get(id).getGeometry().getWorldBound();
+    tmpVec3 = box.getMin(tmpVec3);
+    return tmpVec3.y;
   }
   
   
@@ -156,7 +172,7 @@ public class Creature
   {
     float a = getNeuronInput(neuron, Neuron.A);
     float b = getNeuronInput(neuron, Neuron.B);
-    float y = neuron.getOutput(a,b, 0);
+    float y = neuron.getOutput(a,b, Neuron.FIRST_HALF);
     float c = getNeuronInput(neuron, Neuron.C);
     
     if (y>c) return true;
@@ -167,8 +183,8 @@ public class Creature
   {
     float d       = getNeuronInput(neuron, Neuron.D);
     float e       = getNeuronInput(neuron, Neuron.E);
-    float impulse = neuron.getOutput(d,e, 2);
-    float speed   = JOINT_MAX_ANGULAR_SPEED;
+    float impulse = neuron.getOutput(d,e, Neuron.SECOND_HALF);
+    float speed   = PhysicsConstants.JOINT_MAX_ANGULAR_SPEED;
     if (impulse < 0)
     {
       speed   = -speed;
@@ -189,9 +205,17 @@ public class Creature
   public float getNeuronInput(Neuron neuron, int i)
   {
     float x = 0;
-    if (neuron.getInputType(i) == EnumNeuronInput.CONSTANT) x = neuron.getInputValue(i);
-    else if (neuron.getInputType(i) == EnumNeuronInput.TIME) x = elapsedSimulationTime;
-    //* Other cases not yet implemented //
+    if (neuron.getInputType(i) == EnumNeuronInput.CONSTANT)   x = neuron.getInputValue(i);
+    else if (neuron.getInputType(i) == EnumNeuronInput.TIME)  x = elapsedSimulationTime;
+    else if (neuron.getInputType(i) == EnumNeuronInput.JOINT) 
+    { 
+      x = getJointAngle(neuron.getBlockIdx(i));
+    }
+    else if (neuron.getInputType(i) == EnumNeuronInput.HEIGHT) 
+    { 
+      x = getHeight(neuron.getBlockIdx(i));
+    }
+             
 
     return x;
   }

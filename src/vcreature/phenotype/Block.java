@@ -77,9 +77,10 @@ public class Block
     geometry.addControl(physicsControl);
     physicsControl.setPhysicsLocation(center);
     physicsSpace.add(physicsControl);
-    physicsControl.setRestitution(0.5f);
-    physicsControl.setFriction(1.0f);
-    physicsControl.setDamping(0.2f, 0.1f);
+    physicsControl.setRestitution(PhysicsConstants.BLOCK_BOUNCINESS);
+    physicsControl.setFriction(PhysicsConstants.SLIDING_FRICTION);
+    physicsControl.setDamping(PhysicsConstants.LINEAR_DAMPINING, 
+            PhysicsConstants.ANGULAR_DAMPINING);
   }
   
   private void addChild(Block child) {childList.add(child);}
