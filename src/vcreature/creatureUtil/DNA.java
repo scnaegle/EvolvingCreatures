@@ -10,6 +10,7 @@ import vcreature.phenotype.EnumNeuronInput;
  * Will have a deep copy method/constructor.
  * Creatures should be able to use this as a constructor.
  */
+//TODO needs to support multiple blocks.  Private inner class of block structure?
 //TODO Enum of what each vector 3 stands for, ordered by index of vector.
 public class DNA
 {
