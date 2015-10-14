@@ -23,6 +23,7 @@ import com.jme3.light.AmbientLight;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.system.AppSettings;
+import vcreature.creatureUtil.DNA;
 
 public class MainSim extends SimpleApplication implements ActionListener
 {
@@ -87,6 +88,10 @@ public class MainSim extends SimpleApplication implements ActionListener
     initLighting();
     initKeys();
 
+    /* DNA toString test. TODO remove
+    DNA dna = new DNA();
+    System.out.println(dna.toString());
+    */
     flyCam.setDragToRotate(true);
     
   }
