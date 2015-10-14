@@ -10,58 +10,32 @@ import vcreature.phenotype.EnumNeuronInput;
  * Will have a deep copy method/constructor.
  * Creatures should be able to use this as a constructor.
  */
-//TODO needs to support multiple blocks.  Private inner class of block structure?
 //TODO Enum of what each vector 3 stands for, ordered by index of vector.
 public class DNA
 {
   private int numBlocks;
-  private Vector3f[] sizeAndShape;
-  private float[] neuronRules;
+  private int length; //TODO calculate in constructor.
+  private BlockDNA[] blockDNAs;
 
   /**
    * Default constructor initializes all values to zero.
    */
-  public DNA()
+  public DNA(int numBlocks)
   {
-    sizeAndShape = new Vector3f[6];
-    for(int i = 0; i < 6; ++i)
+    this.numBlocks = numBlocks;
+    blockDNAs = new BlockDNA[this.numBlocks];
+    for(int i = 0; i < this.numBlocks; ++i)
     {
-      sizeAndShape[i] = new Vector3f(0, 0, 0);
+      blockDNAs[i] = new BlockDNA(i);
     }
-    neuronRules = new float[5];
   }
 
-  //Getters TODO Javadoc
   public int getNumBlocks()
   {
     return numBlocks;
   }
 
-  public Vector3f[] getSizeAndShape()
-  {
-    return sizeAndShape;
-  }
-
-  public Vector3f getSizeAndShapeAt(int i)
-  {
-    return sizeAndShape[i];
-  }
-
-  public float[] getNeuronRules()
-  {
-    return neuronRules;
-  }
-
-  public float getNeuronRuleAt(int i)
-  {
-    return neuronRules[i];
-  }
-
-  public float getNeuronRuleAt(EnumNeuronInput e)
-  {
-    return neuronRules[e.ordinal()];
-  }
-  //end getters.
+  //TODO getters and setters.
 
   /**
    * Build a string representation of the DNA.  The string representation will
@@ -74,23 +48,49 @@ public class DNA
   {
     String stringOut = new String(Integer.toString(numBlocks));
     stringOut += ' ';
-    for(Vector3f v : sizeAndShape)
+    for(BlockDNA b : blockDNAs)
     {
-      stringOut += v.x;
+      stringOut += b.blockID;
       stringOut += ' ';
-      stringOut += v.y;
-      stringOut += ' ';
-      stringOut += v.z;
-      stringOut += ' ';
-    }
+      for (Vector3f v : b.sizeAndShape)
+      {
+        stringOut += v.x;
+        stringOut += ' ';
+        stringOut += v.y;
+        stringOut += ' ';
+        stringOut += v.z;
+        stringOut += ' ';
+      }
 
-    for(float f : neuronRules)
-    {
-      stringOut += f;
-      stringOut += ' ';
+      for (float f : b.neuronRules)
+      {
+        stringOut += f;
+        stringOut += ' ';
+      }
     }
-
     stringOut += '\n';
     return stringOut;
+  }
+
+  /**
+   * The DNA for each individual block.  To be stored in an array in the main
+   * object.
+   */
+  private class BlockDNA
+  {
+    private int blockID;
+    private Vector3f[] sizeAndShape;
+    private float[] neuronRules;
+
+    public BlockDNA(int id)
+    {
+      blockID = id;
+      sizeAndShape = new Vector3f[6];
+      for(int i = 0; i < 6; ++i)
+      {
+        sizeAndShape[i] = new Vector3f(0, 0, 0);
+      }
+      neuronRules = new float[5];
+    }
   }
 }

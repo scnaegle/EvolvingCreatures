@@ -88,8 +88,8 @@ public class MainSim extends SimpleApplication implements ActionListener
     initLighting();
     initKeys();
 
-    /* DNA toString test. TODO remove
-    DNA dna = new DNA();
+    /* DNA toString Test TODO remove when done
+    DNA dna = new DNA(3);
     System.out.println(dna.toString());
     */
     flyCam.setDragToRotate(true);
