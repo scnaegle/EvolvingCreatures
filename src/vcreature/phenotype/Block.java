@@ -12,7 +12,14 @@ import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.scene.Node;
 import com.jme3.bullet.collision.shapes.BoxCollisionShape;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.control.RigidBodyControl;
 
@@ -46,7 +53,7 @@ public class Block
   //Creates a box that has a center of 0,0,0 and extends in the out from 
     //the center by the given amount in each direction. 
     // So, for example, a box with extent of 0.5 would be the unit cube.
-  public Block(PhysicsSpace physicsSpace, Node rootNode, int id, Vector3f center, Vector3f size) 
+  public Block(PhysicsSpace physicsSpace, Node rootNode, int id, Vector3f center, Vector3f size)
   { 
     if (size.x < 0.5f || size.y < 0.5f || size.z < 0.5f) 
     { throw new IllegalArgumentException("No dimension may be less than 0.5 from block's center: ("+vectorToStr(size));
@@ -142,8 +149,88 @@ public class Block
     mat.setFloat("Shininess", 64f);  // [0,128]
     return mat;
   }
-  
-  
+
+  public HashMap<String, Object> toHash() {
+    HashMap<String, Object> part_hash = new HashMap<>();
+    if (parent != null) {
+      part_hash.put("parent_id", parent.getID());
+    }
+    part_hash.put("center", getCenterHash());
+    part_hash.put("dimensions", getDimensionHash());
+    if (jointToParent != null) {
+      part_hash.put("joint", getJointHash());
+    }
+    part_hash.put("Neurons", getNeuronTableHash());
+    return part_hash;
+  }
+
+  private HashMap<String, Float> getCenterHash() {
+    HashMap<String, Float> center_hash = new HashMap<>();
+    center_hash.put("X", startCenter.getX());
+    center_hash.put("Y", startCenter.getY());
+    center_hash.put("Z", startCenter.getZ());
+    return center_hash;
+  }
+
+  private HashMap<String, Float> getDimensionHash() {
+    HashMap<String, Float> dimension_hash = new HashMap<>();
+    dimension_hash.put("X", sizeX);
+    dimension_hash.put("Y", sizeY);
+    dimension_hash.put("Z", sizeZ);
+    return dimension_hash;
+  }
+
+  private HashMap<String, Object> getJointHash() {
+    HashMap<String, Float> pivotA_hash = new HashMap<>();
+    pivotA_hash.put("X", jointToParent.getPivotA().getX());
+    pivotA_hash.put("Y", jointToParent.getPivotA().getX());
+    pivotA_hash.put("Z", jointToParent.getPivotA().getX());
+
+    HashMap<String, Float> pivotB_hash = new HashMap<>();
+    pivotB_hash.put("X", jointToParent.getPivotA().getX());
+    pivotB_hash.put("Y", jointToParent.getPivotA().getX());
+    pivotB_hash.put("Z", jointToParent.getPivotA().getX());
+
+    HashMap<String, Object> joint_hash = new HashMap<>();
+    joint_hash.put("PivotA", pivotA_hash);
+    joint_hash.put("PivotB", pivotB_hash);
+
+    for (Field field : jointToParent.getClass().getDeclaredFields()) {
+      if (Modifier.isProtected(field.getModifiers())
+          && (field.getName().startsWith("axis"))
+          ) {
+        field.setAccessible(true);
+        Object value = null;
+        try {
+          value = field.get(jointToParent);
+        } catch (IllegalAccessException e) {
+          e.printStackTrace();
+        }
+        if (value != null) {
+          Vector3f vect_value = (Vector3f) value;
+          HashMap<String, Float> axis_hash = new HashMap<>();
+          axis_hash.put("X", vect_value.getX());
+          axis_hash.put("Y", vect_value.getY());
+          axis_hash.put("Z", vect_value.getZ());
+
+          joint_hash.put(field.getName(), axis_hash);
+        }
+      }
+    }
+
+    return joint_hash;
+  }
+
+  private HashMap<Integer, Object> getNeuronTableHash() {
+    HashMap<Integer, Object> neuron_hash = new HashMap<>();
+    int i = 0;
+    for(Neuron neuron : neuronTable) {
+      neuron_hash.put(i, neuron.getHash());
+      i++;
+    }
+    return neuron_hash;
+  }
+
   public String toString()
   {
     String s = "Block["+id+"]: {" + sizeX + ", " + sizeY + ", " + sizeZ + "}\n";

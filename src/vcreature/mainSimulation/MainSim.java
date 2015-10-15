@@ -88,7 +88,9 @@ public class MainSim extends SimpleApplication implements ActionListener
     initKeys();
 
     flyCam.setDragToRotate(true);
-    
+
+    System.out.println("creature JSON: ");
+    System.out.println(myCreature.toJSON());
   }
 
   
@@ -144,6 +146,8 @@ public class MainSim extends SimpleApplication implements ActionListener
     //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
     myCreature.updateBrain(elapsedSimulationTime);
 
+    System.out.println("Max Fitness: " + myCreature.getFitness());
+
     if (isCameraRotating)
     {
       //Move camera continously in circle of radius 25 meters centered 10 meters
@@ -178,11 +182,11 @@ public class MainSim extends SimpleApplication implements ActionListener
   {
     AppSettings settings = new AppSettings(true);
     settings.setResolution(1024, 768);
-    settings.setSamples(4); //activate antialising (softer edges, may be slower.) 
+    settings.setSamples(4); //activate antialising (softer edges, may be slower.)
 
     //Set vertical syncing to true to time the frame buffer to coincide with the refresh frequency of the screen.
     //This also throttles the calls to simpleUpdate. Without this throttling, I get 1000+ pfs on my Alienware laptop
-    //   Your application will have more work to do than to spend cycles rendering faster than the 
+    //   Your application will have more work to do than to spend cycles rendering faster than the
     //   capture rate of the RED Camera used to shoot Lord of the Rings.
     settings.setVSync(true);
     settings.setFrequency(60);//Frames per second

@@ -1,5 +1,9 @@
 package vcreature.phenotype;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashMap;
+
 /**
  * 
  * @author Joel
@@ -233,12 +237,45 @@ public class Neuron
   }
   
 
+  public HashMap<String, Object> getHash() {
+//    private EnumNeuronInput[] type = new EnumNeuronInput[TOTAL_INPUTS];
+//    private float[] constantValue = new float[TOTAL_INPUTS];  //used only for CONSTANT type.
+//
+//    private EnumOperator[] operator =  new EnumOperator[TOTAL_OPERATIONS];
+    HashMap<String, Object> hash = new HashMap<>();
+    for(String constant : Arrays.asList("A", "B", "C", "D", "E")) {
+      Field field = null;
+      try {
+        field = getClass().getDeclaredField(constant);
+      } catch (NoSuchFieldException e) {
+        e.printStackTrace();
+      }
+      int index = 0;
+      try {
+        index = (int)field.get(this);
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      }
+      HashMap<String, Object> field_hash = new HashMap<>();
+      field_hash.put("type", type[index]);
+      field_hash.put("constantValue", constantValue[index]);
+      try {
+        field_hash.put("operator", operator[index]);
+      } catch (ArrayIndexOutOfBoundsException e) {
+//        e.printStackTrace();
+      }
+
+      hash.put(constant, field_hash);
+    }
+
+    return hash;
+  }
   
   public String toString()
   {
     String out = "Neuron: if {" + type[0] + " " + operator[0] + " " + type[1] + 
         " --> " + operator[1] + "} > {" + type[2] + 
-        " then {" + type[3] + ", " + operator[3] + " " + type[4] + " --> " + operator[4];
+        " then {" + type[3] + ", " + operator[3] + " " + type[4]; // + " --> " + operator[4];
     return out;
   }
  
