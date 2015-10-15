@@ -2,7 +2,6 @@
 package vcreature.mainSimulation;
 
 import org.json.JSONObject;
-import vcreature.creatureUtil.JSONHandler;
 import vcreature.phenotype.PhysicsConstants;
 import vcreature.phenotype.Block;
 
@@ -263,9 +262,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private void jsonOps()
   {
     System.out.println("creature JSON: ");
-    JSONObject jsonObject = JSONHandler.toJSON(myCreature);
-    JSONHandler.writeGenomeFile(jsonObject);
-    JSONObject jsonIn = JSONHandler.readGenomeFile("dnaOut.txt");
+    JSONObject jsonObject = DNA.toJSON(myCreature);
+    DNA.writeGenomeFile(jsonObject);
+    JSONObject jsonIn = DNA.readGenomeFile("dnaOut.txt");
     System.out.println(jsonIn);
   }
 }
