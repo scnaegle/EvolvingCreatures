@@ -1,15 +1,18 @@
 package vcreature.creatureUtil;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import vcreature.phenotype.Block;
 import vcreature.phenotype.Creature;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  * @author Justin Thomas(jthomas105@unm.edu)
  * JSON code from Sean, decoupled from creature class.
+ * Contains static methods for dealing with JSON Objects.
  */
 public class JSONHandler
 {
@@ -53,5 +56,59 @@ public class JSONHandler
     JSONObject json = new JSONObject(character_hash);
 
     return json;
+  }
+
+  /**
+   * Write JSONObject to output file
+   * @param jsonObj   JSONObject to write
+   */
+  public static void writeGenomeFile(JSONObject jsonObj)
+  {
+
+    try
+    {
+      FileWriter w = new FileWriter("dnaOut.txt");
+      jsonObj.write(w);
+      w.close();
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+      System.out.println("Write error.");
+    }
+    catch(JSONException e)
+    {
+      e.printStackTrace();
+      System.out.println("JSON error.");
+    }
+  }
+
+  /**
+   * Test json file reader.  Reads and creates a JSONObject.
+   * @param path        Path to file to use
+   * @return            JSONObject created
+   */
+  public static JSONObject readGenomeFile(String path)
+  {
+    JSONObject obj = null;
+    try
+    {
+      BufferedReader reader = new BufferedReader(new FileReader(path));
+      String lineIn = reader.readLine();
+      obj = new JSONObject(lineIn);
+    }
+    catch(FileNotFoundException e)
+    {
+      e.printStackTrace();
+    }
+    catch(IOException e)
+    {
+      e.printStackTrace();
+    }
+    catch(JSONException e)
+    {
+      e.printStackTrace();
+    }
+    return obj;
   }
 }

@@ -218,7 +218,7 @@ public class Creature
     { 
       x = getHeight(neuron.getBlockIdx(i));
     }
-             
+
 
     return x;
   }

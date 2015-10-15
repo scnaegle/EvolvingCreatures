@@ -1,6 +1,7 @@
 
 package vcreature.mainSimulation;
 
+import org.json.JSONObject;
 import vcreature.creatureUtil.JSONHandler;
 import vcreature.phenotype.PhysicsConstants;
 import vcreature.phenotype.Block;
@@ -98,14 +99,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     initKeys();
 
     initializeGUI();
+    jsonOps();
     /* DNA toString Test TODO remove when done
     DNA dna = new DNA(3);
     System.out.println(dna.toString());
     */
     flyCam.setDragToRotate(true);
 
-    System.out.println("creature JSON: ");
-    System.out.println(JSONHandler.toJSON(myCreature));
+
   }
 
   
@@ -255,4 +256,16 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     nifty.gotoScreen("end");
   }
   //=========end ScreenController implementation===============================
+
+  /**
+   * Test json IO
+   */
+  private void jsonOps()
+  {
+    System.out.println("creature JSON: ");
+    JSONObject jsonObject = JSONHandler.toJSON(myCreature);
+    JSONHandler.writeGenomeFile(jsonObject);
+    JSONObject jsonIn = JSONHandler.readGenomeFile("dnaOut.txt");
+    System.out.println(jsonIn);
+  }
 }
