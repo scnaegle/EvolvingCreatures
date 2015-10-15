@@ -221,6 +221,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    * will look into it further.
    * From example code at:
    * https://code.google.com/p/jmonkeyengine/source/browse/trunk/engine/src/test/jme3test/niftygui/TestNiftyGui.java
+   * XML stuff:
+   * http://wiki.jmonkeyengine.org/doku.php/jme3:advanced:nifty_gui_xml_layout
    */
   private void initializeGUI()
   {
