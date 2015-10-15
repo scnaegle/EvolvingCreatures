@@ -1,6 +1,7 @@
 
 package vcreature.mainSimulation;
 
+import vcreature.creatureUtil.JSONHandler;
 import vcreature.phenotype.PhysicsConstants;
 import vcreature.phenotype.Block;
 
@@ -104,7 +105,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     flyCam.setDragToRotate(true);
 
     System.out.println("creature JSON: ");
-    System.out.println(myCreature.toJSON());
+    System.out.println(JSONHandler.toJSON(myCreature));
   }
 
   

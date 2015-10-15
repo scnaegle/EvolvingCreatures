@@ -150,40 +150,6 @@ public class Creature
     return updateFitness();
   }
 
-//  public void buildFromJSON(JSONObject json) {
-//    JSONObject myjson = new JSONObject(the_json);
-//    JSONArray the_json_array = myjson.getJSONArray("profiles");
-//    int size = the_json_array.length();
-//    ArrayList<JSONObject> arrays = new ArrayList<JSONObject>();
-//    for (int i = 0; i < size; i++) {
-//      JSONObject another_json_object = the_json_array.getJSONObject(i);
-//      //Blah blah blah...
-//      arrays.add(another_json_object);
-//    }
-//
-////Finally
-//    JSONObject[] jsons = new JSONObject[arrays.size()];
-//    arrays.toArray(jsons);
-//  }
-
-  public JSONObject toJSON() {
-    HashMap<String, Object> character_hash = new HashMap<>();
-    character_hash.put("number_of_blocks", body.size());
-    character_hash.put("blocks", getBodyHash());
-
-    JSONObject json = new JSONObject(character_hash);
-
-    return json;
-  }
-
-  private ArrayList<HashMap<String, Object>> getBodyHash() {
-    ArrayList<HashMap<String, Object>> body_details = new ArrayList<>();
-    for(Block part : body) {
-      body_details.add(part.toHash());
-    }
-    return body_details;
-  }
-  
   private float updateFitness()
   {
     float currentHeightOfLowestPoint = Float.MAX_VALUE;
