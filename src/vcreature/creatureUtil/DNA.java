@@ -52,6 +52,8 @@ public class DNA
     {
       stringOut += b.blockID;
       stringOut += ' ';
+      stringOut += b.parentID;
+      stringOut += ' ';
       for (Vector3f v : b.sizeAndShape)
       {
         stringOut += v.x;
@@ -78,13 +80,14 @@ public class DNA
    */
   private class BlockDNA
   {
-    private int blockID;
+    private int blockID, parentID;
     private Vector3f[] sizeAndShape;
     private float[] neuronRules;
 
     public BlockDNA(int id)
     {
       blockID = id;
+      parentID = -1; //will be -1 until initialized
       sizeAndShape = new Vector3f[6];
       for(int i = 0; i < 6; ++i)
       {
