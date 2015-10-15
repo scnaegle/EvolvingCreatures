@@ -23,8 +23,15 @@ import com.jme3.light.AmbientLight;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.system.AppSettings;
+import vcreature.creatureUtil.DNA;
 
-public class MainSim extends SimpleApplication implements ActionListener
+//Added 10/14/2015 justin thomas
+import com.jme3.niftygui.NiftyJmeDisplay;
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.screen.Screen;
+import de.lessvoid.nifty.screen.ScreenController;
+
+public class MainSim extends SimpleApplication implements ActionListener, ScreenController
 {
   
   private BulletAppState bulletAppState;
@@ -36,7 +43,9 @@ public class MainSim extends SimpleApplication implements ActionListener
   private Vector3f tmpVec3; //
   private FlappyBird myCreature;
   private boolean isCameraRotating = true;
-  
+
+  //Nifty gui
+  private Nifty nifty;
 
 
   @Override
@@ -87,6 +96,11 @@ public class MainSim extends SimpleApplication implements ActionListener
     initLighting();
     initKeys();
 
+    initializeGUI();
+    /* DNA toString Test TODO remove when done
+    DNA dna = new DNA(3);
+    System.out.println(dna.toString());
+    */
     flyCam.setDragToRotate(true);
 
     System.out.println("creature JSON: ");
@@ -199,4 +213,43 @@ public class MainSim extends SimpleApplication implements ActionListener
     app.setSettings(settings);
     app.start();
   }
+
+  //============GUI Stuff======================================================
+
+  /**
+   * This initializes and displays the gui, I don't understand it fully yet, but
+   * will look into it further.
+   * From example code at:
+   * https://code.google.com/p/jmonkeyengine/source/browse/trunk/engine/src/test/jme3test/niftygui/TestNiftyGui.java
+   */
+  private void initializeGUI()
+  {
+    //Begin GUI setup
+    NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager,
+        inputManager,
+        audioRenderer,
+        guiViewPort);
+    nifty = niftyDisplay.getNifty();
+    nifty.fromXml("Interface/gaGUI.xml", "hud", this);
+    // attach the nifty display to the gui view port as a processor
+    guiViewPort.addProcessor(niftyDisplay);
+  }
+
+  //=====begin ScreenController implementation================================
+  public void bind(Nifty nifty, Screen screen) {
+    System.out.println("bind( " + screen.getScreenId() + ")");
+  }
+
+  public void onStartScreen() {
+    System.out.println("onStartScreen");
+  }
+
+  public void onEndScreen() {
+    System.out.println("onEndScreen");
+  }
+
+  public void quit(){
+    nifty.gotoScreen("end");
+  }
+  //=========end ScreenController implementation===============================
 }
