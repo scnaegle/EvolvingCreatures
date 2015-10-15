@@ -86,6 +86,7 @@ public class Creature
     
     RigidBodyControl controlA = parent.getPhysicsControl();
     RigidBodyControl controlB = block.getPhysicsControl();
+    block.storeJointAxis(axisA, axisB);
     HingeJoint joint = new HingeJoint(controlA, controlB, pivotA, pivotB, axisA, axisB);
     joint.setCollisionBetweenLinkedBodys(false);
     

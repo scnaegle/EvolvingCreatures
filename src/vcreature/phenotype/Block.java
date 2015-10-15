@@ -45,6 +45,8 @@ public class Block
   private ArrayList<Block> childList    = new ArrayList<Block>();
   private Geometry geometry;
   private RigidBodyControl physicsControl;
+
+  private Vector3f jointAxisA, jointAxisB;
   
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
@@ -89,7 +91,12 @@ public class Block
     physicsControl.setDamping(PhysicsConstants.LINEAR_DAMPINING, 
             PhysicsConstants.ANGULAR_DAMPINING);
   }
-  
+
+  public void storeJointAxis(Vector3f axisA, Vector3f axisB)
+  {
+    jointAxisA = axisA;
+    jointAxisB = axisB;
+  }
   private void addChild(Block child) {childList.add(child);}
   
   public void setMaterial(Material mat)
@@ -194,7 +201,10 @@ public class Block
     HashMap<String, Object> joint_hash = new HashMap<>();
     joint_hash.put("PivotA", pivotA_hash);
     joint_hash.put("PivotB", pivotB_hash);
+    joint_hash.put("AxisA", jointAxisA);
+    joint_hash.put("AxisB", jointAxisB);
 
+    /*
     for (Field field : jointToParent.getClass().getDeclaredFields()) {
       if (Modifier.isProtected(field.getModifiers())
           && (field.getName().startsWith("axis"))
@@ -213,11 +223,10 @@ public class Block
           axis_hash.put("Y", vect_value.getY());
           axis_hash.put("Z", vect_value.getZ());
 
-          joint_hash.put(field.getName(), axis_hash);
         }
       }
     }
-
+    */
     return joint_hash;
   }
 

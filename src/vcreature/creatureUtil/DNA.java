@@ -14,7 +14,6 @@ import java.util.HashMap;
  * JSON code from Sean, decoupled from creature class.
  * Contains static methods for dealing with JSON Objects.
  */
-//TODO Enum of what each vector 3 stands for, ordered by index of vector.
 public class DNA
 {
   //  public void buildFromJSON(JSONObject json) {
