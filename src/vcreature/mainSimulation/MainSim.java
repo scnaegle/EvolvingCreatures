@@ -226,7 +226,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         audioRenderer,
         guiViewPort);
     nifty = niftyDisplay.getNifty();
-    nifty.fromXml("Interface/Nifty/HelloJme.xml", "start", this);
+    nifty.fromXml("Interface/gaGUI.xml", "hud", this);
     // attach the nifty display to the gui view port as a processor
     guiViewPort.addProcessor(niftyDisplay);
   }
