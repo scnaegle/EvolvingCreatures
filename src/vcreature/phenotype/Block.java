@@ -190,13 +190,13 @@ public class Block
   private HashMap<String, Object> getJointHash() {
     HashMap<String, Float> pivotA_hash = new HashMap<>();
     pivotA_hash.put("X", jointToParent.getPivotA().getX());
-    pivotA_hash.put("Y", jointToParent.getPivotA().getX());
-    pivotA_hash.put("Z", jointToParent.getPivotA().getX());
+    pivotA_hash.put("Y", jointToParent.getPivotA().getY());
+    pivotA_hash.put("Z", jointToParent.getPivotA().getZ());
 
     HashMap<String, Float> pivotB_hash = new HashMap<>();
     pivotB_hash.put("X", jointToParent.getPivotA().getX());
-    pivotB_hash.put("Y", jointToParent.getPivotA().getX());
-    pivotB_hash.put("Z", jointToParent.getPivotA().getX());
+    pivotB_hash.put("Y", jointToParent.getPivotA().getY());
+    pivotB_hash.put("Z", jointToParent.getPivotA().getZ());
 
     HashMap<String, Object> joint_hash = new HashMap<>();
     joint_hash.put("PivotA", pivotA_hash);
