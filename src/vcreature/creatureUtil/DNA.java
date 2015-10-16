@@ -76,26 +76,7 @@ public class DNA
     {
       if (b != null)
       {
-        stringOut += b.blockID;
-        stringOut += ' ';
-        stringOut += b.parentID;
-        stringOut += ' ';
-        for (Vector3f v : b.sizeAndShape)
-        {
-          if (v != null)
-          {
-            stringOut += v.x;
-            stringOut += ' ';
-            stringOut += v.y;
-            stringOut += ' ';
-            stringOut += v.z;
-            stringOut += ' ';
-          }
-          else//TODO For testing: Remove when doing fileIO
-          {
-            stringOut += "null ";
-          }
-        }
+        stringOut += b.getString();
       }
       else//TODO For testing: Remove when doing fileIO
       {
@@ -106,6 +87,7 @@ public class DNA
     return stringOut;
   }
 
+  //============================Nested BlockDNA================================
   /**
    * The DNA for each individual block.  To be stored in an array in the main
    * object.
@@ -150,6 +132,36 @@ public class DNA
       }
     }
 
+    /**
+     * Get string representation of the block
+     */
+    public String getString()
+    {
+      String bString = new String();
+      bString += blockID;
+      bString += ' ';
+      bString += parentID;
+      bString += ' ';
+      for (Vector3f v : sizeAndShape)
+      {
+        if (v != null)
+        {
+          bString += v.x;
+          bString += ' ';
+          bString += v.y;
+          bString += ' ';
+          bString += v.z;
+          bString += ' ';
+        }
+        else//TODO For testing: Remove when doing fileIO
+        {
+          bString += "null ";
+        }
+      }
+      return bString;
+    }
+
+    //==============Nested NeuronDNA===========================================
     /**
      * Nested class containing Neuron DNA, one per neuron per block.
      */
