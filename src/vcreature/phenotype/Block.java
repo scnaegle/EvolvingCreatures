@@ -92,10 +92,24 @@ public class Block
             PhysicsConstants.ANGULAR_DAMPINING);
   }
 
+  /**
+   * Store the joint axis of rotation
+   * @param axisA     axis of rotation A.
+   * @param axisB     axis of rotation B.
+   */
   public void storeJointAxis(Vector3f axisA, Vector3f axisB)
   {
     jointAxisA = axisA;
     jointAxisB = axisB;
+  }
+
+  /**
+   * Get pointer to list of children
+   * @return        ArrayList of children reference.
+   */
+  public ArrayList<Block> getChildList()
+  {
+    return childList;
   }
   private void addChild(Block child) {childList.add(child);}
   
@@ -157,10 +171,20 @@ public class Block
     return mat;
   }
 
+  /**
+   * Convert properties to hashmap for dna
+   * @return      Hashmap representing the block.
+   */
   public HashMap<String, Object> toHash() {
     HashMap<String, Object> part_hash = new HashMap<>();
+    part_hash.put("this_id", id);
+
     if (parent != null) {
       part_hash.put("parent_id", parent.getID());
+    }
+    else
+    {
+      part_hash.put("parent_id", -1); //for consistency
     }
     part_hash.put("center", getCenterHash());
     part_hash.put("dimensions", getDimensionHash());
@@ -204,32 +228,13 @@ public class Block
     joint_hash.put("AxisA", jointAxisA);
     joint_hash.put("AxisB", jointAxisB);
 
-    /*
-    for (Field field : jointToParent.getClass().getDeclaredFields()) {
-      if (Modifier.isProtected(field.getModifiers())
-          && (field.getName().startsWith("axis"))
-          ) {
-        field.setAccessible(true);
-        Object value = null;
-        try {
-          value = field.get(jointToParent);
-        } catch (IllegalAccessException e) {
-          e.printStackTrace();
-        }
-        if (value != null) {
-          Vector3f vect_value = (Vector3f) value;
-          HashMap<String, Float> axis_hash = new HashMap<>();
-          axis_hash.put("X", vect_value.getX());
-          axis_hash.put("Y", vect_value.getY());
-          axis_hash.put("Z", vect_value.getZ());
-
-        }
-      }
-    }
-    */
     return joint_hash;
   }
 
+  /**
+   * Convert neuron table to hash format for JSON dna
+   * @return        Hashmap of neurons
+   */
   private HashMap<Integer, Object> getNeuronTableHash() {
     HashMap<Integer, Object> neuron_hash = new HashMap<>();
     int i = 0;
