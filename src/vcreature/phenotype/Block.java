@@ -158,7 +158,7 @@ public class Block
   public void populateVectorDNA(Vector3f[] dna)
   {
     dna[DNA.BlockVector.CENTER.ordinal()] = startCenter;
-    dna[DNA.BlockVector.SIZE.ordinal()] = new Vector3f(sizeX, sizeY, sizeZ);
+    dna[DNA.BlockVector.SIZE.ordinal()] = new Vector3f(sizeX / 2, sizeY / 2, sizeZ / 2);
     if(jointToParent != null)
     {
       dna[DNA.BlockVector.JOINT_A.ordinal()] = new Vector3f(jointToParent.getPivotA());

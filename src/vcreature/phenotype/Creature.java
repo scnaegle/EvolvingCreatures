@@ -61,6 +61,22 @@ public class Creature
     this.physicsSpace = physicsSpace;
     this.jMonkeyRootNode = jMonkeyRootNode;
   }
+
+  /**
+   * Remove whole creature, temp fix until joel updates.
+   */
+  public void remove()
+  {
+    for(Block b : body)
+    {
+      if(b.getJoint() != null)
+      {
+        physicsSpace.remove(b.getJoint());
+      }
+      physicsSpace.remove(b.getPhysicsControl());
+      jMonkeyRootNode.detachChild(b.getGeometry());
+    }
+  }
  
   public Block addRoot(Vector3f rootCenter, Vector3f rootSize)
   {
