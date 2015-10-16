@@ -1,6 +1,8 @@
 
 package vcreature.mainSimulation;
 
+import com.beust.jcommander.JCommander;
+import com.jme3.system.JmeContext;
 import org.json.JSONObject;
 import vcreature.phenotype.PhysicsConstants;
 import vcreature.phenotype.Block;
@@ -26,15 +28,55 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.system.AppSettings;
 import vcreature.creatureUtil.DNA;
 
+import java.util.ArrayList;
+import java.util.List;
+
 //Added 10/14/2015 justin thomas
 import com.jme3.niftygui.NiftyJmeDisplay;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 
+//JCommander for command-line arguments
+import com.beust.jcommander.Parameter;
+
+
 public class MainSim extends SimpleApplication implements ActionListener, ScreenController
 {
-  
+  @Parameter
+  private List<String> parameters = new ArrayList<>();
+
+  @Parameter(names = {"-h", "--help"}, description = "Shows the help text", help = true)
+  private boolean help;
+
+  @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
+  private Integer verbose = 1;
+
+  @Parameter(names = "--headless", description = "If this flag is present then it will Run the GA in headless mode with no GUI")
+  private boolean headless = false;
+
+  @Parameter(names = "--thead-count", description = "Number of threads to use, defaults to 1")
+  private int thread_count = 1;
+
+  @Parameter(names = "--population-count", description = "Starting number of Genomes in the population")
+  private int starting_population_count = 100;
+
+  @Parameter(names = "--viewing-thread", description = "What thread you are currently viewing")
+  private int viewing_thread = 1;
+
+  @Parameter(names = "--output-frequency", description = "Defines how often we dump the Genomes to a log defined by number of seconds.")
+  private int output_frequency = 300;
+
+  @Parameter(names = "--output", description = "File that you woud like to output to")
+  private String output_file = "dna_out.txt";
+
+  @Parameter(names = "--input", description = "Input file to start the Genetic Algorithm")
+  private String input_file = null;
+
+  @Parameter(names = "-debug", description = "Debug mode")
+  private boolean debug = false;
+
+
   private BulletAppState bulletAppState;
   private PhysicsSpace physicsSpace;
   private float cameraAngle = (float)(Math.PI/2.0);
@@ -59,11 +101,13 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     stateManager.attach(bulletAppState);
     physicsSpace = bulletAppState.getPhysicsSpace();
     //bulletAppState.setDebugEnabled(true);
-    
+
     physicsSpace.setGravity(PhysicsConstants.GRAVITY);
     physicsSpace.setAccuracy(PhysicsConstants.PHYSICS_UPDATE_RATE);
-    physicsSpace.setMaxSubSteps(4);
-    
+    physicsSpace.setMaxSubSteps(50);
+//    speed = 20;
+    speed = 1;
+
    
 
 
@@ -88,8 +132,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     physicsSpace.add(floor_phy);
     floor_phy.setFriction(PhysicsConstants.GROUND_SLIDING_FRICTION);
     floor_phy.setRestitution(PhysicsConstants.GROUND_BOUNCINESS);
-    floor_phy.setDamping(PhysicsConstants.GROUND_LINEAR_DAMPINING, 
-            PhysicsConstants.GROUND_ANGULAR_DAMPINING);
+    floor_phy.setDamping(PhysicsConstants.GROUND_LINEAR_DAMPINING,
+        PhysicsConstants.GROUND_ANGULAR_DAMPINING);
     
    
     Block.initStaticMaterials(assetManager);
@@ -132,12 +176,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   
   
   private void initKeys() {
-    inputManager.addMapping("Quit",  new KeyTrigger(KeyInput.KEY_Q));
-    inputManager.addMapping("Toggle Camera Rotation",  new KeyTrigger(KeyInput.KEY_P));
+    inputManager.addMapping("Quit", new KeyTrigger(KeyInput.KEY_Q));
+    inputManager.addMapping("Toggle Camera Rotation", new KeyTrigger(KeyInput.KEY_P));
 
     // Add the names to the action listener.
-    inputManager.addListener(this,"Quit");
-    inputManager.addListener(this,"Toggle Camera Rotation");
+    inputManager.addListener(this, "Quit");
+    inputManager.addListener(this, "Toggle Camera Rotation");
   }
   
   public void onAction(String name, boolean isPressed, float timePerFrame) 
@@ -195,6 +239,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
   public static void main(String[] args)
   {
+    MainSim app = new MainSim();
+    JCommander jc = new JCommander(app, args);
+
+    if (app.help) {
+      jc.usage();
+      System.exit(0);
+    }
+
     AppSettings settings = new AppSettings(true);
     settings.setResolution(1024, 768);
     settings.setSamples(4); //activate antialising (softer edges, may be slower.)
@@ -206,12 +258,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     settings.setVSync(true);
     settings.setFrequency(60);//Frames per second
     settings.setTitle("Flappy Bird Creature");
-    
+
     System.out.println("Starting App");
 
-    MainSim app = new MainSim();
     app.setShowSettings(false);
     app.setSettings(settings);
+//    app.start(JmeContext.Type.Headless);
     app.start();
   }
 
