@@ -157,6 +157,17 @@ public class DNA
         {
           bString += "null ";
         }
+        if(neuronDNAs != null)
+        {
+          for(NeuronDNA nDNA : neuronDNAs)
+          {
+            bString += nDNA.getString();
+          }
+        }
+        else
+        {
+          bString += "null ";
+        }
       }
       return bString;
     }
@@ -192,6 +203,21 @@ public class DNA
           constantValues[i] = n.getInputValue(i);
           blockIndex[i] = n.getBlockIdx(i);
         }
+      }
+
+      public String getString()
+      {
+        String nString = new String();
+        for(int i = 0; i < NUM_RULES; ++i)
+        {
+          nString += inputTypes[i];
+          nString += ' ';
+          nString += constantValues[i];
+          nString += ' ';
+          nString += blockIndex[i];
+          nString += ' ';
+        }
+        return nString;
       }
     }
   }
