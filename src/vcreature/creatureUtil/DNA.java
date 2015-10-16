@@ -80,9 +80,6 @@ public class DNA
                     newVector(i, BlockVector.JOINT_B),
                     newVector(i, BlockVector.AXIS_A),
                     newVector(i, BlockVector.AXIS_B));
-      }
-      if(blockDNAs[i].neuronDNAs != null)
-      {
         blockDNAs[i].addNeurons(c.getBlockByID(blockDNAs[i].blockID));
       }
     }

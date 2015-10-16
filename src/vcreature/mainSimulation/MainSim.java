@@ -7,6 +7,7 @@ import de.lessvoid.nifty.elements.render.TextRenderer;
 import org.json.JSONObject;
 import vcreature.creatureUtil.JSONHandler;
 import vcreature.creatureUtil.RandomCreature;
+import vcreature.phenotype.OurCreature;
 import vcreature.phenotype.PhysicsConstants;
 import vcreature.phenotype.Block;
 
@@ -92,6 +93,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private Vector3f tmpVec3; //
   private FlappyBird myCreature;
   //private RandomCreature myCreature;
+  private OurCreature ourCreature; //TODO testing, remove.
   private boolean isCameraRotating = true;
 
   //Nifty gui
@@ -146,12 +148,20 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     Block.initStaticMaterials(assetManager);
     myCreature = new FlappyBird(physicsSpace, rootNode);
     //myCreature = new RandomCreature(physicsSpace, rootNode);
+
+    //TODO Remove, building homemade creature
+    DNA dna = new DNA(myCreature);
+    myCreature.remove();
+    System.out.println(dna);
+    ourCreature = new OurCreature(physicsSpace, rootNode, dna);
+    dna = new DNA(ourCreature);
+    System.out.println(dna);
+
     initLighting();
     initKeys();
 
     initializeGUI();
     //jsonOps();
-    dnaOps();
 
     flyCam.setDragToRotate(true);
 
@@ -195,7 +205,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     { isCameraRotating = !isCameraRotating;
     }
     else if (name.equals("Quit"))
-    { System.out.format("Creature Fitness (Maximium height of lowest point) = %.3f meters]\n", myCreature.getFitness());
+    {
+      //TODO put back: System.out.format("Creature Fitness (Maximium height of lowest point) = %.3f meters]\n", myCreature.getFitness());
+      System.out.format("Creature Fitness (Maximium height of lowest point) = %.3f meters]\n", ourCreature.getFitness());
       System.exit(0);
     }
   }
@@ -208,11 +220,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     elapsedSimulationTime += deltaSeconds;
     //print("simpleUpdate() elapsedSimulationTime=", (float)elapsedSimulationTime);
     //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
-    myCreature.updateBrain(elapsedSimulationTime);
+    //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
+    ourCreature.updateBrain(elapsedSimulationTime);
 
-    System.out.println("Max Fitness: " + myCreature.getFitness());
+    //TODO put back: System.out.println("Max Fitness: " + myCreature.getFitness());
+    System.out.println("Max Fitness: " + ourCreature.getFitness());
     de.lessvoid.nifty.elements.Element nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
-    nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
+    //TODO put back: nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
+    nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + ourCreature.getFitness());
 
     if (isCameraRotating)
     {
