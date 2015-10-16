@@ -6,6 +6,7 @@ import com.jme3.system.JmeContext;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import org.json.JSONObject;
 import vcreature.creatureUtil.JSONHandler;
+import vcreature.creatureUtil.RandomCreature;
 import vcreature.phenotype.PhysicsConstants;
 import vcreature.phenotype.Block;
 
@@ -90,6 +91,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
   private FlappyBird myCreature;
+  //private RandomCreature myCreature;
   private boolean isCameraRotating = true;
 
   //Nifty gui
@@ -143,6 +145,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    
     Block.initStaticMaterials(assetManager);
     myCreature = new FlappyBird(physicsSpace, rootNode);
+    //myCreature = new RandomCreature(physicsSpace, rootNode);
     initLighting();
     initKeys();
 

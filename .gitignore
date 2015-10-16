@@ -13,4 +13,7 @@ hs_err_pid*
 .idea
 *.iml
 
+#MacOS Specific
+*.DS_Store
+
 out
