@@ -5,13 +5,15 @@ import com.jme3.math.Vector3f;
 import vcreature.phenotype.Block;
 import vcreature.phenotype.Creature;
 import vcreature.phenotype.EnumNeuronInput;
+import vcreature.phenotype.Neuron;
+
+import java.util.ArrayList;
 
 /**
  * @author Justin Thomas 10/14/2015
  * A class containing the DNA description of the block.  Will have a tostring
  * method for saving the creature, getters and setters to manipulate the block.
  * Will have a deep copy method/constructor.
- * Creatures should be able to use this as a constructor.
  */
 
 //TODO Enum of what each vector 3 stands for, ordered by index of vector.
@@ -94,12 +96,6 @@ public class DNA
             stringOut += "null ";
           }
         }
-
-        for (float f : b.neuronRules)
-        {
-          stringOut += f;
-          stringOut += ' ';
-        }
       }
       else//TODO For testing: Remove when doing fileIO
       {
@@ -117,10 +113,9 @@ public class DNA
   private class BlockDNA
   {
     private final int NUM_VECTORS = 6;
-    private final int NUM_RULES = 5;
     private int blockID, parentID;
     private Vector3f[] sizeAndShape;
-    private float[] neuronRules;
+    private ArrayList<NeuronDNA> neuronDNAs;
 
     /**
      * Default constructor creates a blank block.
@@ -134,7 +129,7 @@ public class DNA
       {
         sizeAndShape[i] = new Vector3f(0, 0, 0);
       }
-      neuronRules = new float[NUM_RULES];
+      neuronDNAs = new ArrayList<>();
     }
 
     /**
@@ -147,7 +142,45 @@ public class DNA
       parentID = b.getIdOfParent();
       sizeAndShape = new Vector3f[NUM_VECTORS];
       b.populateVectorDNA(sizeAndShape);
-      neuronRules = new float[NUM_RULES];
+      neuronDNAs = new ArrayList<>();
+      ArrayList<Neuron> neuronTable = b.getNeuronTable();
+      for(Neuron n : neuronTable)
+      {
+        neuronDNAs.add(new NeuronDNA(n));
+      }
+    }
+
+    /**
+     * Nested class containing Neuron DNA, one per neuron per block.
+     */
+    private class NeuronDNA
+    {
+      private final int NUM_RULES = Neuron.TOTAL_INPUTS;
+      int[] inputTypes = new int[NUM_RULES];
+      float[] constantValues = new float[NUM_RULES];
+      int[] blockIndex = new int[NUM_RULES];
+
+      /**
+       * Default constructor does nothing.
+       */
+      public NeuronDNA()
+      {
+        ;
+      }
+
+      /**
+       * Constructor that accepts a neuron then populates the dna values.
+       * @param n
+       */
+      public NeuronDNA(Neuron n)
+      {
+        for(int i = 0; i < NUM_RULES; ++i)
+        {
+          inputTypes[i] = n.getInputType(i).ordinal();
+          constantValues[i] = n.getInputValue(i);
+          blockIndex[i] = n.getBlockIdx(i);
+        }
+      }
     }
   }
 }
