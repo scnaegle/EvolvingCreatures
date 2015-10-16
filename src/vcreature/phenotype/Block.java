@@ -161,10 +161,10 @@ public class Block
     dna[DNA.BlockVector.SIZE.ordinal()] = new Vector3f(sizeX, sizeY, sizeZ);
     if(jointToParent != null)
     {
-      dna[DNA.BlockVector.JOINT_A.ordinal()] = jointToParent.getPivotA();
-      dna[DNA.BlockVector.JOINT_B.ordinal()] = jointToParent.getPivotB();
-      dna[DNA.BlockVector.AXIS_A.ordinal()] = jointAxisA;
-      dna[DNA.BlockVector.AXIS_B.ordinal()] = jointAxisB;
+      dna[DNA.BlockVector.JOINT_A.ordinal()] = new Vector3f(jointToParent.getPivotA());
+      dna[DNA.BlockVector.JOINT_B.ordinal()] = new Vector3f(jointToParent.getPivotB());
+      dna[DNA.BlockVector.AXIS_A.ordinal()] = new Vector3f(jointAxisA);
+      dna[DNA.BlockVector.AXIS_B.ordinal()] = new Vector3f(jointAxisB);
     }
   }
   public ArrayList<Neuron> getNeuronTable() { return neuronTable;}
