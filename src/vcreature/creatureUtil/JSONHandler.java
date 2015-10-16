@@ -42,12 +42,11 @@ public class JSONHandler
     int size = c.getNumberOfBodyBlocks();
     character_hash.put("number_of_blocks", size);
     ArrayList<HashMap<String, Object>> body_details = new ArrayList<>();
-    Block root;
-    root = c.getBlockByID(0);
-    body_details.add(root.toHash());
+    for(int i = 0; i < size; ++i)
+    {
+      body_details.add(c.getBlockByID(i).toHash());
+    }
     character_hash.put("blocks", body_details);
-
-
     JSONObject json = new JSONObject(character_hash);
 
     return json;

@@ -147,11 +147,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     initKeys();
 
     initializeGUI();
-    jsonOps();
-    /* DNA toString Test TODO remove when done
-    DNA dna = new DNA(3);
-    System.out.println(dna.toString());
-    */
+    //jsonOps();
+    dnaOps();
+
     flyCam.setDragToRotate(true);
 
 
@@ -314,6 +312,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
   //=========end ScreenController implementation===============================
 
+  //==========TESTING METHODS=================================================
   /**
    * Test json IO
    */
@@ -324,5 +323,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     JSONHandler.writeGenomeFile(jsonObject);
     JSONObject jsonIn = JSONHandler.readGenomeFile("dnaOut.txt");
     System.out.println(jsonIn);
+  }
+
+  /**
+   * Test DNA object.
+   */
+  private void dnaOps()
+  {
+    DNA dna = new DNA(myCreature);
+    System.out.println(dna);
   }
 }
