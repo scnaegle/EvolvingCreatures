@@ -16,8 +16,7 @@ import java.util.HashMap;
  */
 public class JSONHandler
 {
-
-//  public void buildFromJSON(JSONObject json) {
+  //  public void buildFromJSON(JSONObject json) {
 //    JSONObject myjson = new JSONObject(the_json);
 //    JSONArray the_json_array = myjson.getJSONArray("profiles");
 //    int size = the_json_array.length();
@@ -42,17 +41,13 @@ public class JSONHandler
     HashMap<String, Object> character_hash = new HashMap<>();
     int size = c.getNumberOfBodyBlocks();
     character_hash.put("number_of_blocks", size);
-
-
-    Block part;
     ArrayList<HashMap<String, Object>> body_details = new ArrayList<>();
-    for(int i = 0; i < size; ++i)
-    {
-      part = c.getBlockByID(i);
-      body_details.add(part.toHash());
-    }
-
+    Block root;
+    root = c.getBlockByID(0);
+    body_details.add(root.toHash());
     character_hash.put("blocks", body_details);
+
+
     JSONObject json = new JSONObject(character_hash);
 
     return json;

@@ -192,6 +192,12 @@ public class Block
       part_hash.put("joint", getJointHash());
     }
     part_hash.put("Neurons", getNeuronTableHash());
+    ArrayList<HashMap<String, Object>> children = new ArrayList<>();
+    for(Block child : childList)
+    {
+      children.add(child.toHash());
+    }
+    part_hash.put("children_" + id, children);
     return part_hash;
   }
 
