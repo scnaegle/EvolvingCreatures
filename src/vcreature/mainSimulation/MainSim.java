@@ -3,6 +3,7 @@ package vcreature.mainSimulation;
 
 import com.beust.jcommander.JCommander;
 import com.jme3.system.JmeContext;
+import de.lessvoid.nifty.elements.render.TextRenderer;
 import org.json.JSONObject;
 import vcreature.creatureUtil.JSONHandler;
 import vcreature.phenotype.PhysicsConstants;
@@ -40,6 +41,9 @@ import de.lessvoid.nifty.screen.ScreenController;
 
 //JCommander for command-line arguments
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.JCommander;
+
+import javax.lang.model.element.Element;
 
 
 public class MainSim extends SimpleApplication implements ActionListener, ScreenController
@@ -151,7 +155,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
   }
 
-  
   private void initLighting()
   {
     //  ust add a light to make the lit object visible!
@@ -205,6 +208,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     myCreature.updateBrain(elapsedSimulationTime);
 
     System.out.println("Max Fitness: " + myCreature.getFitness());
+    de.lessvoid.nifty.elements.Element nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
+    nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
 
     if (isCameraRotating)
     {
