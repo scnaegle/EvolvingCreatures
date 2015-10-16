@@ -11,6 +11,7 @@ import vcreature.creatureUtil.DNA;
 public class OurCreature extends Creature
 {
   private DNA dna;
+
   /**
    * Default constructor, attaches creature to world
    * @param physicsWorld
@@ -31,13 +32,6 @@ public class OurCreature extends Creature
   {
     super(physWorld, visWorld);
     this.dna = dna;
-  }
-
-  /**
-   * Build the creature using it's DNA object.
-   */
-  private void buildWithDNA()
-  {
-
+    this.dna.initializeCreature(this);
   }
 }

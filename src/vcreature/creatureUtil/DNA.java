@@ -53,12 +53,40 @@ public class DNA
     }
   }
 
+  /**
+   * Get number of blocks in DNA
+   * @return        number of blocks in DNA.
+   */
   public int getNumBlocks()
   {
     return numBlocks;
   }
 
-  //TODO getters and setters.
+  /**
+   * Build creature with DNA
+   * @param c       Creature to build.
+   */
+  public void initializeCreature(Creature c)
+  {
+    c.addRoot(newVector(0, BlockVector.CENTER), newVector(0, BlockVector.SIZE));
+    for(int i = 1; i < MAX_BLOCKS; ++i)
+    {
+      if(blockDNAs[i] != null)
+      {
+        c.addBlock(newVector(i, BlockVector.CENTER),
+                    newVector(i, BlockVector.SIZE),
+                    c.getBlockByID(blockDNAs[i].parentID),
+                    newVector(i, BlockVector.JOINT_A),
+                    newVector(i, BlockVector.JOINT_B),
+                    newVector(i, BlockVector.AXIS_A),
+                    newVector(i, BlockVector.AXIS_B));
+      }
+      if(blockDNAs[i].neuronDNAs != null)
+      {
+        blockDNAs[i].addNeurons(c.getBlockByID(blockDNAs[i].blockID));
+      }
+    }
+  }
 
   /**
    * Build a string representation of the DNA.  The string representation will
@@ -85,6 +113,18 @@ public class DNA
       stringOut += '\n';
     }
     return stringOut;
+  }
+
+  /**
+   * Helper method that creates and returns a new vector from a block's size
+   * and shape array
+   * @param dnaNum        block to get vector from.
+   * @param type          which vector we want.
+   * @return              new vector3f
+   */
+  private Vector3f newVector(int dnaNum, BlockVector type)
+  {
+    return new Vector3f(blockDNAs[dnaNum].sizeAndShape[type.ordinal()]);
   }
 
   //============================Nested BlockDNA================================
@@ -129,6 +169,27 @@ public class DNA
       for(Neuron n : neuronTable)
       {
         neuronDNAs.add(new NeuronDNA(n));
+      }
+    }
+
+    /**
+     * Add neurons to the creature.  Instantiate neuron, set values, attach.
+     * @param b       Block to add neurons to.
+     */
+    public void addNeurons(Block b)
+    {
+      Neuron n;
+      for(NeuronDNA nDNA : neuronDNAs)
+      {
+        n = new Neuron(nDNA.inputTypes[0], nDNA.inputTypes[1],
+                      nDNA.inputTypes[2], nDNA.inputTypes[3],
+                      nDNA.inputTypes[4]);
+        for(int i = 0; i < nDNA.NUM_RULES; ++i)
+        {
+          n.setInputValue(i, nDNA.constantValues[i]);
+          n.setBlockIdx(i, nDNA.blockIndex[i]);
+        }
+        b.addNeuron(n);
       }
     }
 
@@ -179,7 +240,7 @@ public class DNA
     private class NeuronDNA
     {
       private final int NUM_RULES = Neuron.TOTAL_INPUTS;
-      int[] inputTypes = new int[NUM_RULES];
+      EnumNeuronInput[] inputTypes = new EnumNeuronInput[NUM_RULES];
       float[] constantValues = new float[NUM_RULES];
       int[] blockIndex = new int[NUM_RULES];
 
@@ -199,7 +260,7 @@ public class DNA
       {
         for(int i = 0; i < NUM_RULES; ++i)
         {
-          inputTypes[i] = n.getInputType(i).ordinal();
+          inputTypes[i] = n.getInputType(i);
           constantValues[i] = n.getInputValue(i);
           blockIndex[i] = n.getBlockIdx(i);
         }
@@ -210,7 +271,14 @@ public class DNA
         String nString = new String();
         for(int i = 0; i < NUM_RULES; ++i)
         {
-          nString += inputTypes[i];
+          if(inputTypes[i] != null)
+          {
+            nString += inputTypes[i].ordinal();
+          }
+          else
+          {
+            nString += "null";
+          }
           nString += ' ';
           nString += constantValues[i];
           nString += ' ';
@@ -220,5 +288,7 @@ public class DNA
         return nString;
       }
     }
+    //===========End NeuronDNA===============================================
   }
+  //=================End BlockDNA============================================
 }
