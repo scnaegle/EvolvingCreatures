@@ -45,6 +45,8 @@ public class Block
   private ArrayList<Block> childList    = new ArrayList<Block>();
   private Geometry geometry;
   private RigidBodyControl physicsControl;
+
+  private Vector3f jointAxisA, jointAxisB;
   
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
@@ -89,7 +91,26 @@ public class Block
     physicsControl.setDamping(PhysicsConstants.LINEAR_DAMPINING, 
             PhysicsConstants.ANGULAR_DAMPINING);
   }
-  
+
+  /**
+   * Store the joint axis of rotation
+   * @param axisA     axis of rotation A.
+   * @param axisB     axis of rotation B.
+   */
+  public void storeJointAxis(Vector3f axisA, Vector3f axisB)
+  {
+    jointAxisA = axisA;
+    jointAxisB = axisB;
+  }
+
+  /**
+   * Get pointer to list of children
+   * @return        ArrayList of children reference.
+   */
+  public ArrayList<Block> getChildList()
+  {
+    return childList;
+  }
   private void addChild(Block child) {childList.add(child);}
   
   public void setMaterial(Material mat)
@@ -150,10 +171,20 @@ public class Block
     return mat;
   }
 
+  /**
+   * Convert properties to hashmap for dna
+   * @return      Hashmap representing the block.
+   */
   public HashMap<String, Object> toHash() {
     HashMap<String, Object> part_hash = new HashMap<>();
+    part_hash.put("this_id", id);
+
     if (parent != null) {
       part_hash.put("parent_id", parent.getID());
+    }
+    else
+    {
+      part_hash.put("parent_id", -1); //for consistency
     }
     part_hash.put("center", getCenterHash());
     part_hash.put("dimensions", getDimensionHash());
@@ -183,44 +214,27 @@ public class Block
   private HashMap<String, Object> getJointHash() {
     HashMap<String, Float> pivotA_hash = new HashMap<>();
     pivotA_hash.put("X", jointToParent.getPivotA().getX());
-    pivotA_hash.put("Y", jointToParent.getPivotA().getX());
-    pivotA_hash.put("Z", jointToParent.getPivotA().getX());
+    pivotA_hash.put("Y", jointToParent.getPivotA().getY());
+    pivotA_hash.put("Z", jointToParent.getPivotA().getZ());
 
     HashMap<String, Float> pivotB_hash = new HashMap<>();
     pivotB_hash.put("X", jointToParent.getPivotA().getX());
-    pivotB_hash.put("Y", jointToParent.getPivotA().getX());
-    pivotB_hash.put("Z", jointToParent.getPivotA().getX());
+    pivotB_hash.put("Y", jointToParent.getPivotA().getY());
+    pivotB_hash.put("Z", jointToParent.getPivotA().getZ());
 
     HashMap<String, Object> joint_hash = new HashMap<>();
     joint_hash.put("PivotA", pivotA_hash);
     joint_hash.put("PivotB", pivotB_hash);
-
-    for (Field field : jointToParent.getClass().getDeclaredFields()) {
-      if (Modifier.isProtected(field.getModifiers())
-          && (field.getName().startsWith("axis"))
-          ) {
-        field.setAccessible(true);
-        Object value = null;
-        try {
-          value = field.get(jointToParent);
-        } catch (IllegalAccessException e) {
-          e.printStackTrace();
-        }
-        if (value != null) {
-          Vector3f vect_value = (Vector3f) value;
-          HashMap<String, Float> axis_hash = new HashMap<>();
-          axis_hash.put("X", vect_value.getX());
-          axis_hash.put("Y", vect_value.getY());
-          axis_hash.put("Z", vect_value.getZ());
-
-          joint_hash.put(field.getName(), axis_hash);
-        }
-      }
-    }
+    joint_hash.put("AxisA", jointAxisA);
+    joint_hash.put("AxisB", jointAxisB);
 
     return joint_hash;
   }
 
+  /**
+   * Convert neuron table to hash format for JSON dna
+   * @return        Hashmap of neurons
+   */
   private HashMap<Integer, Object> getNeuronTableHash() {
     HashMap<Integer, Object> neuron_hash = new HashMap<>();
     int i = 0;

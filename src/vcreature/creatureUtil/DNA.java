@@ -14,7 +14,6 @@ import java.util.HashMap;
  * JSON code from Sean, decoupled from creature class.
  * Contains static methods for dealing with JSON Objects.
  */
-//TODO Enum of what each vector 3 stands for, ordered by index of vector.
 public class DNA
 {
   //  public void buildFromJSON(JSONObject json) {
@@ -42,20 +41,32 @@ public class DNA
     HashMap<String, Object> character_hash = new HashMap<>();
     int size = c.getNumberOfBodyBlocks();
     character_hash.put("number_of_blocks", size);
-
-
-    Block part;
     ArrayList<HashMap<String, Object>> body_details = new ArrayList<>();
-    for(int i = 0; i < size; ++i)
-    {
-      part = c.getBlockByID(i);
-      body_details.add(part.toHash());
-    }
-
+    Block root;
+    root = c.getBlockByID(0);
+    getBlocks(root, body_details);
     character_hash.put("blocks", body_details);
+
+
     JSONObject json = new JSONObject(character_hash);
 
     return json;
+  }
+
+  /**
+   * Recursive function to populate the JSONObject with block info nested by
+   * parent child relationship.
+   * @param part        block in question for this level
+   * @return            block list.
+   */
+  private static void getBlocks(Block part, ArrayList<HashMap<String, Object>> partMap)
+  {
+    partMap.add(part.toHash());
+    ArrayList<Block> children = part.getChildList();
+    for(Block child : children)
+    {
+      getBlocks(child, partMap);
+    }
   }
 
   /**
