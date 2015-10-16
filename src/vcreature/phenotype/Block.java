@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.control.RigidBodyControl;
+import vcreature.creatureUtil.DNA;
 
 /**
  * The Class Block.
@@ -103,14 +104,6 @@ public class Block
     jointAxisB = axisB;
   }
 
-  /**
-   * Get pointer to list of children
-   * @return        ArrayList of children reference.
-   */
-  public ArrayList<Block> getChildList()
-  {
-    return childList;
-  }
   private void addChild(Block child) {childList.add(child);}
   
   public void setMaterial(Material mat)
@@ -137,7 +130,17 @@ public class Block
   
   public int getID() {return id;}
 
-  public int getIdOfParent(){ return parent.getID();}
+  public int getIdOfParent()
+  {
+    if(parent != null)
+    {
+      return parent.getID();
+    }
+    else
+    {
+      return -1;
+    }
+  }
   
 
   public float getSizeX() {return sizeX;}
@@ -147,7 +150,23 @@ public class Block
   
 
   public float getSize() {return sizeZ;}
-  
+
+  /**
+   * Populate the DNA's Size and shape array with all the right vectors.
+   * @param dna       sizeAndShape array from DNA => BlockDNA
+   */
+  public void populateVectorDNA(Vector3f[] dna)
+  {
+    dna[DNA.BlockVector.CENTER.ordinal()] = startCenter;
+    dna[DNA.BlockVector.SIZE.ordinal()] = new Vector3f(sizeX, sizeY, sizeZ);
+    if(jointToParent != null)
+    {
+      dna[DNA.BlockVector.JOINT_A.ordinal()] = jointToParent.getPivotA();
+      dna[DNA.BlockVector.JOINT_B.ordinal()] = jointToParent.getPivotB();
+      dna[DNA.BlockVector.AXIS_A.ordinal()] = jointAxisA;
+      dna[DNA.BlockVector.AXIS_B.ordinal()] = jointAxisB;
+    }
+  }
   public ArrayList<Neuron> getNeuronTable() { return neuronTable;}
   
   
@@ -192,12 +211,14 @@ public class Block
       part_hash.put("joint", getJointHash());
     }
     part_hash.put("Neurons", getNeuronTableHash());
+    /*
     ArrayList<HashMap<String, Object>> children = new ArrayList<>();
     for(Block child : childList)
     {
       children.add(child.toHash());
     }
     part_hash.put("children_" + id, children);
+    */
     return part_hash;
   }
 
