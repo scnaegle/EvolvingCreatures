@@ -8,8 +8,10 @@ import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import org.json.JSONObject;
+import vcreature.creatureUtil.CreatureConstants;
 import vcreature.creatureUtil.JSONHandler;
 import vcreature.creatureUtil.RandomCreature;
+import vcreature.phenotype.Creature;
 import vcreature.phenotype.OurCreature;
 import vcreature.phenotype.PhysicsConstants;
 import vcreature.phenotype.Block;
@@ -66,17 +68,17 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--headless", description = "If this flag is present then it will Run the GA in headless mode with no GUI")
   boolean headless = false;
 
-  @Parameter(names = "--thead-count", description = "Number of threads to use, defaults to 1")
-  int thread_count = 1;
+  @Parameter(names = "--thread-count", description = "Number of threads to use, defaults to 1")
+  static int thread_count = 1;
 
   @Parameter(names = "--viewing-thread", description = "What thread you are currently viewing")
-  int viewing_thread = 1;
+  static int viewing_thread = 1;
 
   @Parameter(names = "--population-count", description = "Starting number of Genomes in the population")
-  int starting_population_count = 100;
+  static int starting_population_count = 100;
 
   @Parameter(names = "--max-num-blocks", description = "Maximum number of blocks for a creature")
-  int max_num_blocks = 10;
+  public static int max_num_blocks = 10;
 
   @Parameter(names = "--output-frequency", description = "Defines how often we dump the Genomes to a log defined by number of seconds.")
   int output_frequency = 300;
@@ -175,7 +177,29 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     flyCam.setDragToRotate(true);
 
+    if (debug) {
+      showSettings();
+    }
+    setCreatureConstants();
 
+  }
+
+  private void showSettings() {
+    System.out.println("verbose: " + verbose);
+    System.out.println("headless: " + headless);
+    System.out.println("thread_count: " + thread_count);
+    System.out.println("viewing_thread: " + viewing_thread);
+    System.out.println("starting_population_count: " + starting_population_count);
+    System.out.println("max number of blocks:" + max_num_blocks);
+    System.out.println("output frequency: " + output_frequency);
+    System.out.println("output file: " + output_file);
+    System.out.println("input: " + input_file);
+    System.out.println("debug: " + debug);
+  }
+
+  private void setCreatureConstants() {
+    CreatureConstants.MAX_BLOCKS = max_num_blocks;
+    CreatureConstants.MAX_POPULATION = starting_population_count;
   }
 
   private void initLighting()
