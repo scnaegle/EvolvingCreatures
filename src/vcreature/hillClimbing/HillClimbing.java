@@ -1,4 +1,4 @@
-//TODO: deepClone methods want method to do copying for me instead of in hillClimb DO FIRST
+//TODO: 1st mutateBlocks
 
 package vcreature.hillClimbing;
 
@@ -29,9 +29,6 @@ public class HillClimbing
   private final int NEURON_COUNT = Neuron.TOTAL_INPUTS;
 
   //TODO: mock fitness test
-  //TODO: need to select random block to do mutation on
-  //TODO: if block is child, need to check if we will mutate a child's child and so on
-  //TODO: will want to mutate HCFlappyBird for testing, and see if GUI will update it
   //TODO: to start, want to print out creature info to see if HillClimbing is changing creature
 
   //TODO: take in arraylist of creatures, population
@@ -70,6 +67,47 @@ public class HillClimbing
   }
 
   /**
+   * Will add a new block that is an exact copy of originalBlock
+   * to the creature being modified
+   * @param originalBlock from the creature
+   * @param center of the new block
+   * @param size of the new block
+   */
+  private void deepCopyBlock(Block originalBlock, Vector3f center, Vector3f size)
+  {
+    Block parent = randomCreature.getBlockByID(originalBlock.getIdOfParent());
+    Vector3f pivotA = new Vector3f(originalBlock.getJoint().getPivotA());
+    Vector3f pivotB = new Vector3f(originalBlock.getJoint().getPivotB());
+    Block block = randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
+
+    Neuron neuron;
+    EnumNeuronInput a;
+    EnumNeuronInput b;
+    EnumNeuronInput c;
+    EnumNeuronInput d;
+    EnumNeuronInput e;
+
+    //loop through neuron table
+    for(Neuron blockNeuron : originalBlock.getNeuronTable())
+    {
+      a = blockNeuron.getInputType(0);
+      b = blockNeuron.getInputType(1);
+      c = blockNeuron.getInputType(2);
+      d = blockNeuron.getInputType(3);
+      e = blockNeuron.getInputType(4);
+      neuron = new Neuron(a,b,c,d,e);
+
+      for(int j = 0; j < NEURON_COUNT; j++)
+      {
+        neuron.setInputValue(j, blockNeuron.getInputValue(j));
+      }
+
+      block.addNeuron(neuron);
+
+    }
+  }
+
+  /**
    * Mutates the structure of a block
    * Copies all other components of the sample creature
    * from the population that isn't being changed
@@ -79,18 +117,8 @@ public class HillClimbing
   private void mutateBlockStructure(Creature sample, int targetBlockID)
   {
     Block currentBlock;
-    Block block;
-    Block parent;
     Vector3f center;
     Vector3f size;
-    Vector3f pivotA;
-    Vector3f pivotB;
-    Neuron neuron;
-    EnumNeuronInput a;
-    EnumNeuronInput b;
-    EnumNeuronInput c;
-    EnumNeuronInput d;
-    EnumNeuronInput e;
     float sizeX;
     float sizeY;
     float sizeZ;
@@ -111,28 +139,7 @@ public class HillClimbing
       {
         if(i != 0)
         {
-          parent = randomCreature.getBlockByID(currentBlock.getIdOfParent());
-          pivotA = new Vector3f(currentBlock.getJoint().getPivotA());
-          pivotB = new Vector3f(currentBlock.getJoint().getPivotB());
-          block = randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
-          //loop through neuron table
-          for(Neuron blockNeuron : currentBlock.getNeuronTable())
-          {
-            a = blockNeuron.getInputType(0);
-            b = blockNeuron.getInputType(1);
-            c = blockNeuron.getInputType(2);
-            d = blockNeuron.getInputType(3);
-            e = blockNeuron.getInputType(4);
-            neuron = new Neuron(a,b,c,d,e);
-
-            for(int j = 0; j < NEURON_COUNT; j++)
-            {
-              neuron.setInputValue(j, blockNeuron.getInputValue(j));
-            }
-
-            block.addNeuron(neuron);
-
-          }
+          deepCopyBlock(currentBlock,center,size);
         }
         else randomCreature.addRoot(center,size);
       }
@@ -141,28 +148,7 @@ public class HillClimbing
         if(i == 0) randomCreature.addRoot(center,size);
         else
         {
-          parent = randomCreature.getBlockByID(currentBlock.getIdOfParent());
-          pivotA = new Vector3f(currentBlock.getJoint().getPivotA());
-          pivotB = new Vector3f(currentBlock.getJoint().getPivotB());
-          block = randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
-          //loop through neuron table
-          for(Neuron blockNeuron : currentBlock.getNeuronTable())
-          {
-            a = blockNeuron.getInputType(0);
-            b = blockNeuron.getInputType(1);
-            c = blockNeuron.getInputType(2);
-            d = blockNeuron.getInputType(3);
-            e = blockNeuron.getInputType(4);
-            neuron = new Neuron(a,b,c,d,e);
-
-            for(int j = 0; j < NEURON_COUNT; j++)
-            {
-              neuron.setInputValue(j,blockNeuron.getInputValue(j));
-            }
-
-            block.addNeuron(neuron);
-
-          }
+          deepCopyBlock(currentBlock,center,size);
         }
       }
     }
