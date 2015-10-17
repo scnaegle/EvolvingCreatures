@@ -69,11 +69,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--thead-count", description = "Number of threads to use, defaults to 1")
   int thread_count = 1;
 
+  @Parameter(names = "--viewing-thread", description = "What thread you are currently viewing")
+  int viewing_thread = 1;
+
   @Parameter(names = "--population-count", description = "Starting number of Genomes in the population")
   int starting_population_count = 100;
 
-  @Parameter(names = "--viewing-thread", description = "What thread you are currently viewing")
-  int viewing_thread = 1;
+  @Parameter(names = "--max-num-blocks", description = "Maximum number of blocks for a creature")
+  int max_num_blocks = 10;
 
   @Parameter(names = "--output-frequency", description = "Defines how often we dump the Genomes to a log defined by number of seconds.")
   int output_frequency = 300;
