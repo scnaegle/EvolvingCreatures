@@ -1,3 +1,5 @@
+//TODO: deepClone methods want method to do copying for me instead of in hillClimb DO FIRST
+
 package vcreature.hillClimbing;
 
 import com.jme3.bullet.PhysicsSpace;
@@ -76,7 +78,6 @@ public class HillClimbing
    */
   private void mutateBlockStructure(Creature sample, int targetBlockID)
   {
-    //TODO: deepClone methods want method to do copying for me instead of in here
     Block currentBlock;
     Block block;
     Block parent;
