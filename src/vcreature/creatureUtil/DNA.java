@@ -54,12 +54,18 @@ public class DNA
   }
 
   /**
-   * Get number of blocks in DNA
-   * @return        number of blocks in DNA.
+   * Adjust the height of the creature.  Change the y values of
+   * vectors that control creature's initial location
+   * @param deltaY        amount to change by.
    */
-  public int getNumBlocks()
+  public void changeYLocations(float deltaY)
   {
-    return numBlocks;
+    for(BlockDNA b : blockDNAs)
+    {
+      b.sizeAndShape[BlockVector.CENTER.ordinal()].y += deltaY;
+      b.sizeAndShape[BlockVector.JOINT_A.ordinal()].y += deltaY;
+      b.sizeAndShape[BlockVector.JOINT_B.ordinal()].y += deltaY;
+    }
   }
 
   /**
