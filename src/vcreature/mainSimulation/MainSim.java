@@ -63,31 +63,31 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private boolean help;
 
   @Parameter(names = { "--log", "--verbose" }, description = "Level of verbosity")
-  Integer verbose = 1;
+  public static Integer verbose = 1;
 
   @Parameter(names = "--headless", description = "If this flag is present then it will Run the GA in headless mode with no GUI")
   boolean headless = false;
 
   @Parameter(names = "--thread-count", description = "Number of threads to use, defaults to 1")
-  static int thread_count = 1;
+  public static int thread_count = 1;
 
   @Parameter(names = "--viewing-thread", description = "What thread you are currently viewing")
-  static int viewing_thread = 1;
+  public static int viewing_thread = 1;
 
   @Parameter(names = "--population-count", description = "Starting number of Genomes in the population")
-  static int starting_population_count = 100;
+  int starting_population_count = 100;
 
   @Parameter(names = "--max-num-blocks", description = "Maximum number of blocks for a creature")
-  public static int max_num_blocks = 10;
+  int max_num_blocks = 10;
 
   @Parameter(names = "--output-frequency", description = "Defines how often we dump the Genomes to a log defined by number of seconds.")
-  int output_frequency = 300;
+  public static int output_frequency = 300;
 
   @Parameter(names = "--output", description = "File that you woud like to output to")
-  String output_file = "dna_out.txt";
+  public static String output_file = "dna_out.txt";
 
   @Parameter(names = "--input", description = "Input file to start the Genetic Algorithm")
-  String input_file = null;
+  public static String input_file = null;
 
   @Parameter(names = "--debug", description = "Debug mode")
   boolean debug = false;
