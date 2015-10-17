@@ -7,6 +7,7 @@ import vcreature.creatureUtil.DNA;
 import vcreature.creatureUtil.RandomCreature;
 import vcreature.phenotype.Block;
 import vcreature.phenotype.Creature;
+import vcreature.phenotype.EnumNeuronInput;
 import vcreature.phenotype.Neuron;
 
 import java.util.Random;
@@ -23,7 +24,7 @@ public class HillClimbing
   private Node rootNode;
   private Random generator;
   private DNA dna;
-  private final int NEURON_COUNT = 5;
+  private final int NEURON_COUNT = Neuron.TOTAL_INPUTS;
 
   //TODO: mock fitness test
   //TODO: need to select random block to do mutation on
@@ -75,12 +76,20 @@ public class HillClimbing
    */
   private void mutateBlockStructure(Creature sample, int targetBlockID)
   {
+    //TODO: deepClone methods want method to do copying for me instead of in here
     Block currentBlock;
+    Block block;
     Block parent;
     Vector3f center;
     Vector3f size;
     Vector3f pivotA;
     Vector3f pivotB;
+    Neuron neuron;
+    EnumNeuronInput a;
+    EnumNeuronInput b;
+    EnumNeuronInput c;
+    EnumNeuronInput d;
+    EnumNeuronInput e;
     float sizeX;
     float sizeY;
     float sizeZ;
@@ -97,33 +106,34 @@ public class HillClimbing
       center = new Vector3f(dna.getBlockCenter(i));
       size = new Vector3f(sizeX,sizeY,sizeZ);
 
-      //currentBlock.setMaterial(Block.MATERIAL_BROWN);
-      if(i != targetBlockID)//change back to i != targetID
+      if(i != targetBlockID)
       {
         if(i != 0)
         {
           parent = randomCreature.getBlockByID(currentBlock.getIdOfParent());
           pivotA = new Vector3f(currentBlock.getJoint().getPivotA());
           pivotB = new Vector3f(currentBlock.getJoint().getPivotB());
-          randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
+          block = randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
           //loop through neuron table
-          /*for(Neuron neuron : currentBlock.getNeuronTable())
+          for(Neuron blockNeuron : currentBlock.getNeuronTable())
           {
-            neuron.get
-          }*/
+            a = blockNeuron.getInputType(0);
+            b = blockNeuron.getInputType(1);
+            c = blockNeuron.getInputType(2);
+            d = blockNeuron.getInputType(3);
+            e = blockNeuron.getInputType(4);
+            neuron = new Neuron(a,b,c,d,e);
+
+            for(int j = 0; j < NEURON_COUNT; j++)
+            {
+              neuron.setInputValue(j, blockNeuron.getInputValue(j));
+            }
+
+            block.addNeuron(neuron);
+
+          }
         }
         else randomCreature.addRoot(center,size);
-        /*center = new Vector3f(currentBlock.getStartCenter());
-        size = new Vector3f(currentBlock.getSizeX()/2,currentBlock.getSizeY()/2,currentBlock.getSize()/2);
-        if(i == 0) mutatedCreature.addRoot(center,size);
-        else
-        {
-          parent = sample.getBlockByID(currentBlock.getIdOfParent());
-          pivotA = currentBlock.getJoint().getPivotA();
-          pivotB = currentBlock.getJoint().getPivotB();
-          mutatedCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
-          mutatedCreature.getBlockByID(i).setMaterial(Block.MATERIAL_BROWN);
-        }*/
       }
       else//Mutate Block here
       {
@@ -133,7 +143,25 @@ public class HillClimbing
           parent = randomCreature.getBlockByID(currentBlock.getIdOfParent());
           pivotA = new Vector3f(currentBlock.getJoint().getPivotA());
           pivotB = new Vector3f(currentBlock.getJoint().getPivotB());
-          randomCreature.addBlock(center, size, parent, pivotA, pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+          block = randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
+          //loop through neuron table
+          for(Neuron blockNeuron : currentBlock.getNeuronTable())
+          {
+            a = blockNeuron.getInputType(0);
+            b = blockNeuron.getInputType(1);
+            c = blockNeuron.getInputType(2);
+            d = blockNeuron.getInputType(3);
+            e = blockNeuron.getInputType(4);
+            neuron = new Neuron(a,b,c,d,e);
+
+            for(int j = 0; j < NEURON_COUNT; j++)
+            {
+              neuron.setInputValue(j,blockNeuron.getInputValue(j));
+            }
+
+            block.addNeuron(neuron);
+
+          }
         }
       }
     }

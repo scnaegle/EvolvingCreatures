@@ -43,7 +43,7 @@ public class RandomCreature extends Creature
     super(physicsSpace, jMonkeyRootNode);
     centerList = new ArrayList<Vector3f>();
 
-    int blockNumber = rand.nextInt(DNA.MAX_BLOCKS);
+   /* int blockNumber = rand.nextInt(DNA.MAX_BLOCKS);
 
     makeRoot();
 
@@ -51,7 +51,7 @@ public class RandomCreature extends Creature
     {
       int parentBlock = rand.nextInt(getNumberOfBodyBlocks());
       addRandomBlock(parentBlock);
-    }
+    }*/
 
   }
 
