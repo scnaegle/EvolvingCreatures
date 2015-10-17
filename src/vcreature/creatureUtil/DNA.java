@@ -2,6 +2,7 @@ package vcreature.creatureUtil;
 
 
 import com.jme3.math.Vector3f;
+import vcreature.mainSimulation.MainSim;
 import vcreature.phenotype.Block;
 import vcreature.phenotype.Creature;
 import vcreature.phenotype.EnumNeuronInput;
@@ -26,7 +27,6 @@ public class DNA
    */
   public enum BlockVector{CENTER, SIZE, JOINT_A, JOINT_B, AXIS_A, AXIS_B}
 
-  public static final int MAX_BLOCKS = 10;
   private int numBlocks;
   private int length; //TODO calculate in constructor.
   private BlockDNA[] blockDNAs;
@@ -36,7 +36,7 @@ public class DNA
    */
   public DNA()
   {
-    blockDNAs = new BlockDNA[MAX_BLOCKS];
+    blockDNAs = new BlockDNA[CreatureConstants.MAX_BLOCKS];
   }
 
   /**
@@ -45,7 +45,7 @@ public class DNA
    */
   public DNA(Creature c)
   {
-    blockDNAs = new BlockDNA[MAX_BLOCKS];
+    blockDNAs = new BlockDNA[CreatureConstants.MAX_BLOCKS];
     numBlocks = c.getNumberOfBodyBlocks();
     for(int i = 0; i < numBlocks; ++i)
     {
@@ -70,7 +70,7 @@ public class DNA
   {
     //create root block
     c.addRoot(newVector(0, BlockVector.CENTER), newVector(0, BlockVector.SIZE));
-    for(int i = 1; i < MAX_BLOCKS; ++i)
+    for(int i = 1; i < CreatureConstants.MAX_BLOCKS; ++i)
     {
       //if there is dna, and it's parent exists, add block
       if(blockDNAs[i] != null && c.getBlockByID(blockDNAs[i].parentID) != null)
