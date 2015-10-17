@@ -3,6 +3,9 @@ package vcreature.mainSimulation;
 
 import com.beust.jcommander.JCommander;
 import com.jme3.system.JmeContext;
+import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import org.json.JSONObject;
 import vcreature.creatureUtil.JSONHandler;
@@ -33,6 +36,7 @@ import com.jme3.system.AppSettings;
 import vcreature.creatureUtil.DNA;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 //Added 10/14/2015 justin thomas
@@ -83,6 +87,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "-debug", description = "Debug mode")
   private boolean debug = false;
 
+  public ArrayList<Integer> thread_count_selections = new ArrayList<>(Arrays.asList(1, 2, 4, 8, 16, 32));
+  public ArrayList<Integer> thread_selections = new ArrayList<>();
 
   private BulletAppState bulletAppState;
   private PhysicsSpace physicsSpace;
@@ -301,6 +307,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    */
   private void initializeGUI()
   {
+    for(int i = 1; i <= 32; i++)
+    {
+      thread_selections.add(i);
+    }
+
     //Begin GUI setup
     NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager,
         inputManager,
@@ -312,9 +323,34 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     guiViewPort.addProcessor(niftyDisplay);
   }
 
+  public void updateSettings() {
+//    nifty.gotoScreen("hud");
+  }
+
+
   //=====begin ScreenController implementation================================
   public void bind(Nifty nifty, Screen screen) {
+    ListBox thread_count_box = screen.findNiftyControl("threadCountSelectionBox", ListBox.class);
+    for(int t : thread_count_selections) {
+      thread_count_box.addItem(t);
+    }
+    ListBox thread_view_box = screen.findNiftyControl("threadViewSelectionBox", ListBox.class);
+    for(int t : thread_selections) {
+      thread_view_box.addItem(t);
+    }
     System.out.println("bind( " + screen.getScreenId() + ")");
+  }
+
+  @NiftyEventSubscriber(id = "threadCountSelectionBox")
+  public void onThreadCountSelectionBoxChanged(final String id, final ListBoxSelectionChangedEvent<String> event) {
+    List<String> selection = event.getSelection();
+    thread_count = Integer.parseInt(selection.get(0));
+  }
+
+  @NiftyEventSubscriber(id = "threadViewSelectionBox")
+  public void onThreadViewSelectionBoxChanged(final String id, final ListBoxSelectionChangedEvent<String> event) {
+    List<String> selection = event.getSelection();
+    viewing_thread = Integer.parseInt(selection.get(0));
   }
 
   public void onStartScreen() {

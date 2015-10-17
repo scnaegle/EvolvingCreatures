@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
+    <useStyles filename="nifty-default-styles.xml" />
+    <useControls filename="nifty-default-controls.xml" />
     <screen id="hud" controller="vcreature.mainSimulation.MainSim">
 
         <layer id="foreground" backgroundColor="#0000" childLayout="vertical">
-            <panel id="info_panel" width="20%" height="50%" childLayout="vertical"
-                   backgroundColor="#00f8" >
+            <panel id="info_panel" width="20%" height="50%" childLayout="vertical" backgroundColor="#00f8" >
                 <text text="HelloGUI" font="Interface/Fonts/Default.fnt" width="100%" height="100%" valign="top" style="top:0px" />
-                <control name="label" text="Select cube color" align="left" valign="top"/>
-                <control id="colorSelectionBox" width="60%" height="90%" align="left" valign="center" name="listBox"
-                         vertical="optional" horizontal="optional" displayItems="3" selectionMode="Single" forceSelection = "true" />
-                <control name="button" label="Submit" id="SubmitButton" width="100%" height="100%" align="right" valign="top">
-                    <interact onClick="updateSettings()" />
-                </control>
+                <control name="label" text="Select number of threads" align="left" valign="top"/>
+                <control id="threadCountSelectionBox" width="60%" height="90%" align="left" valign="center" name="listBox"
+                         vertical="optional" horizontal="optional" displayItems="6" selectionMode="Single" forceSelection = "true" />
+                <control name="label" text="Select thread to view" align="left" valign="top"/>
+                <control id="threadViewSelectionBox" width="60%" height="90%" align="left" valign="center" name="listBox"
+                         vertical="optional" horizontal="optional" displayItems="6" selectionMode="Single" forceSelection = "true" />
+                <control name="button" label="Submit" id="SubmitButton" width="100%" height="100%" align="right" />
             </panel>
             <panel id="fitness_params" width="20%" height="50%" childLayout="vertical" backgroundColor="#00f8">
                 <text text="Fitness: 0.0" id="fitness_text" font="Interface/Fonts/Default.fnt" width="100%" height="100%" align="right" />
