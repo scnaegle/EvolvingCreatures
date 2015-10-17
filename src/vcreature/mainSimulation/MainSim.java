@@ -61,34 +61,31 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private boolean help;
 
   @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
-  private Integer verbose = 1;
+  Integer verbose = 1;
 
   @Parameter(names = "--headless", description = "If this flag is present then it will Run the GA in headless mode with no GUI")
-  private boolean headless = false;
+  boolean headless = false;
 
   @Parameter(names = "--thead-count", description = "Number of threads to use, defaults to 1")
-  private int thread_count = 1;
+  int thread_count = 1;
 
   @Parameter(names = "--population-count", description = "Starting number of Genomes in the population")
-  private int starting_population_count = 100;
+  int starting_population_count = 100;
 
   @Parameter(names = "--viewing-thread", description = "What thread you are currently viewing")
-  private int viewing_thread = 1;
+  int viewing_thread = 1;
 
   @Parameter(names = "--output-frequency", description = "Defines how often we dump the Genomes to a log defined by number of seconds.")
-  private int output_frequency = 300;
+  int output_frequency = 300;
 
   @Parameter(names = "--output", description = "File that you woud like to output to")
-  private String output_file = "dna_out.txt";
+  String output_file = "dna_out.txt";
 
   @Parameter(names = "--input", description = "Input file to start the Genetic Algorithm")
-  private String input_file = null;
+  String input_file = null;
 
   @Parameter(names = "-debug", description = "Debug mode")
-  private boolean debug = false;
-
-  public ArrayList<Integer> thread_count_selections = new ArrayList<>(Arrays.asList(1, 2, 4, 8, 16, 32));
-  public ArrayList<Integer> thread_selections = new ArrayList<>();
+  boolean debug = false;
 
   private BulletAppState bulletAppState;
   private PhysicsSpace physicsSpace;
@@ -307,18 +304,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    */
   private void initializeGUI()
   {
-    for(int i = 1; i <= 32; i++)
-    {
-      thread_selections.add(i);
-    }
-
     //Begin GUI setup
     NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager,
         inputManager,
         audioRenderer,
         guiViewPort);
     nifty = niftyDisplay.getNifty();
-    nifty.fromXml("Interface/gaGUI.xml", "hud", this);
+    NiftySelectController controller = new NiftySelectController(this);
+    nifty.fromXml("Interface/gaGUI.xml", "hud", controller);
     // attach the nifty display to the gui view port as a processor
     guiViewPort.addProcessor(niftyDisplay);
   }
@@ -327,30 +320,17 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 //    nifty.gotoScreen("hud");
   }
 
+  public void setThreadCount(int thread_count) {
+    this.thread_count = thread_count;
+  }
+
+  public void setViewingThread(int viewing_thread) {
+    this.viewing_thread = viewing_thread;
+  }
 
   //=====begin ScreenController implementation================================
   public void bind(Nifty nifty, Screen screen) {
-    ListBox thread_count_box = screen.findNiftyControl("threadCountSelectionBox", ListBox.class);
-    for(int t : thread_count_selections) {
-      thread_count_box.addItem(t);
-    }
-    ListBox thread_view_box = screen.findNiftyControl("threadViewSelectionBox", ListBox.class);
-    for(int t : thread_selections) {
-      thread_view_box.addItem(t);
-    }
     System.out.println("bind( " + screen.getScreenId() + ")");
-  }
-
-  @NiftyEventSubscriber(id = "threadCountSelectionBox")
-  public void onThreadCountSelectionBoxChanged(final String id, final ListBoxSelectionChangedEvent<String> event) {
-    List<String> selection = event.getSelection();
-    thread_count = Integer.parseInt(selection.get(0));
-  }
-
-  @NiftyEventSubscriber(id = "threadViewSelectionBox")
-  public void onThreadViewSelectionBoxChanged(final String id, final ListBoxSelectionChangedEvent<String> event) {
-    List<String> selection = event.getSelection();
-    viewing_thread = Integer.parseInt(selection.get(0));
   }
 
   public void onStartScreen() {
