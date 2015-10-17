@@ -68,10 +68,12 @@ public class DNA
    */
   public void initializeCreature(Creature c)
   {
+    //create root block
     c.addRoot(newVector(0, BlockVector.CENTER), newVector(0, BlockVector.SIZE));
     for(int i = 1; i < MAX_BLOCKS; ++i)
     {
-      if(blockDNAs[i] != null)
+      //if there is dna, and it's parent exists, add block
+      if(blockDNAs[i] != null && c.getBlockByID(blockDNAs[i].parentID) != null)
       {
         c.addBlock(newVector(i, BlockVector.CENTER),
                     newVector(i, BlockVector.SIZE),
