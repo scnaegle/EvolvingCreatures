@@ -2,9 +2,7 @@ package vcreature.mainSimulation;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.controls.DropDown;
-import de.lessvoid.nifty.controls.ListBox;
-import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
+import de.lessvoid.nifty.controls.*;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 
@@ -35,6 +33,10 @@ public class NiftySelectController implements ScreenController
     for(int i = 1; i <= app.thread_count; i++) {
       thread_view_box.addItem(i);
     }
+    Slider speed_slider = screen.findNiftyControl("speedSlider", Slider.class);
+    speed_slider.setMin(1);
+    speed_slider.setMax(50);
+    speed_slider.setButtonStepSize(5);
   }
 
   @NiftyEventSubscriber(id = "threadCountSelectionBox")
@@ -55,6 +57,14 @@ public class NiftySelectController implements ScreenController
       System.out.println("Thread Count Selection class: " + selection.get(0).getClass());
     }
     app.setViewingThread(selection.get(0));
+  }
+
+  @NiftyEventSubscriber(id = "speedSlider")
+  public void onSpeedSliderChanged(final String id, final SliderChangedEvent event) {
+    if (app.debug) {
+      System.out.println("speed selection: " + event.getValue());
+    }
+    app.setSpeed((int)event.getValue());
   }
 
   @Override

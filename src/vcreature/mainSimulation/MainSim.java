@@ -344,6 +344,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     this.viewing_thread = viewing_thread;
   }
 
+  public void setSpeed(int speed) {
+    this.speed = speed;
+    physicsSpace.setMaxSubSteps(speed * 4);
+  }
+
   //=====begin ScreenController implementation================================
   public void bind(Nifty nifty, Screen screen) {
     System.out.println("bind( " + screen.getScreenId() + ")");
