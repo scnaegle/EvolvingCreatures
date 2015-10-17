@@ -16,7 +16,6 @@ import java.util.ArrayList;
  * Will have a deep copy method/constructor.
  */
 
-//TODO Enum of what each vector 3 stands for, ordered by index of vector.
 public class DNA
 {
   /*
