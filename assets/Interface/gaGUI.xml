@@ -20,6 +20,8 @@
                  forceSelection="true"/>
 
         <control name="label" text="Choose Speed:" align="left" valign="top" />
+        <control id="speedSlider" width="100%" align="left" valign="center" name="horizontalSlider"
+                 vertical="optional" horizontal="optional" forceSelection="true" />
 
         <control name="button" label="Submit" id="SubmitButton" align="right"/>
       </panel>
