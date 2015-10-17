@@ -69,6 +69,18 @@ public class DNA
   }
 
   /**
+   * Get center coordinates for a block.  This vector is separate from the
+   * creature structure.
+   * @param blockID       int BlockID
+   * @return              Vector3f center coordinates
+   */
+  public Vector3f getBlockCenter(int blockID)
+  {
+    return blockDNAs[blockID].sizeAndShape[BlockVector.CENTER.ordinal()];
+  }
+
+
+  /**
    * Build creature with DNA
    * @param c       Creature to build.
    */
