@@ -163,7 +163,7 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
     //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
     myCreature.updateBrain(elapsedSimulationTime);
 
-    System.out.println("Max Fitness: " + myCreature.getFitness());
+    //System.out.println("Max Fitness: " + myCreature.getFitness());
 
     if (isCameraRotating)
     {
