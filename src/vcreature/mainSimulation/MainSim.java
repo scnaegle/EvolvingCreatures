@@ -60,7 +60,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = {"-h", "--help"}, description = "Shows the help text", help = true)
   private boolean help;
 
-  @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
+  @Parameter(names = { "--log", "--verbose" }, description = "Level of verbosity")
   Integer verbose = 1;
 
   @Parameter(names = "--headless", description = "If this flag is present then it will Run the GA in headless mode with no GUI")
@@ -84,7 +84,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--input", description = "Input file to start the Genetic Algorithm")
   String input_file = null;
 
-  @Parameter(names = "-debug", description = "Debug mode")
+  @Parameter(names = "--debug", description = "Debug mode")
   boolean debug = false;
 
   private BulletAppState bulletAppState;
@@ -116,9 +116,13 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     physicsSpace.setGravity(PhysicsConstants.GRAVITY);
     physicsSpace.setAccuracy(PhysicsConstants.PHYSICS_UPDATE_RATE);
-    physicsSpace.setMaxSubSteps(50);
-//    speed = 20;
-    speed = 1;
+    if (headless) {
+      physicsSpace.setMaxSubSteps(50);
+      speed = 20;
+    } else {
+      physicsSpace.setMaxSubSteps(4);
+      speed = 1;
+    }
 
    
 
@@ -318,6 +322,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     nifty = niftyDisplay.getNifty();
     NiftySelectController controller = new NiftySelectController(this);
     nifty.fromXml("Interface/gaGUI.xml", "hud", controller);
+    if (debug) {
+      nifty.setDebugOptionPanelColors(true);
+    }
     // attach the nifty display to the gui view port as a processor
     guiViewPort.addProcessor(niftyDisplay);
   }

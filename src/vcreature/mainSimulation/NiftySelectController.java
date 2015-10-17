@@ -2,6 +2,7 @@ package vcreature.mainSimulation;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.screen.Screen;
@@ -26,26 +27,34 @@ public class NiftySelectController implements ScreenController
   @Override
   public void bind(Nifty nifty, Screen screen)
   {
-    ListBox thread_count_box = screen.findNiftyControl("threadCountSelectionBox", ListBox.class);
+    DropDown thread_count_box = screen.findNiftyControl("threadCountSelectionBox", DropDown.class);
     for(int t : thread_count_selections) {
       thread_count_box.addItem(t);
     }
-    ListBox thread_view_box = screen.findNiftyControl("threadViewSelectionBox", ListBox.class);
+    DropDown thread_view_box = screen.findNiftyControl("threadViewSelectionBox", DropDown.class);
     for(int i = 1; i <= app.thread_count; i++) {
       thread_view_box.addItem(i);
     }
   }
 
   @NiftyEventSubscriber(id = "threadCountSelectionBox")
-  public void onThreadCountSelectionBoxChanged(final String id, final ListBoxSelectionChangedEvent<String> event) {
-    List<String> selection = event.getSelection();
-    app.setThreadCount(Integer.parseInt(selection.get(0)));
+  public void onThreadCountSelectionBoxChanged(final String id, final ListBoxSelectionChangedEvent<Integer> event) {
+    List<Integer> selection = event.getSelection();
+    if (app.debug) {
+      System.out.println("Thread Count Selection: " + selection.get(0));
+      System.out.println("Thread Count Selection class: " + selection.get(0).getClass());
+    }
+    app.setThreadCount(selection.get(0));
   }
 
   @NiftyEventSubscriber(id = "threadViewSelectionBox")
-  public void onThreadViewSelectionBoxChanged(final String id, final ListBoxSelectionChangedEvent<String> event) {
-    List<String> selection = event.getSelection();
-    app.setViewingThread(Integer.parseInt(selection.get(0)));
+  public void onThreadViewSelectionBoxChanged(final String id, final ListBoxSelectionChangedEvent<Integer> event) {
+    List<Integer> selection = event.getSelection();
+    if (app.debug) {
+      System.out.println("Thread View Selection: " + selection.get(0));
+      System.out.println("Thread Count Selection class: " + selection.get(0).getClass());
+    }
+    app.setViewingThread(selection.get(0));
   }
 
   @Override
