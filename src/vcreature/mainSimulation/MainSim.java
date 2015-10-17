@@ -226,11 +226,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
     ourCreature.updateBrain(elapsedSimulationTime);
 
-    //TODO put back: System.out.println("Max Fitness: " + myCreature.getFitness());
-    System.out.println("Max Fitness: " + ourCreature.getFitness());
-    de.lessvoid.nifty.elements.Element nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
-    //TODO put back: nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
-    nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + ourCreature.getFitness());
+    if (headless && debug)
+    {
+      System.out.println("Max Fitness: " + ourCreature.getFitness());
+    } else
+    {
+      de.lessvoid.nifty.elements.Element nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
+      nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + ourCreature.getFitness());
+    }
 
     if (isCameraRotating)
     {
@@ -288,8 +291,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     app.setShowSettings(false);
     app.setSettings(settings);
-//    app.start(JmeContext.Type.Headless);
-    app.start();
+    if (app.headless) {
+    app.start(JmeContext.Type.Headless);
+    } else {
+      app.start();
+    }
   }
 
   //============GUI Stuff======================================================
