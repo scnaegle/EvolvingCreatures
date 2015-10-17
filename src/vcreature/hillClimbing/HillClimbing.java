@@ -3,8 +3,11 @@ package vcreature.hillClimbing;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import vcreature.creatureUtil.DNA;
+import vcreature.creatureUtil.RandomCreature;
 import vcreature.phenotype.Block;
 import vcreature.phenotype.Creature;
+import vcreature.phenotype.Neuron;
 
 import java.util.Random;
 
@@ -13,22 +16,22 @@ import java.util.Random;
  */
 public class HillClimbing
 {
-  private Creature creature;
+  private Creature creature;//TODO: can remove after Hill Climbing is set to take in population
   private Creature mutatedCreature;
+  private Creature randomCreature;
   private PhysicsSpace physicsSpace;
   private Node rootNode;
   private Random generator;
+  private DNA dna;
+  private final int NEURON_COUNT = 5;
 
-  //TODO: change so HillClimbing can take in a population instead of a single creature
   //TODO: mock fitness test
   //TODO: need to select random block to do mutation on
   //TODO: if block is child, need to check if we will mutate a child's child and so on
   //TODO: will want to mutate HCFlappyBird for testing, and see if GUI will update it
   //TODO: to start, want to print out creature info to see if HillClimbing is changing creature
-  //NOTE: able to get blocks by their ID, ID seems to be the number they are added, getBlockByID will return that Block
-  //NOTE: Block.toString will print out Block[ID]: {size in X dir, size in Y dir, size in Z dir}, if not ROOT,
-  //then will print parent ID and the joint to that parent
 
+  //TODO: take in arraylist of creatures, population
   public HillClimbing(Creature sample, PhysicsSpace space, Node root)
   {
     creature = sample;
@@ -37,6 +40,7 @@ public class HillClimbing
     generator = new Random();
   }
 
+  //mock fitness test
   private int fitnessTest(Creature sample)
   {
     Block block;
@@ -62,17 +66,53 @@ public class HillClimbing
     return fitnessScore;
   }
 
+  /**
+   * Mutates the structure of a block
+   * Copies all other components of the sample creature
+   * from the population that isn't being changed
+   * @param sample single creature from the population
+   * @param targetBlockID the id for the block that will be mutated
+   */
   private void mutateBlockStructure(Creature sample, int targetBlockID)
   {
     Block currentBlock;
-    mutatedCreature = new HCFlappyBird(physicsSpace,rootNode);
+    Block parent;
+    Vector3f center;
+    Vector3f size;
+    Vector3f pivotA;
+    Vector3f pivotB;
+    float sizeX;
+    float sizeY;
+    float sizeZ;
 
-    for(int i = 0; i < mutatedCreature.getNumberOfBodyBlocks(); i++)
+    randomCreature = new Creature(physicsSpace,rootNode);
+    dna = new DNA(sample);
+
+    for(int i = 0; i < sample.getNumberOfBodyBlocks(); i++)
     {
-      currentBlock = mutatedCreature.getBlockByID(i);
-      currentBlock.setMaterial(Block.MATERIAL_BROWN);
-    //  if(i < sample.getNumberOfBodyBlocks())//change back to i != targetID
-     // {
+      currentBlock = sample.getBlockByID(i);
+      sizeX = currentBlock.getSizeX()/2;
+      sizeY = currentBlock.getSizeY()/2;
+      sizeZ = currentBlock.getSize()/2;
+      center = new Vector3f(dna.getBlockCenter(i));
+      size = new Vector3f(sizeX,sizeY,sizeZ);
+
+      //currentBlock.setMaterial(Block.MATERIAL_BROWN);
+      if(i != targetBlockID)//change back to i != targetID
+      {
+        if(i != 0)
+        {
+          parent = randomCreature.getBlockByID(currentBlock.getIdOfParent());
+          pivotA = new Vector3f(currentBlock.getJoint().getPivotA());
+          pivotB = new Vector3f(currentBlock.getJoint().getPivotB());
+          randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
+          //loop through neuron table
+          /*for(Neuron neuron : currentBlock.getNeuronTable())
+          {
+            neuron.get
+          }*/
+        }
+        else randomCreature.addRoot(center,size);
         /*center = new Vector3f(currentBlock.getStartCenter());
         size = new Vector3f(currentBlock.getSizeX()/2,currentBlock.getSizeY()/2,currentBlock.getSize()/2);
         if(i == 0) mutatedCreature.addRoot(center,size);
@@ -84,19 +124,38 @@ public class HillClimbing
           mutatedCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
           mutatedCreature.getBlockByID(i).setMaterial(Block.MATERIAL_BROWN);
         }*/
-     // }
+      }
+      else//Mutate Block here
+      {
+        if(i == 0) randomCreature.addRoot(center,size);
+        else
+        {
+          parent = randomCreature.getBlockByID(currentBlock.getIdOfParent());
+          pivotA = new Vector3f(currentBlock.getJoint().getPivotA());
+          pivotB = new Vector3f(currentBlock.getJoint().getPivotB());
+          randomCreature.addBlock(center, size, parent, pivotA, pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+        }
+      }
     }
   }
-//TODO: fix hillClimb
+
+  /**
+   * Will perform the hill climbing on the given population when called.
+   * TODO: will need it to go through the population
+   */
   public void hillClimb() {
     int blockID;
     final int MAX_NUM_BLOCKS = creature.getNumberOfBodyBlocks();
 
     blockID = generator.nextInt(MAX_NUM_BLOCKS);
-
     mutateBlockStructure(creature, blockID);
   }
 
-  public Creature getCreature(){return mutatedCreature;}//new HCFlappyBird(physicsSpace,rootNode);}
+  /**
+   * Grabs a creature from the hill climbing to show
+   * TODO: grap a random creature from population, or pick best fit one
+   * @return creature from this population
+   */
+  public Creature getCreature(){return randomCreature;}
 
 }
