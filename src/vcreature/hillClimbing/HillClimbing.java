@@ -64,20 +64,15 @@ public class HillClimbing
 
   private void mutateBlockStructure(Creature sample, int targetBlockID)
   {
-    Vector3f center;
-    Vector3f size;
-    Vector3f pivotA; //joint connection on parent block
-    Vector3f pivotB; //joint connection on current block
-
     Block currentBlock;
-    Block parent;
-    mutatedCreature = new Creature(physicsSpace,null);
+    mutatedCreature = new HCFlappyBird(physicsSpace,rootNode);
 
-    for(int i = 0; i < sample.getNumberOfBodyBlocks(); i++)
+    for(int i = 0; i < mutatedCreature.getNumberOfBodyBlocks(); i++)
     {
-      currentBlock = sample.getBlockByID(i);
-      if(i < sample.getNumberOfBodyBlocks())//change back to i != targetID
-      {
+      currentBlock = mutatedCreature.getBlockByID(i);
+      currentBlock.setMaterial(Block.MATERIAL_BROWN);
+    //  if(i < sample.getNumberOfBodyBlocks())//change back to i != targetID
+     // {
         /*center = new Vector3f(currentBlock.getStartCenter());
         size = new Vector3f(currentBlock.getSizeX()/2,currentBlock.getSizeY()/2,currentBlock.getSize()/2);
         if(i == 0) mutatedCreature.addRoot(center,size);
@@ -89,7 +84,7 @@ public class HillClimbing
           mutatedCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
           mutatedCreature.getBlockByID(i).setMaterial(Block.MATERIAL_BROWN);
         }*/
-      }
+     // }
     }
   }
 //TODO: fix hillClimb
@@ -102,6 +97,6 @@ public class HillClimbing
     mutateBlockStructure(creature, blockID);
   }
 
-  public Creature getCreature(){return mutatedCreature;}
+  public Creature getCreature(){return mutatedCreature;}//new HCFlappyBird(physicsSpace,rootNode);}
 
 }

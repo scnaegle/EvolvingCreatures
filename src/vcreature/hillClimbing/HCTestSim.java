@@ -177,13 +177,13 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
       cam.setLocation(tmpVec3);
       cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
     }
-    //hillClimbing.hillClimb();
-    //myCreature =(HCFlappyBird) hillClimbing.getCreature();
     //TODO: make myCreature be best creature from population
     if(myCreature.getFitness() < 20 && elapsedSimulationTime > 17.0f)
     {
+      hillClimbing.hillClimb();
+
       myCreature.remove();
-      myCreature = new RandomCreature(physicsSpace,rootNode);
+      myCreature = hillClimbing.getCreature();
       elapsedSimulationTime = 0.0f;
     }
   }
