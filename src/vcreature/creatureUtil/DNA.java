@@ -17,7 +17,6 @@ import java.util.ArrayList;
  * Will have a deep copy method/constructor.
  */
 
-//TODO Enum of what each vector 3 stands for, ordered by index of vector.
 public class DNA
 {
   /*
@@ -70,13 +69,20 @@ public class DNA
 
   /**
    * Get center coordinates for a block.  This vector is separate from the
-   * creature structure.
-   * @param blockID       int BlockID
-   * @return              Vector3f center coordinates
+   * creature structure, but can be used to alter the DNA.
+   * @param iD       int BlockID
+   * @return         Vector3f center coordinates, return null.
    */
-  public Vector3f getBlockCenter(int blockID)
+  public Vector3f getBlockCenter(int iD)
   {
-    return blockDNAs[blockID].sizeAndShape[BlockVector.CENTER.ordinal()];
+    for(BlockDNA bDNA : blockDNAs)
+    {
+      if(bDNA.blockID == iD)
+      {
+        return bDNA.sizeAndShape[BlockVector.CENTER.ordinal()];
+      }
+    }
+    return null;
   }
 
 
