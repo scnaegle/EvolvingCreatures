@@ -6,6 +6,7 @@ import de.lessvoid.nifty.controls.*;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,9 @@ public class NiftySelectController implements ScreenController
   private final MainSim app;
   private ArrayList<Integer> thread_count_selections = new ArrayList<>(Arrays.asList(1, 2, 4, 8, 16, 32));
 
+  private DropDown thread_count_box;
+  private DropDown thread_view_box;
+
   public NiftySelectController(MainSim app) {
     this.app = app;
   }
@@ -25,11 +29,11 @@ public class NiftySelectController implements ScreenController
   @Override
   public void bind(Nifty nifty, Screen screen)
   {
-    DropDown thread_count_box = screen.findNiftyControl("threadCountSelectionBox", DropDown.class);
+    thread_count_box = screen.findNiftyControl("threadCountSelectionBox", DropDown.class);
     for(int t : thread_count_selections) {
       thread_count_box.addItem(t);
     }
-    DropDown thread_view_box = screen.findNiftyControl("threadViewSelectionBox", DropDown.class);
+    thread_view_box = screen.findNiftyControl("threadViewSelectionBox", DropDown.class);
     for(int i = 1; i <= app.thread_count; i++) {
       thread_view_box.addItem(i);
     }
@@ -40,23 +44,30 @@ public class NiftySelectController implements ScreenController
   }
 
   @NiftyEventSubscriber(id = "threadCountSelectionBox")
-  public void onThreadCountSelectionBoxChanged(final String id, final ListBoxSelectionChangedEvent<Integer> event) {
-    List<Integer> selection = event.getSelection();
+  public void onThreadCountSelectionBoxChanged(final String id, final DropDownSelectionChangedEvent<Integer> event) {
+    int selection = event.getSelection();
     if (app.debug) {
-      System.out.println("Thread Count Selection: " + selection.get(0));
-      System.out.println("Thread Count Selection class: " + selection.get(0).getClass());
+      System.out.println("Thread Count Selection: " + selection);
     }
-    app.setThreadCount(selection.get(0));
+    app.setThreadCount(selection);
+
+    int thread_view_selection = thread_view_box.getSelectedIndex();
+    thread_view_box.clear();
+    for(int i = 1; i <= app.thread_count; i++) {
+      thread_view_box.addItem(i);
+    }
+    if (thread_view_selection < app.thread_count) {
+      thread_view_box.selectItemByIndex(thread_view_selection);
+    }
   }
 
   @NiftyEventSubscriber(id = "threadViewSelectionBox")
-  public void onThreadViewSelectionBoxChanged(final String id, final ListBoxSelectionChangedEvent<Integer> event) {
-    List<Integer> selection = event.getSelection();
+  public void onThreadViewSelectionBoxChanged(final String id, final DropDownSelectionChangedEvent<Integer> event) {
+    int selection = event.getSelection();
     if (app.debug) {
-      System.out.println("Thread View Selection: " + selection.get(0));
-      System.out.println("Thread Count Selection class: " + selection.get(0).getClass());
+      System.out.println("Thread View Selection: " + selection);
     }
-    app.setViewingThread(selection.get(0));
+    app.setViewingThread(selection);
   }
 
   @NiftyEventSubscriber(id = "speedSlider")
@@ -64,7 +75,7 @@ public class NiftySelectController implements ScreenController
     if (app.debug) {
       System.out.println("speed selection: " + event.getValue());
     }
-    app.setSpeed((int)event.getValue());
+    app.setSpeed((int) event.getValue());
   }
 
   @Override
