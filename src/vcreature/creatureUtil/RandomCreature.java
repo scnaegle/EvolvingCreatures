@@ -6,6 +6,7 @@ import com.jme3.scene.Node;
 import vcreature.phenotype.Block;
 import vcreature.phenotype.Creature;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 // Only 10 max blocks, generate number from 0-9
@@ -28,6 +29,8 @@ import java.util.Random;
  */
 public class RandomCreature extends Creature
 {
+  public ArrayList<Vector3f> centerList;
+
   private static Random rand = new Random();
 
   /**
@@ -38,15 +41,16 @@ public class RandomCreature extends Creature
   public RandomCreature(PhysicsSpace physicsSpace, Node jMonkeyRootNode)
   {
     super(physicsSpace, jMonkeyRootNode);
+    centerList = new ArrayList<Vector3f>();
 
-    int blockNumber = rand.nextInt(9)+1;
+    int blockNumber = rand.nextInt(DNA.MAX_BLOCKS);
 
-    Block root = makeRoot();
+    makeRoot();
 
     while (this.getNumberOfBodyBlocks() < blockNumber)
     {
-      //int parentBlock = rand.nextInt(getNumberOfBodyBlocks) + 1;
-      //addRandomBlock(parentBlock);
+      int parentBlock = rand.nextInt(getNumberOfBodyBlocks());
+      addRandomBlock(parentBlock);
     }
 
   }
@@ -65,22 +69,109 @@ public class RandomCreature extends Creature
     rootSize.z = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
 
     //bump up the root node so it doesn't overlap with floor
+    //bumpUpCreature();
     rootCenter.y = rootSize.y;
+
+    centerList.add(rootCenter);
 
     return addRoot(rootCenter, rootSize);
   }
 
   private void addRandomBlock(int index)
   {
-    //Block parent = this.getBlockByID(index);
-    //Block child = newRandomBlock();
+    Block parent = this.getBlockByID(index);
+    newRandomBlock(parent);
   }
 
-  //private Block newRandomBlock()
-  //{
-    Vector3f rootSize = new Vector3f();
-  //}
+  private void newRandomBlock(Block parent)
+  {
+    int parentSurface;
+    int childSurface;
+
+    Vector3f childSize = new Vector3f();
+    Vector3f childCenter = new Vector3f();
+
+    Vector3f parentJoint = new Vector3f();
+    Vector3f childJoint = new Vector3f();
+
+    childSize.x = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
+    childSize.y = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
+    childSize.z = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
+
+    parentSurface = rand.nextInt(6);
+    childSurface = correspondingChildSurface(parentSurface);
+
+    findRandomParentJoint(parentJoint, parentSurface, parent);
+    findRandomChildJoint(childJoint, childSurface, childSize);
+
+    //transformChild(childSize,childCenter,);
+
+    addBlock(childCenter, childSize, parent, parentJoint,  childJoint, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+  }
+
+  private void findRandomParentJoint(Vector3f pJoint, int pSurface, Block parent)
+  {
+    Vector3f parentCenter = centerList.get(parent.getID());
+
+  }
+
+  private void findRandomChildJoint(Vector3f cJoint, int cSurface, Vector3f cSize)
+  {
+
+  }
+
+  /**
+   * Corresponding ints to surfaces on blocks
+   * 0 = +y;
+   * 1 = -y;
+   * 2 = +x;
+   * 3 = -x;
+   * 4 = +z;
+   * 5 = -z;
+   * @param parentSurface
+   * @return
+   */
+  private int correspondingChildSurface(int parentSurface)
+  {
+    int childSurface = -1;
+    switch (parentSurface) {
+      case 0: childSurface = 1;
+        break;
+      case 1: childSurface = 0;
+        break;
+      case 2: childSurface = 3;
+        break;
+      case 3: childSurface = 2;
+        break;
+      case 4: childSurface = 5;
+        break;
+      case 5: childSurface = 4;
+    }
+    return childSurface;
+  }
+
+  private Vector3f pointOnSurface(int blockId, int surface)
+  {
+    Vector3f joint = new Vector3f();
 
 
 
+    return joint;
+  }
+
+  /**
+   * Finds the lowest point if it's below
+   */
+  private void bumpUpCreature()
+  {
+    float lowestPoint = 0;
+    for (int i = 0; i < getNumberOfBodyBlocks(); ++i)
+    {
+      if (lowestPoint >= this.getHeight(i) && this.getHeight(i) < 0);
+      {
+        lowestPoint = this.getHeight(i);
+      }
+    }
+    lowestPoint = Math.abs(lowestPoint);
+  }
 }
