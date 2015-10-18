@@ -143,6 +143,16 @@ public class OurCreature extends Creature
     return b;
   }
 
+  @Override
+  public Block addBlock(float[] eulerAngles, Vector3f halfsize, Block parent, Vector3f pivotA, Vector3f pivotB, Vector3f axisA, Vector3f axisB)
+  {
+    Vector3f bCenter = new Vector3f();
+    Block b = super.addBlock(eulerAngles,halfsize,parent,pivotA,pivotB,axisA,axisB);
+    blockProperties.add(makeBlockVectorArray(b.getCenter(bCenter), halfsize, pivotA,pivotB,axisA,axisB));
+
+    return b;
+  }
+
   /**
    * Add block to the creature.  Log it in an accessible location.
    * @param center        Location of the block.
@@ -189,6 +199,7 @@ public class OurCreature extends Creature
                                                         BlockVector.AXIS_B));
     }
   }
+
 
   /**
    * Get a deep copy of specified vector info for the specified block.

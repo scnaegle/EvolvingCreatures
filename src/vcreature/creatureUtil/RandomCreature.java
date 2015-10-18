@@ -5,6 +5,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import vcreature.phenotype.Block;
 import vcreature.phenotype.Creature;
+import vcreature.phenotype.OurCreature;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -27,11 +28,10 @@ import java.util.Random;
  * Creature generation begins with a root node and follows set of rules to create random valid creature
  * Extends Joel's Creature class
  */
-public class RandomCreature extends Creature
+public class RandomCreature extends OurCreature
 {
-  public ArrayList<Vector3f> centerList;
-
   private static Random rand = new Random();
+  private static float[] axisAligned = {0,0,0};
 
   /**
    * Default constructor, attaches creature to world
@@ -41,9 +41,12 @@ public class RandomCreature extends Creature
   public RandomCreature(PhysicsSpace physicsSpace, Node jMonkeyRootNode)
   {
     super(physicsSpace, jMonkeyRootNode);
-    centerList = new ArrayList();
-    
-    int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS);
+
+    //int blockNumber = rand.nextInt(3)+1;
+
+    //int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS)+1;
+
+    int blockNumber = 2;
 
     makeRoot();
 
@@ -53,6 +56,7 @@ public class RandomCreature extends Creature
       addRandomBlock(parentBlock);
     }
 
+    placeOnGround();
   }
 
   /**
@@ -71,8 +75,6 @@ public class RandomCreature extends Creature
     //bump up the root node so it doesn't overlap with floor
     //bumpUpCreature();
     rootCenter.y = rootSize.y;
-
-    centerList.add(rootCenter);
 
     return addRoot(rootCenter, rootSize);
   }
@@ -105,17 +107,13 @@ public class RandomCreature extends Creature
     parentSurface = rand.nextInt(6);
     childSurface = correspondingChildSurface(parentSurface); //find corresponding surface on child
 
-    //make a new joint vector on the parent and on the chold
+    //make a new joint vector on the parent and on the child
     getSurfaceVector(parentJoint, parentSurface, parent);
     getSurfaceVector(childJoint, childSurface, childSize);
 
-    //find the child's center relative to the world origin
-    findChildCenter(parentJoint, childJoint, childCenter);
-
-    //add the block
-    addBlock(childCenter, childSize, parent, parentJoint,  childJoint, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    //addBlock
+    addBlock(axisAligned, childSize, parent, parentJoint, childJoint, Vector3f.ZERO, Vector3f.ZERO);
   }
-
 
   /**
    * Makes a vector to a joint a child block's surface
@@ -154,11 +152,6 @@ public class RandomCreature extends Creature
       default:
         break;
     }
-  }
-
-  private void findChildCenter(Vector3f parentJoint, Vector3f childJoint, Vector3f childCenter)
-  {
-    
   }
 
   private void getSurfaceVector(Vector3f joint, int surface, Block b)
@@ -226,6 +219,11 @@ public class RandomCreature extends Creature
 
   private float randomSurfacePoint(float bounds)
   {
+    return bounds;
+  }
+    /*
+  private float randomSurfacePoint(float bounds)
+  {
     int sign = rand.nextInt(1);
     int scale = (int) bounds;
 
@@ -237,22 +235,5 @@ public class RandomCreature extends Creature
     }
 
     return point;
-  }
-
-  /**
-   * Finds the lowest point if it's below
-   */
-  // TODO should no longer need this now that JOEL added a placeOnGround method in the creature class
-  private void bumpUpCreature()
-  {
-    float lowestPoint = 0;
-    for (int i = 0; i < getNumberOfBodyBlocks(); ++i)
-    {
-      if (lowestPoint >= this.getHeight(i) && this.getHeight(i) < 0);
-      {
-        lowestPoint = this.getHeight(i);
-      }
-    }
-    lowestPoint = Math.abs(lowestPoint);
-  }
+  }*/
 }

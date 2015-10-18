@@ -249,7 +249,7 @@ public class Creature
   
   /**
    *
-   * @param id
+   * @param idx
    * @param mat
    */
   public void setBlockMaterial(int idx, Material mat)

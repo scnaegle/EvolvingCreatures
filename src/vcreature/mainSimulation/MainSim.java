@@ -409,6 +409,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     System.out.println(jsonIn);
   }
 
+  /*
   /**
    * Test DNA object.
    */
