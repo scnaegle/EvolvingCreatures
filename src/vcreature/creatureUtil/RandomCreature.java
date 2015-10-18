@@ -41,8 +41,8 @@ public class RandomCreature extends Creature
   public RandomCreature(PhysicsSpace physicsSpace, Node jMonkeyRootNode)
   {
     super(physicsSpace, jMonkeyRootNode);
-    centerList = new ArrayList<Vector3f>();
-
+    centerList = new ArrayList();
+    
     int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS);
 
     makeRoot();
@@ -88,36 +88,109 @@ public class RandomCreature extends Creature
     int parentSurface;
     int childSurface;
 
+    //new vectors for child block
     Vector3f childSize = new Vector3f();
     Vector3f childCenter = new Vector3f();
 
+    //vectors for the joints between the parents and the child
     Vector3f parentJoint = new Vector3f();
     Vector3f childJoint = new Vector3f();
 
+    //create random sizes for child block
     childSize.x = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
     childSize.y = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
     childSize.z = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
 
+    //select a random surface on parent to add child to
     parentSurface = rand.nextInt(6);
-    childSurface = correspondingChildSurface(parentSurface);
+    childSurface = correspondingChildSurface(parentSurface); //find corresponding surface on child
 
-    findRandomParentJoint(parentJoint, parentSurface, parent);
-    findRandomChildJoint(childJoint, childSurface, childSize);
+    //make a new joint vector on the parent and on the chold
+    getSurfaceVector(parentJoint, parentSurface, parent);
+    getSurfaceVector(childJoint, childSurface, childSize);
 
-    //transformChild(childSize,childCenter,);
+    //find the child's center relative to the world origin
+    findChildCenter(parentJoint, childJoint, childCenter);
 
+    //add the block
     addBlock(childCenter, childSize, parent, parentJoint,  childJoint, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
   }
 
-  private void findRandomParentJoint(Vector3f pJoint, int pSurface, Block parent)
-  {
-    Vector3f parentCenter = centerList.get(parent.getID());
 
+  /**
+   * Makes a vector to a joint a child block's surface
+   *
+   * @param joint joint to draw vector to
+   * @param surface surface to draw vector to
+   * @param cSize child size
+   */
+  private void getSurfaceVector(Vector3f joint, int surface, Vector3f cSize)
+  {
+    switch (surface) {
+      case 0: joint.y = cSize.y;
+        joint.x = randomSurfacePoint(cSize.x);
+        joint.z = randomSurfacePoint(cSize.z);
+        break;
+      case 1: joint.y = -cSize.y;
+        joint.x = randomSurfacePoint(cSize.x);
+        joint.z = randomSurfacePoint(cSize.z);
+        break;
+      case 2: joint.x = cSize.x;
+        joint.y = randomSurfacePoint(cSize.y);
+        joint.z = randomSurfacePoint(cSize.z);
+        break;
+      case 3: joint.x = -cSize.x;
+        joint.y = randomSurfacePoint(cSize.y);
+        joint.z = randomSurfacePoint(cSize.z);
+        break;
+      case 4: joint.z = cSize.z;
+        joint.x = randomSurfacePoint(cSize.x);
+        joint.y = randomSurfacePoint(cSize.y);
+        break;
+      case 5: joint.z = -cSize.z;
+        joint.x = randomSurfacePoint(cSize.x);
+        joint.y = randomSurfacePoint(cSize.y);
+        break;
+      default:
+        break;
+    }
   }
 
-  private void findRandomChildJoint(Vector3f cJoint, int cSurface, Vector3f cSize)
+  private void findChildCenter(Vector3f parentJoint, Vector3f childJoint, Vector3f childCenter)
   {
+    
+  }
 
+  private void getSurfaceVector(Vector3f joint, int surface, Block b)
+  {
+    switch (surface) {
+      case 0: joint.y = b.getSizeY();
+              joint.x = randomSurfacePoint(b.getSizeX());
+              joint.z = randomSurfacePoint(b.getSize());
+        break;
+      case 1: joint.y = -b.getSizeY();
+              joint.x = randomSurfacePoint(b.getSizeX());
+              joint.z = randomSurfacePoint(b.getSize());
+        break;
+      case 2: joint.x = b.getSizeX();
+              joint.y = randomSurfacePoint(b.getSizeY());
+              joint.z = randomSurfacePoint(b.getSize());
+        break;
+      case 3: joint.x = -b.getSizeX();
+              joint.y = randomSurfacePoint(b.getSizeY());
+              joint.z = randomSurfacePoint(b.getSize());
+        break;
+      case 4: joint.z = b.getSize();
+              joint.x = randomSurfacePoint(b.getSizeX());
+              joint.y = randomSurfacePoint(b.getSizeY());
+        break;
+      case 5: joint.z = b.getSize();
+              joint.x = randomSurfacePoint(b.getSizeX());
+              joint.y = randomSurfacePoint(b.getSizeY());
+        break;
+      default:
+        break;
+    }
   }
 
   /**
@@ -146,17 +219,24 @@ public class RandomCreature extends Creature
       case 4: childSurface = 5;
         break;
       case 5: childSurface = 4;
+        break;
     }
     return childSurface;
   }
 
-  private Vector3f pointOnSurface(int blockId, int surface)
+  private float randomSurfacePoint(float bounds)
   {
-    Vector3f joint = new Vector3f();
+    int sign = rand.nextInt(1);
+    int scale = (int) bounds;
 
+    float point = rand.nextInt(scale+1) + rand.nextFloat();
 
+    if (sign == 1)
+    {
+      point = -point;
+    }
 
-    return joint;
+    return point;
   }
 
   /**
