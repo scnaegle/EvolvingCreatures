@@ -80,6 +80,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--max-num-blocks", description = "Maximum number of blocks for a creature")
   int max_num_blocks = 10;
 
+  @Parameter(names = "--speed", description = "Set the speed of the simulation")
+  int sim_speed = 1;
+
   @Parameter(names = "--output-frequency", description = "Defines how often we dump the Genomes to a log defined by number of seconds.")
   public static int output_frequency = 300;
 
@@ -121,13 +124,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     physicsSpace.setGravity(PhysicsConstants.GRAVITY);
     physicsSpace.setAccuracy(PhysicsConstants.PHYSICS_UPDATE_RATE);
-    if (headless) {
-      physicsSpace.setMaxSubSteps(50);
-      speed = 20;
-    } else {
-      physicsSpace.setMaxSubSteps(4);
-      speed = 1;
-    }
+    physicsSpace.setMaxSubSteps(4);
+    speed = 1;
 
    
 
@@ -178,16 +176,18 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     flyCam.setDragToRotate(true);
 
+    setCreatureConstants();
+    setSpeed(sim_speed);
+
     if (debug) {
       showSettings();
     }
-    setCreatureConstants();
-
   }
 
   private void showSettings() {
     System.out.println("verbose: " + verbose);
     System.out.println("headless: " + headless);
+    System.out.println("speed: " + speed);
     System.out.println("thread_count: " + thread_count);
     System.out.println("viewing_thread: " + viewing_thread);
     System.out.println("starting_population_count: " + starting_population_count);
@@ -196,6 +196,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     System.out.println("output file: " + output_file);
     System.out.println("input: " + input_file);
     System.out.println("debug: " + debug);
+    System.out.println("settings: " + settings);
   }
 
   private void setCreatureConstants() {
@@ -372,6 +373,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   public void setSpeed(int speed) {
     this.speed = speed;
     physicsSpace.setMaxSubSteps(speed * 4);
+    settings.setFrequency(speed * 60);
   }
 
   //=====begin ScreenController implementation================================
