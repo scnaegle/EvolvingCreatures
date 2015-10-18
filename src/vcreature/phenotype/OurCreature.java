@@ -154,12 +154,13 @@ public class OurCreature extends Creature
    * @param axisB         axis of rotation b.
    * @return              block created.
    */
+  @Override
   public Block addBlock(Vector3f center, Vector3f size, Block parent,
                         Vector3f pivotA, Vector3f pivotB, Vector3f axisA,
                         Vector3f axisB)
   {
     Block b = super.addBlock(center, size, parent, pivotA, pivotB, axisA,
-                        axisB);
+        axisB);
     blockProperties.add(makeBlockVectorArray(center, size, pivotA, pivotB,
                                               axisA, axisB));
     return b;
@@ -190,7 +191,20 @@ public class OurCreature extends Creature
   }
 
   /**
+   * Get a deep copy of specified vector info for the specified block.
+   * @param id        id of block.
+   * @param v         vector type
+   * @return          Copy of specified block vector.
+   */
+  public Vector3f getBlockVectorCopy(int id, BlockVector v)
+  {
+    return new Vector3f(getBlockVector(id, v));
+  }
+
+  /**
    * Returns the specified vector info for the specified block.
+   * Caution! returns pointer to block info vector stored in OurCreature, can
+   * corrupt data.
    * @param id        id of block.
    * @param v         Vector type.
    * @return          Specified vector3f in blockProperties.
@@ -216,14 +230,12 @@ public class OurCreature extends Creature
                                           Vector3f axisA, Vector3f axisB)
   {
     Vector3f[] blockProperties = new Vector3f[6];
-    blockProperties[0] = center;
-    blockProperties[1] = size;
-    blockProperties[2] = jointA;
-    blockProperties[3] = jointB;
-    blockProperties[4] = axisA;
-    blockProperties[5] = axisB;
+    blockProperties[BlockVector.CENTER.ordinal()] = center;
+    blockProperties[BlockVector.SIZE.ordinal()] = size;
+    blockProperties[BlockVector.JOINT_A.ordinal()] = jointA;
+    blockProperties[BlockVector.JOINT_B.ordinal()] = jointB;
+    blockProperties[BlockVector.AXIS_A.ordinal()] = axisA;
+    blockProperties[BlockVector.AXIS_B.ordinal()] = axisB;
     return blockProperties;
   }
-
-
 }
