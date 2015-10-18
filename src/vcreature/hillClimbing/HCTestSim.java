@@ -29,6 +29,7 @@ import vcreature.creatureUtil.DNA;
 import vcreature.creatureUtil.RandomCreature;
 import vcreature.phenotype.Block;
 import vcreature.phenotype.Creature;
+import vcreature.phenotype.OurCreature;
 import vcreature.phenotype.PhysicsConstants;
 
 //Added 10/14/2015 justin thomas
@@ -43,7 +44,7 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
   
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
-  private Creature myCreature;
+  private OurCreature myCreature;
   private boolean isCameraRotating = true;
 
   //Nifty gui
@@ -96,7 +97,7 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
 
 
     Block.initStaticMaterials(assetManager);
-    myCreature = new HCFlappyBird(physicsSpace, rootNode);
+    myCreature = new OurCreature(physicsSpace, rootNode, true);
     initLighting();
     initKeys();
 

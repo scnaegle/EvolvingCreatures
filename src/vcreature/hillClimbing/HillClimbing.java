@@ -7,10 +7,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import vcreature.creatureUtil.DNA;
 import vcreature.creatureUtil.RandomCreature;
-import vcreature.phenotype.Block;
-import vcreature.phenotype.Creature;
-import vcreature.phenotype.EnumNeuronInput;
-import vcreature.phenotype.Neuron;
+import vcreature.phenotype.*;
 
 import java.util.Random;
 
@@ -19,9 +16,9 @@ import java.util.Random;
  */
 public class HillClimbing
 {
-  private Creature creature;//TODO: can remove after Hill Climbing is set to take in population
+  private OurCreature creature;//TODO: can remove after Hill Climbing is set to take in population
   private Creature mutatedCreature;
-  private Creature randomCreature;
+  private OurCreature randomCreature;
   private PhysicsSpace physicsSpace;
   private Node rootNode;
   private Random generator;
@@ -32,7 +29,7 @@ public class HillClimbing
   //TODO: to start, want to print out creature info to see if HillClimbing is changing creature
 
   //TODO: take in arraylist of creatures, population
-  public HillClimbing(Creature sample, PhysicsSpace space, Node root)
+  public HillClimbing(OurCreature sample, PhysicsSpace space, Node root)
   {
     creature = sample;
     physicsSpace = space;
@@ -114,7 +111,7 @@ public class HillClimbing
    * @param sample single creature from the population
    * @param targetBlockID the id for the block that will be mutated
    */
-  private void mutateBlockStructure(Creature sample, int targetBlockID)
+  private void mutateBlockStructure(OurCreature sample, int targetBlockID)
   {
     Block currentBlock;
     Vector3f center;
@@ -123,7 +120,7 @@ public class HillClimbing
     float sizeY;
     float sizeZ;
 
-    randomCreature = new Creature(physicsSpace,rootNode);
+    randomCreature = new OurCreature(physicsSpace,rootNode);
     dna = new DNA(sample);
 
     for(int i = 0; i < sample.getNumberOfBodyBlocks(); i++)
@@ -171,6 +168,6 @@ public class HillClimbing
    * TODO: grap a random creature from population, or pick best fit one
    * @return creature from this population
    */
-  public Creature getCreature(){return randomCreature;}
+  public OurCreature getCreature(){return randomCreature;}
 
 }

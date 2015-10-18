@@ -99,7 +99,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
-  private FlappyBird myCreature;
+  private OurCreature myCreature;
   //private RandomCreature myCreature;
   private OurCreature ourCreature; //TODO testing, remove.
   private boolean isCameraRotating = true;
@@ -158,7 +158,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     
    
     Block.initStaticMaterials(assetManager);
-    myCreature = new FlappyBird(physicsSpace, rootNode);
+    //create "Flappy Bird"
+    myCreature = new OurCreature(physicsSpace, rootNode, true);
     //myCreature = new RandomCreature(physicsSpace, rootNode);
 
     //TODO Remove, building homemade creature

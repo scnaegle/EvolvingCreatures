@@ -77,7 +77,7 @@ public class Creature
       jMonkeyRootNode.detachChild(b.getGeometry());
     }
   }
- 
+
   public Block addRoot(Vector3f rootCenter, Vector3f rootSize)
   {
     if (!body.isEmpty()) 
@@ -102,7 +102,6 @@ public class Creature
     
     RigidBodyControl controlA = parent.getPhysicsControl();
     RigidBodyControl controlB = block.getPhysicsControl();
-    block.storeJointAxis(axisA, axisB);
     HingeJoint joint = new HingeJoint(controlA, controlB, pivotA, pivotB, axisA, axisB);
     joint.setCollisionBetweenLinkedBodys(false);
     

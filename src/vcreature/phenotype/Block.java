@@ -93,17 +93,6 @@ public class Block
             PhysicsConstants.ANGULAR_DAMPINING);
   }
 
-  /**
-   * Store the joint axis of rotation
-   * @param axisA     axis of rotation A.
-   * @param axisB     axis of rotation B.
-   */
-  public void storeJointAxis(Vector3f axisA, Vector3f axisB)
-  {
-    jointAxisA = axisA;
-    jointAxisB = axisB;
-  }
-
   private void addChild(Block child) {childList.add(child);}
   
   public void setMaterial(Material mat)
@@ -151,22 +140,7 @@ public class Block
 
   public float getSize() {return sizeZ;}
 
-  /**
-   * Populate the DNA's Size and shape array with all the right vectors.
-   * @param dna       sizeAndShape array from DNA => BlockDNA
-   */
-  public void populateVectorDNA(Vector3f[] dna)
-  {
-    dna[DNA.BlockVector.CENTER.ordinal()] = new Vector3f(startCenter);
-    dna[DNA.BlockVector.SIZE.ordinal()] = new Vector3f(sizeX / 2, sizeY / 2, sizeZ / 2);
-    if(jointToParent != null)
-    {
-      dna[DNA.BlockVector.JOINT_A.ordinal()] = new Vector3f(jointToParent.getPivotA());
-      dna[DNA.BlockVector.JOINT_B.ordinal()] = new Vector3f(jointToParent.getPivotB());
-      dna[DNA.BlockVector.AXIS_A.ordinal()] = new Vector3f(jointAxisA);
-      dna[DNA.BlockVector.AXIS_B.ordinal()] = new Vector3f(jointAxisB);
-    }
-  }
+
   public ArrayList<Neuron> getNeuronTable() { return neuronTable;}
   
   

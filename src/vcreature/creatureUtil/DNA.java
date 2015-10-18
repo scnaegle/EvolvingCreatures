@@ -3,10 +3,7 @@ package vcreature.creatureUtil;
 
 import com.jme3.math.Vector3f;
 import vcreature.mainSimulation.MainSim;
-import vcreature.phenotype.Block;
-import vcreature.phenotype.Creature;
-import vcreature.phenotype.EnumNeuronInput;
-import vcreature.phenotype.Neuron;
+import vcreature.phenotype.*;
 
 import java.util.ArrayList;
 
@@ -24,7 +21,6 @@ public class DNA
    * BlockVector.enum.ordinal() corresponds to the index of the array where
    * you will find that vector.
    */
-  public enum BlockVector{CENTER, SIZE, JOINT_A, JOINT_B, AXIS_A, AXIS_B}
 
   private int numBlocks;
   private int length; //TODO calculate in constructor.
@@ -42,13 +38,14 @@ public class DNA
    * DNA Built from creature
    * @param c       Creature to build from.
    */
-  public DNA(Creature c)
+  public DNA(OurCreature c)
   {
     blockDNAs = new BlockDNA[CreatureConstants.MAX_BLOCKS];
     numBlocks = c.getNumberOfBodyBlocks();
     for(int i = 0; i < numBlocks; ++i)
     {
       blockDNAs[i] = new BlockDNA(c.getBlockByID(i));
+      c.populateVectorDNA(i, blockDNAs[i].sizeAndShape);
     }
   }
 
@@ -186,7 +183,7 @@ public class DNA
       blockID = b.getID();
       parentID = b.getIdOfParent();
       sizeAndShape = new Vector3f[NUM_VECTORS];
-      b.populateVectorDNA(sizeAndShape);
+      //b.populateVectorDNA(sizeAndShape);
       neuronDNAs = new ArrayList<>();
       ArrayList<Neuron> neuronTable = b.getNeuronTable();
       for(Neuron n : neuronTable)
