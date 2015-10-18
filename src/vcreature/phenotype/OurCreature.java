@@ -7,6 +7,7 @@ import com.jme3.scene.Node;
 import vcreature.creatureUtil.DNA;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -19,6 +20,7 @@ public class OurCreature extends Creature
   private PhysicsSpace physicsSpace;
   private Node visualWorld;
   private ArrayList<Vector3f[]> blockProperties;
+  private ArrayList<float[]> blockAngles;
 
   //====================Begin Constructors======================================
   /**
@@ -32,6 +34,7 @@ public class OurCreature extends Creature
     physicsSpace = physicsWorld;
     this.visualWorld = visualWorld;
     blockProperties = new ArrayList<>();
+    blockAngles = new ArrayList<>();
   }
 
   /**
@@ -143,13 +146,28 @@ public class OurCreature extends Creature
     return b;
   }
 
+  /**
+   * Add block, calls super.addBlock().  Also logs important vectors and block
+   * angles.
+   * @param eulerAngles
+   * @param halfsize half the extent (in meters) of the block in the x, y and z direction.
+   * For example, a block with extent in the x dimension of 0.5 would extend from 0.5 meters from
+   * the origin in the -x direction and 0.5 meters from the origin in the +x direction.
+   * @param parent Block instance onto which this block will be joined.
+   * @param pivotA Location in local coordinates of the pivot point on the parent block.
+   * Local coordinates means the location on the block relitive to the block's center with zero rotation.
+   * @param pivotB Location in local coordinates of the pivot point on this block.
+   * @param axisA One-degree of freedom hinge axis in local coordinates of the parent block.
+   * @param axisB One-degree of freedom hinge axis in local coordinates of the this block.
+   * @return
+   */
   @Override
   public Block addBlock(float[] eulerAngles, Vector3f halfsize, Block parent, Vector3f pivotA, Vector3f pivotB, Vector3f axisA, Vector3f axisB)
   {
     Vector3f bCenter = new Vector3f();
     Block b = super.addBlock(eulerAngles,halfsize,parent,pivotA,pivotB,axisA,axisB);
     blockProperties.add(makeBlockVectorArray(b.getCenter(bCenter), halfsize, pivotA,pivotB,axisA,axisB));
-
+    blockAngles.add(Arrays.copyOf(eulerAngles, eulerAngles.length));
     return b;
   }
 
@@ -198,6 +216,18 @@ public class OurCreature extends Creature
       dna[BlockVector.AXIS_B.ordinal()] = new Vector3f(getBlockVector(id,
                                                         BlockVector.AXIS_B));
     }
+  }
+
+  /**
+   * Get float array representing the rotation of the specifed block.
+   * Caution! sends pointer to array.
+   * @param id        block's ID
+   * @return          float array representing the Quaternion block was made
+   *                  with.
+   */
+  public float[] getBlockAngles(int id)
+  {
+    return blockAngles.get(id);
   }
 
 
