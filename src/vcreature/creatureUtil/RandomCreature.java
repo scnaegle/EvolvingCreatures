@@ -242,6 +242,7 @@ public class RandomCreature extends Creature
   /**
    * Finds the lowest point if it's below
    */
+  // TODO should no longer need this now that JOEL added a placeOnGround method in the creature class
   private void bumpUpCreature()
   {
     float lowestPoint = 0;
