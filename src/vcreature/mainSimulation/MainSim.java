@@ -1,6 +1,7 @@
 
 package vcreature.mainSimulation;
 
+import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.jme3.system.JmeContext;
 import de.lessvoid.nifty.NiftyEventSubscriber;
@@ -37,6 +38,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.system.AppSettings;
 import vcreature.creatureUtil.DNA;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -86,11 +88,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--output-frequency", description = "Defines how often we dump the Genomes to a log defined by number of seconds.")
   public static int output_frequency = 300;
 
-  @Parameter(names = "--output", description = "File that you woud like to output to")
-  public static String output_file = "dna_out.txt";
+  @Parameter(names = "--output", description = "File that you woud like to output to", converter = FileConverter.class)
+  public static File output_file = new File("dna_out.txt");
 
-  @Parameter(names = "--input", description = "Input file to start the Genetic Algorithm")
-  public static String input_file = null;
+  @Parameter(names = "--input", description = "Input file to start the Genetic Algorithm", converter = FileConverter.class)
+  public static File input_file = null;
 
   @Parameter(names = "--debug", description = "Debug mode")
   boolean debug = false;
@@ -414,5 +416,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   {
     DNA dna = new DNA(myCreature);
     System.out.println(dna);
+  }
+
+  public class FileConverter implements IStringConverter<File>
+  {
+    @Override
+    public File convert(String value)
+    {
+      return new File(value);
+    }
   }
 }
