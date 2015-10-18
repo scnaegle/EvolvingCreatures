@@ -44,7 +44,7 @@ public class JSONHandler
     ArrayList<HashMap<String, Object>> body_details = new ArrayList<>();
     for(int i = 0; i < size; ++i)
     {
-      body_details.add(c.getBlockByID(i).toHash());
+//      body_details.add(c.getBlockByID(i).toHash());
     }
     character_hash.put("blocks", body_details);
     JSONObject json = new JSONObject(character_hash);
