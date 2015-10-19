@@ -47,6 +47,7 @@ public class DNA
     {
       blockDNAs[i] = new BlockDNA(c.getBlockByID(i));
       c.populateVectorDNA(i, blockDNAs[i].sizeAndShape);
+      System.out.println("DNA Constructor center" + blockDNAs[i].sizeAndShape[0]);
       blockDNAs[i].setAngles(c.getBlockAngles(i));
     }
   }

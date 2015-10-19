@@ -71,7 +71,7 @@ public class OurCreature extends Creature
     Vector3f pivotB = new Vector3f(-3.0f,  0.5f,  0.0f); //Center of hinge in child block's coordinates
 
 
-    Block leg1  = addBlock(leg1Center, leg1Size,torso, pivotA,  pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    Block leg1  = addBlock(leg1Center, leg1Size, torso, pivotA, pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
 
     Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in parents  block's coordinates
     Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in childs block's coordinates
@@ -168,8 +168,9 @@ public class OurCreature extends Creature
   {
     Vector3f bCenter = new Vector3f();
     Block b = super.addBlock(eulerAngles,halfsize,parent,pivotA,pivotB,axisA,axisB);
-    blockProperties.add(makeBlockVectorArray(b.getCenter(bCenter), halfsize, pivotA,pivotB,axisA,axisB));
+    blockProperties.add(makeBlockVectorArray(b.getCenter(bCenter), halfsize, pivotA, pivotB, axisA, axisB));
     blockAngles.add(Arrays.copyOf(eulerAngles, eulerAngles.length));
+    System.out.println("BlockProperties size" + blockProperties.size());
     return b;
   }
 
@@ -191,8 +192,9 @@ public class OurCreature extends Creature
   {
     Block b = super.addBlock(center, size, parent, pivotA, pivotB, axisA,
         axisB);
-    blockProperties.add(makeBlockVectorArray(center, size, pivotA, pivotB,
-                                              axisA, axisB));
+    //blockProperties.add(makeBlockVectorArray(center, size, pivotA, pivotB,
+                                              //axisA, axisB));
+    System.out.println("Dep vec size " + blockProperties.size());
     return b;
   }
 
@@ -273,7 +275,8 @@ public class OurCreature extends Creature
                                           Vector3f axisA, Vector3f axisB)
   {
     Vector3f[] blockProperties = new Vector3f[6];
-    blockProperties[BlockVector.CENTER.ordinal()] = center;
+    System.out.println("make Block Vector center " + center);
+    blockProperties[BlockVector.CENTER.ordinal()] = new Vector3f(center);
     blockProperties[BlockVector.SIZE.ordinal()] = size;
     blockProperties[BlockVector.JOINT_A.ordinal()] = jointA;
     blockProperties[BlockVector.JOINT_B.ordinal()] = jointB;
