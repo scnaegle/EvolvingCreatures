@@ -41,6 +41,7 @@ public class DNA
    */
   public DNA(OurCreature c)
   {
+    length = 0;
     blockDNAs = new BlockDNA[CreatureConstants.MAX_BLOCKS];
     numBlocks = c.getNumberOfBodyBlocks();
     for(int i = 0; i < numBlocks; ++i)
@@ -48,6 +49,7 @@ public class DNA
       blockDNAs[i] = new BlockDNA(c.getBlockByID(i));
       c.populateVectorDNA(i, blockDNAs[i].sizeAndShape);
       blockDNAs[i].setAngles(c.getBlockAngles(i));
+      length += 7; //length gets 7 longer for each block(1 array + 6 vectors)
     }
   }
 
@@ -121,6 +123,11 @@ public class DNA
         blockDNAs[i].addNeurons(c.getBlockByID(blockDNAs[i].blockID));
       }
     }
+  }
+
+  public int getLength()
+  {
+    return length;
   }
 
   /**
@@ -205,6 +212,7 @@ public class DNA
       {
         neuronDNAs.add(new NeuronDNA(n));
       }
+      length += neuronDNAs.size() * 5;//Length for each neurondna rule
     }
 
     /**

@@ -169,6 +169,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     ourCreature = new OurCreature(physicsSpace, rootNode, dna);
     dna = new DNA(ourCreature);
     System.out.println(dna);
+    System.out.println("DNA length " + dna.getLength());
 
     initLighting();
     initKeys();

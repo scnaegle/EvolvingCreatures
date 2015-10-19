@@ -9,7 +9,6 @@ import vcreature.creatureUtil.DNA;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * @author Justin Thomas(jthomas105@unm.edu)
@@ -245,6 +244,15 @@ public class OurCreature extends Creature
   public Vector3f getBlockVectorCopy(int id, BlockVector v)
   {
     return new Vector3f(getBlockVector(id, v));
+  }
+
+  /**
+   * Get dna object.
+   * @return        dna object
+   */
+  public DNA getDNA()
+  {
+    return dna;
   }
 
   /**
