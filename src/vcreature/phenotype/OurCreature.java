@@ -118,7 +118,6 @@ public class OurCreature extends Creature
   /**
    * Remove whole creature, temp fix until joel updates.
    */
-  /*
   public void remove()
   {
     for(int i = 0; i < getNumberOfBodyBlocks(); ++i)
@@ -131,7 +130,7 @@ public class OurCreature extends Creature
       physicsSpace.remove(b.getPhysicsControl());
       visualWorld.detachChild(b.getGeometry());
     }
-  }*/
+  }
 
   /**
    * @deprecated
