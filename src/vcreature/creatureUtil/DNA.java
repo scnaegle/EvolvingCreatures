@@ -247,6 +247,12 @@ public class DNA
       bString += '\n';
       bString += parentID;
       bString += '\n';
+      for (float f : angles)
+      {
+        bString += f;
+        bString += ' ';
+      }
+      bString += '\n';
       for (Vector3f v : sizeAndShape)
       {
         if (v != null)
@@ -266,6 +272,7 @@ public class DNA
       }
       if(neuronDNAs != null)
       {
+        bString += neuronDNAs.size();
         for(NeuronDNA nDNA : neuronDNAs)
         {
           bString += nDNA.getString();
@@ -273,7 +280,7 @@ public class DNA
       }
       else
       {
-        bString += "null ";
+        bString += 0;
       }
       return bString;
     }
@@ -314,8 +321,6 @@ public class DNA
       public String getString()
       {
         String nString = new String();
-        nString += NUM_RULES;
-        nString += '\n';
         for(int i = 0; i < NUM_RULES; ++i)
         {
           if(inputTypes[i] != null)
