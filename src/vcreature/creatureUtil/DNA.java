@@ -143,9 +143,8 @@ public class DNA
       }
       else//TODO For testing: Remove when doing fileIO
       {
-        stringOut += "null ";
+        stringOut += "null\n";
       }
-      stringOut += '\n';
     }
     return stringOut;
   }
@@ -245,9 +244,9 @@ public class DNA
     {
       String bString = new String();
       bString += blockID;
-      bString += ' ';
+      bString += '\n';
       bString += parentID;
-      bString += ' ';
+      bString += '\n';
       for (Vector3f v : sizeAndShape)
       {
         if (v != null)
@@ -263,17 +262,18 @@ public class DNA
         {
           bString += "null ";
         }
-        if(neuronDNAs != null)
+        bString += '\n';
+      }
+      if(neuronDNAs != null)
+      {
+        for(NeuronDNA nDNA : neuronDNAs)
         {
-          for(NeuronDNA nDNA : neuronDNAs)
-          {
-            bString += nDNA.getString();
-          }
+          bString += nDNA.getString();
         }
-        else
-        {
-          bString += "null ";
-        }
+      }
+      else
+      {
+        bString += "null ";
       }
       return bString;
     }
@@ -314,6 +314,8 @@ public class DNA
       public String getString()
       {
         String nString = new String();
+        nString += NUM_RULES;
+        nString += '\n';
         for(int i = 0; i < NUM_RULES; ++i)
         {
           if(inputTypes[i] != null)
@@ -328,7 +330,7 @@ public class DNA
           nString += constantValues[i];
           nString += ' ';
           nString += blockIndex[i];
-          nString += ' ';
+          nString += '\n';
         }
         return nString;
       }
