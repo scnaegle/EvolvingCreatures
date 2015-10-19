@@ -70,12 +70,12 @@ public class OurCreature extends Creature
     Vector3f pivotB = new Vector3f(-3.0f,  0.5f,  0.0f); //Center of hinge in child block's coordinates
 
 
-    Block leg1  = addBlock(leg1Center, leg1Size, torso, pivotA, pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    Block leg1  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg1Size, torso, pivotA, pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
 
     Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in parents  block's coordinates
     Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in childs block's coordinates
 
-    Block leg2  = addBlock(leg2Center, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    Block leg2  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
 
     torso.setMaterial(Block.MATERIAL_GREEN);
     leg1.setMaterial(Block.MATERIAL_RED);
@@ -114,9 +114,11 @@ public class OurCreature extends Creature
   }
   //==================End Constructors==========================================
 
+
   /**
    * Remove whole creature, temp fix until joel updates.
    */
+  /*
   public void remove()
   {
     for(int i = 0; i < getNumberOfBodyBlocks(); ++i)
@@ -129,9 +131,10 @@ public class OurCreature extends Creature
       physicsSpace.remove(b.getPhysicsControl());
       visualWorld.detachChild(b.getGeometry());
     }
-  }
+  }*/
 
   /**
+   * @deprecated
    * Create root block.
    * @param rootCenter        Location of block.
    * @param rootSize          Size of block.
@@ -184,7 +187,6 @@ public class OurCreature extends Creature
    * @param axisB         axis of rotation b.
    * @return              block created.
    */
-  /*
   @Override
   public Block addBlock(Vector3f center, Vector3f size, Block parent,
                         Vector3f pivotA, Vector3f pivotB, Vector3f axisA,
@@ -192,11 +194,10 @@ public class OurCreature extends Creature
   {
     Block b = super.addBlock(center, size, parent, pivotA, pivotB, axisA,
         axisB);
-    //blockProperties.add(makeBlockVectorArray(center, size, pivotA, pivotB,
-                                              //axisA, axisB));
-    System.out.println("Dep vec size " + blockProperties.size());
+    blockProperties.add(makeBlockVectorArray(center, size, pivotA, pivotB,
+                                              axisA, axisB));
     return b;
-  }*/
+  }
 
   /**
    * Populate the DNA's Size and shape array with all the right vectors.
