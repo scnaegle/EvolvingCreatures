@@ -246,7 +246,29 @@ public class DNA
     }
 
     /**
-     * Get string representation of the block
+     * Alter a block's angle array.
+     * @param newAngles       new value for the angles.
+     * @param id              blockDNA to alter.
+     */
+    public void alterAngles(float[] newAngles, int id)
+    {
+      blockDNAs[id].angles = Arrays.copyOf(newAngles, 3);
+    }
+
+    /**
+     * Alter one of a block's size and shape vectors.
+     * @param newVector       new value for the vector.
+     * @param id              blockDNA to alter.
+     * @param type            the type of vector to alter.
+     */
+    public void alterVector(Vector3f newVector, int id, BlockVector type)
+    {
+      blockDNAs[id].sizeAndShape[type.ordinal()] = new Vector3f(newVector);
+    }
+
+    /**
+     * Get string representation of the block.
+     * @return string representation of the block
      */
     public String getString()
     {
@@ -328,6 +350,10 @@ public class DNA
         }
       }
 
+      /**
+       * String representation of neuron dna.
+       * @return        string with neuron rules.
+       */
       public String getString()
       {
         String nString = new String();
