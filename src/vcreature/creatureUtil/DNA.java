@@ -6,6 +6,7 @@ import vcreature.mainSimulation.MainSim;
 import vcreature.phenotype.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author Justin Thomas 10/14/2015
@@ -46,6 +47,7 @@ public class DNA
     {
       blockDNAs[i] = new BlockDNA(c.getBlockByID(i));
       c.populateVectorDNA(i, blockDNAs[i].sizeAndShape);
+      blockDNAs[i].setAngles(c.getBlockAngles(i));
     }
   }
 
@@ -96,13 +98,26 @@ public class DNA
       //if there is dna, and it's parent exists, add block
       if(blockDNAs[i] != null && c.getBlockByID(blockDNAs[i].parentID) != null)
       {
-        c.addBlock(newVector(i, BlockVector.CENTER),
-                    newVector(i, BlockVector.SIZE),
-                    c.getBlockByID(blockDNAs[i].parentID),
-                    newVector(i, BlockVector.JOINT_A),
-                    newVector(i, BlockVector.JOINT_B),
-                    newVector(i, BlockVector.AXIS_A),
-                    newVector(i, BlockVector.AXIS_B));
+        BlockDNA bDNA = blockDNAs[i];
+        if(bDNA.angles == null)
+        {
+          c.addBlock(CreatureConstants.IDENTITY_QUATERNION,
+                      newVector(i, BlockVector.SIZE),
+                      c.getBlockByID(bDNA.parentID),
+                      newVector(i, BlockVector.JOINT_A),
+                      newVector(i, BlockVector.JOINT_B),
+                      newVector(i, BlockVector.AXIS_A),
+                      newVector(i, BlockVector.AXIS_B));
+        }
+        else
+        {
+          c.addBlock(bDNA.angles, newVector(i, BlockVector.SIZE),
+                                            c.getBlockByID(bDNA.parentID),
+                                            newVector(i, BlockVector.JOINT_A),
+                                            newVector(i, BlockVector.JOINT_B),
+                                            newVector(i, BlockVector.AXIS_A),
+                                            newVector(i, BlockVector.AXIS_B));
+        }
         blockDNAs[i].addNeurons(c.getBlockByID(blockDNAs[i].blockID));
       }
     }
@@ -157,6 +172,7 @@ public class DNA
     private final int NUM_VECTORS = 6;
     private int blockID, parentID;
     private Vector3f[] sizeAndShape;
+    private float[] angles;
     private ArrayList<NeuronDNA> neuronDNAs;
 
     /**
@@ -190,6 +206,15 @@ public class DNA
       {
         neuronDNAs.add(new NeuronDNA(n));
       }
+    }
+
+    /**
+     * Get a copy of the creatures angle argument.
+     * @param angleArr        float array representing rotation quaternion.
+     */
+    public void setAngles(float[] angleArr)
+    {
+      angles = Arrays.copyOf(angleArr, angleArr.length);
     }
 
     /**

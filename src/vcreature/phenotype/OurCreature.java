@@ -4,6 +4,7 @@ import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import vcreature.creatureUtil.CreatureConstants;
 import vcreature.creatureUtil.DNA;
 
 import java.util.ArrayList;
@@ -143,6 +144,7 @@ public class OurCreature extends Creature
     Block b = super.addRoot(rootCenter, rootSize);
     blockProperties.add(makeBlockVectorArray(rootCenter, rootSize, null, null,
                                               null, null));
+    blockAngles.add(CreatureConstants.IDENTITY_QUATERNION);
     return b;
   }
 
