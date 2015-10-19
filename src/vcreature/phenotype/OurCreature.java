@@ -170,9 +170,9 @@ public class OurCreature extends Creature
     Block b = super.addBlock(eulerAngles,halfsize,parent,pivotA,pivotB,axisA,axisB);
     blockProperties.add(makeBlockVectorArray(b.getCenter(bCenter), halfsize, pivotA, pivotB, axisA, axisB));
     blockAngles.add(Arrays.copyOf(eulerAngles, eulerAngles.length));
-    System.out.println("BlockProperties size" + blockProperties.size());
     return b;
   }
+
 
   /**
    * Add block to the creature.  Log it in an accessible location.
@@ -185,6 +185,7 @@ public class OurCreature extends Creature
    * @param axisB         axis of rotation b.
    * @return              block created.
    */
+  /*
   @Override
   public Block addBlock(Vector3f center, Vector3f size, Block parent,
                         Vector3f pivotA, Vector3f pivotB, Vector3f axisA,
@@ -196,7 +197,7 @@ public class OurCreature extends Creature
                                               //axisA, axisB));
     System.out.println("Dep vec size " + blockProperties.size());
     return b;
-  }
+  }*/
 
   /**
    * Populate the DNA's Size and shape array with all the right vectors.
@@ -275,7 +276,6 @@ public class OurCreature extends Creature
                                           Vector3f axisA, Vector3f axisB)
   {
     Vector3f[] blockProperties = new Vector3f[6];
-    System.out.println("make Block Vector center " + center);
     blockProperties[BlockVector.CENTER.ordinal()] = new Vector3f(center);
     blockProperties[BlockVector.SIZE.ordinal()] = size;
     blockProperties[BlockVector.JOINT_A.ordinal()] = jointA;
