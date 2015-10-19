@@ -252,6 +252,10 @@ public class OurCreature extends Creature
    */
   public DNA getDNA()
   {
+    if(dna == null)
+    {
+      dna = new DNA(this);
+    }
     return dna;
   }
 
