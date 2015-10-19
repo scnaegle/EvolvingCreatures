@@ -266,13 +266,14 @@ public class DNA
         }
         else//TODO For testing: Remove when doing fileIO
         {
-          bString += "null ";
+          bString += "null";
         }
         bString += '\n';
       }
       if(neuronDNAs != null)
       {
         bString += neuronDNAs.size();
+        bString += '\n';
         for(NeuronDNA nDNA : neuronDNAs)
         {
           bString += nDNA.getString();
@@ -282,6 +283,7 @@ public class DNA
       {
         bString += 0;
       }
+      bString += '\n';
       return bString;
     }
 
