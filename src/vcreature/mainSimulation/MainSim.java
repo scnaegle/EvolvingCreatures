@@ -376,6 +376,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     this.speed = speed;
     physicsSpace.setMaxSubSteps(speed * 4);
     settings.setFrequency(speed * 60);
+    this.setSettings(settings);
+    this.restart();
   }
 
   //=====begin ScreenController implementation================================
