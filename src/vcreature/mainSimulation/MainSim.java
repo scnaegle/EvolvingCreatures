@@ -159,7 +159,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    
     Block.initStaticMaterials(assetManager);
     //create "Flappy Bird"
-    myCreature = new OurCreature(physicsSpace, rootNode, true);
+    myCreature = new OurCreature(physicsSpace, rootNode, false);
     //myCreature = new RandomCreature(physicsSpace, rootNode);
 
     //TODO Remove, building homemade creature
