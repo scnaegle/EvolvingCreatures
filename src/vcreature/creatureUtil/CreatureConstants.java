@@ -6,5 +6,6 @@ package vcreature.creatureUtil;
 public class CreatureConstants {
   public static int MAX_BLOCKS = 10;
   public static int MAX_POPULATION = 100;
+  public static final int BLOCK_DNA_BASE_SIZE = 7;
   public static final float[] IDENTITY_QUATERNION = {0, 0, 0};
 }
