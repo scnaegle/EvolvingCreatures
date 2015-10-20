@@ -49,6 +49,7 @@ public class OurCreature extends Creature
     this(physWorld, visWorld);
     this.dna = dna;
     this.dna.initializeCreature(this);
+    placeOnGround();
   }
 
   /**
@@ -272,10 +273,7 @@ public class OurCreature extends Creature
     blockProperties[BlockVector.JOINT_B.ordinal()] = jointB;
     blockProperties[BlockVector.AXIS_A.ordinal()] = axisA;
     blockProperties[BlockVector.AXIS_B.ordinal()] = axisB;
-    for(int i = 0; i < blockProperties.length; ++i)
-    {
-      System.out.println(blockProperties[i]);
-    }
+
     return blockProperties;
   }
 

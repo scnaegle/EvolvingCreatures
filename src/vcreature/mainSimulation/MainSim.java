@@ -105,6 +105,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
   private OurCreature myCreature;
+  private DNA testDNA;
   //private RandomCreature myCreature;
   private OurCreature ourCreature; //TODO testing, remove.
   private boolean isCameraRotating = true;
@@ -159,17 +160,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    
     Block.initStaticMaterials(assetManager);
     //create "Flappy Bird"
-    myCreature = new OurCreature(physicsSpace, rootNode, false);
+    ourCreature = new OurCreature(physicsSpace, rootNode, true);
+    testDNA = new DNA(ourCreature);
     //myCreature = new RandomCreature(physicsSpace, rootNode);
 
-    //TODO Remove, building homemade creature
-    DNA dna = new DNA(myCreature);
-    myCreature.remove();
-    System.out.println(dna);
-    ourCreature = new OurCreature(physicsSpace, rootNode, dna);
-    dna = new DNA(ourCreature);
-    System.out.println(dna);
-    System.out.println("DNA length " + dna.getLength());
 
     initLighting();
     initKeys();
@@ -420,16 +414,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     JSONHandler.writeGenomeFile(jsonObject);
     JSONObject jsonIn = JSONHandler.readGenomeFile("dnaOut.txt");
     System.out.println(jsonIn);
-  }
-
-  /*
-  /**
-   * Test DNA object.
-   */
-  private void dnaOps()
-  {
-    DNA dna = new DNA(myCreature);
-    System.out.println(dna);
   }
 
   public class FileConverter implements IStringConverter<File>
