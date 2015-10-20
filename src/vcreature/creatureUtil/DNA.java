@@ -56,6 +56,20 @@ public class DNA
   }
 
   /**
+   * Get number of neuron rules for a block(neuronDNAs.size)
+   * @param blockID       block to get number from.
+   * @return              number of neuron rules, or -1 if blockID is invalid.
+   */
+  public int getNumRules(int blockID)
+  {
+    if(validateBlockIndex(blockID))
+    {
+      return blockDNAs[blockID].neuronDNAs.size();
+    }
+    return -1;
+  }
+
+  /**
    * Adjust the height of the creature.  Change the y values of
    * vectors that control creature's initial location
    * @param deltaY        amount to change by.
@@ -207,6 +221,20 @@ public class DNA
     {
       blockDNAs[blockID].neuronDNAs.get(neuronNum).constantValues[blockNum]
           = blockIndexVal;
+    }
+  }
+
+  /**
+   * Add a block to the DNA.  If the blockID is already in use, it will be
+   * overwritten by the new block. If the index is invalid nothing will happen.
+   * @param b       block to add.
+   */
+  public void addBlockToDNA(Block b)
+  {
+    int index = b.getID();
+    if(validateBlockIndex(index))
+    {
+      blockDNAs[index] = new BlockDNA(b);
     }
   }
 
