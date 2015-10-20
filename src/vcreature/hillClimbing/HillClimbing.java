@@ -1,5 +1,3 @@
-//TODO: 1st mutateBlocks
-
 package vcreature.hillClimbing;
 
 import com.jme3.bullet.PhysicsSpace;
@@ -8,6 +6,7 @@ import com.jme3.scene.Node;
 import vcreature.creatureUtil.DNA;
 import vcreature.phenotype.*;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -15,51 +14,37 @@ import java.util.Random;
  */
 public class HillClimbing
 {
-  private OurCreature creature;//TODO: can remove after Hill Climbing is set to take in population
-  private Creature mutatedCreature;
+  private ArrayList<OurCreature> population;
+  private ArrayList<OurCreature> mutatedPopulation;
   private OurCreature randomCreature;
   private PhysicsSpace physicsSpace;
   private Node rootNode;
   private Random generator;
   private DNA dna;
   private final int NEURON_COUNT = Neuron.TOTAL_INPUTS;
+  private float elapsedTime = 0.0f;
 
-  //TODO: mock fitness test
-  //TODO: to start, want to print out creature info to see if HillClimbing is changing creature
-
-  //TODO: take in arraylist of creatures, population
-  public HillClimbing(OurCreature sample, PhysicsSpace space, Node root)
+  public HillClimbing(ArrayList<OurCreature> population, PhysicsSpace space, Node root)
   {
-    creature = sample;
+    this.population = population;
+    mutatedPopulation = new ArrayList<OurCreature>();
+    //creature = sample;
     physicsSpace = space;
     rootNode = root;
     generator = new Random();
   }
 
-  //mock fitness test
-  private int fitnessTest(Creature sample)
+  /**
+   * Simulates the creature and gets the fitness of it.
+   * At moment, creature will attempt to jump twice, need
+   * to decouple creatures from gui
+   * @param sample creature to do fitness test on
+   * @return fitness value of creature
+   */
+  private float fitnessTest(Creature sample)
   {
-    Block block;
-    int fitnessScore = 0;
-    int blockCount = sample.getNumberOfBodyBlocks();
-    float sizeX, sizeY, sizeZ;
-    boolean invalidSize;
-    for(int i = 0; i < blockCount; i++)
-    {
-      block = sample.getBlockByID(i);
-      sizeX = block.getSizeX();
-      sizeY = block.getSizeY();
-      sizeZ = block.getSize();
-      invalidSize = sizeX < 1 || sizeY < 1 || sizeZ < 1 || sizeX > 10 || sizeY > 10 || sizeZ > 10;
-
-      if(invalidSize) return 0;
-//prefer long legs
-      fitnessScore -= 1/sizeX * 10;
-      fitnessScore += sizeY/2;
-      fitnessScore -= 1/sizeZ * 10;
-
-    }
-    return fitnessScore;
+    sample.updateBrain(elapsedTime);
+    return sample.getFitness();
   }
 
   /**
@@ -126,6 +111,7 @@ public class HillClimbing
    */
   private boolean mutateBlockSize(Block originalBlock, Vector3f center, Vector3f size, boolean isRoot)
   {
+    Vector3f originalSize = new Vector3f(size);
     float x = 0;
     float y = 0;
     float z = 0;
@@ -176,7 +162,7 @@ public class HillClimbing
     size.addLocal(x, y, z);
 
     Block mutatedBlock;
-
+    //TODO: use new add block methods
     if(isRoot) mutatedBlock = randomCreature.addRoot(center,size);
     else
     {
@@ -186,10 +172,7 @@ public class HillClimbing
       mutatedBlock = randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
       copyBlockNeurons(originalBlock,mutatedBlock);
     }
-
-    Vector3f mutatedSize = new Vector3f(x,y,z);
-
-    return !size.equals(mutatedSize);
+    return !originalSize.equals(size);
   }
 
   /**
@@ -233,10 +216,26 @@ public class HillClimbing
         if(i == 0) mutateBlockSize(currentBlock,center,size,true);
         else
         {
-          mutateBlockSize(currentBlock,center,size, false);
+          if(mutateBlockSize(currentBlock,center,size, false))
+          {
+            //TODO: test fitness
+          }
         }
+        System.out.println("Simulated fitness: " + fitnessTest(randomCreature));
+
       }
     }
+  }
+
+  /**
+   * Gives Hill Climbing info about how much time has gone by
+   * in the simulation.  Need the time inorder to do fitness
+   * calculations
+   * @param time passed in the simulation
+   */
+  public void setElapsedTime(float time)
+  {
+    elapsedTime = time;
   }
 
   /**
@@ -245,15 +244,23 @@ public class HillClimbing
    */
   public void hillClimb() {
     int blockID;
-    final int MAX_NUM_BLOCKS = creature.getNumberOfBodyBlocks();
-    //NOTE: may want mutateBlock to return boolean then if all mutates don't improve fitness come back here and choose new block
-    blockID = generator.nextInt(MAX_NUM_BLOCKS);
-    mutateBlock(creature, blockID);
+    OurCreature creature;
+    for(int i = 0; i < population.size(); i++)
+    {
+      creature = population.remove(i);
+      OurCreature clone = new OurCreature(physicsSpace,null); //TODO: test to see if clone will jump without affecting GUI
+      final int MAX_NUM_BLOCKS = creature.getNumberOfBodyBlocks();
+      //NOTE: may want mutateBlock to return boolean then if all mutates don't improve fitness come back here and choose new block
+      blockID = generator.nextInt(MAX_NUM_BLOCKS);
+      mutateBlock(creature, blockID);
+      mutatedPopulation.add(randomCreature);
+    }
+    population = mutatedPopulation;
   }
 
   /**
    * Grabs a creature from the hill climbing to show
-   * TODO: grap a random creature from population, or pick best fit one
+   * TODO: grab a random creature from population, or pick best fit one
    * @return creature from this population
    */
   public OurCreature getCreature(){return randomCreature;}

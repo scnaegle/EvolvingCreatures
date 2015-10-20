@@ -32,6 +32,8 @@ import vcreature.phenotype.Creature;
 import vcreature.phenotype.OurCreature;
 import vcreature.phenotype.PhysicsConstants;
 
+import java.util.ArrayList;
+
 //Added 10/14/2015 justin thomas
 
 public class HCTestSim extends SimpleApplication implements ActionListener, ScreenController
@@ -46,6 +48,7 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
   private Vector3f tmpVec3; //
   private OurCreature myCreature;
   private boolean isCameraRotating = true;
+  private ArrayList<OurCreature> population;
 
   //Nifty gui
   private Nifty nifty;
@@ -108,7 +111,9 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
     */
     flyCam.setDragToRotate(true);
 
-    hillClimbing = new HillClimbing(myCreature, physicsSpace, rootNode);//would want it here to set up hill climbing
+    population = new ArrayList<OurCreature>();
+    population.add(myCreature);
+    hillClimbing = new HillClimbing(population, physicsSpace, rootNode);//would want it here to set up hill climbing
   }
 
   
@@ -164,7 +169,7 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
     //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
     myCreature.updateBrain(elapsedSimulationTime);
 
-    //System.out.println("Max Fitness: " + myCreature.getFitness());
+    System.out.println("Max Fitness: " + myCreature.getFitness());
 
     if (isCameraRotating)
     {
@@ -181,6 +186,7 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
     //TODO: make myCreature be best creature from population
     if(myCreature.getFitness() < 20 && elapsedSimulationTime > 17.0f)
     {
+      hillClimbing.setElapsedTime(elapsedSimulationTime);
       hillClimbing.hillClimb();
 
       myCreature.detach();
