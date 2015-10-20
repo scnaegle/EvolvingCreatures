@@ -183,7 +183,7 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
     {
       hillClimbing.hillClimb();
 
-      myCreature.remove();
+      myCreature.detach();
       myCreature = hillClimbing.getCreature();
       myCreature.placeOnGround();
       elapsedSimulationTime = 0.0f;

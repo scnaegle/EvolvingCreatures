@@ -74,9 +74,9 @@ public class OurCreature extends Creature
 
 
   /**
-   * Remove whole creature, temp fix until joel updates.
+   * Detach creature from world without disrupting it.
    */
-  public void remove()
+  public void detach()
   {
     for(int i = 0; i < getNumberOfBodyBlocks(); ++i)
     {
