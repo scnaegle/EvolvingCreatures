@@ -108,6 +108,13 @@ public class OurCreature extends Creature
     return addRoot(rootCenter, rootSize, CreatureConstants.IDENTITY_QUATERNION);
   }
 
+  /**
+   * Current Root constructor.
+   * @param rootCenter        root location.
+   * @param rootSize          block size.
+   * @param angles            angle orientation
+   * @return                  return block that was created.
+   */
   @Override
   public Block addRoot(Vector3f rootCenter, Vector3f rootSize, float[] angles)
   {
@@ -145,6 +152,7 @@ public class OurCreature extends Creature
 
 
   /**
+   * @deprecated
    * Add block to the creature.  Log it in an accessible location.
    * @param center        Location of the block.
    * @param size          size of the creature.
@@ -168,25 +176,26 @@ public class OurCreature extends Creature
   }
 
   /**
-   * Populate the DNA's Size and shape array with all the right vectors.
+   * Populate the DNA's Size and shape array with all the right vectors.  Pass
+   * in block id and vector array.
    * @param id        id of block to change.
-   * @param dna       sizeAndShape array from DNA => BlockDNA
+   * @param vecArr       sizeAndShape array from DNA => BlockDNA
    */
-  public void populateVectorDNA(int id, Vector3f[] dna)
+  public void populateVectorDNA(int id, Vector3f[] vecArr)
   {
-    dna[BlockVector.CENTER.ordinal()] = new Vector3f(getBlockVector(id,
+    vecArr[BlockVector.CENTER.ordinal()] = new Vector3f(getBlockVector(id,
                                                     BlockVector.CENTER));
-    dna[BlockVector.SIZE.ordinal()] = new Vector3f(getBlockVector(id,
+    vecArr[BlockVector.SIZE.ordinal()] = new Vector3f(getBlockVector(id,
                                                     BlockVector.SIZE));
     if(getBlockByID(id).getJoint() != null)
     {
-      dna[BlockVector.JOINT_A.ordinal()] = new Vector3f(getBlockVector(id,
+      vecArr[BlockVector.JOINT_A.ordinal()] = new Vector3f(getBlockVector(id,
                                                         BlockVector.JOINT_A));
-      dna[BlockVector.JOINT_B.ordinal()] = new Vector3f(getBlockVector(id,
+      vecArr[BlockVector.JOINT_B.ordinal()] = new Vector3f(getBlockVector(id,
                                                         BlockVector.JOINT_B));
-      dna[BlockVector.AXIS_A.ordinal()] = new Vector3f(getBlockVector(id,
+      vecArr[BlockVector.AXIS_A.ordinal()] = new Vector3f(getBlockVector(id,
                                                         BlockVector.AXIS_A));
-      dna[BlockVector.AXIS_B.ordinal()] = new Vector3f(getBlockVector(id,
+      vecArr[BlockVector.AXIS_B.ordinal()] = new Vector3f(getBlockVector(id,
                                                         BlockVector.AXIS_B));
     }
   }
@@ -207,7 +216,7 @@ public class OurCreature extends Creature
   /**
    * Get a deep copy of specified vector info for the specified block.
    * @param id        id of block.
-   * @param v         vector type
+   * @param v         vector type.
    * @return          Copy of specified block vector.
    */
   public Vector3f getBlockVectorCopy(int id, BlockVector v)
@@ -349,6 +358,9 @@ public class OurCreature extends Creature
     leg2.addNeuron(leg2Neuron2);
   }
 
+  /**
+   * Make not flappy bird.
+   */
   private void makeNotFlappy()
   {
     //a Center is only needed for the root.
