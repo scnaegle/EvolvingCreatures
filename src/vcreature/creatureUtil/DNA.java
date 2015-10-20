@@ -22,7 +22,7 @@ public class DNA
   private BlockDNA[] blockDNAs;
 
   /**
-   * Default constructor initializes all values to zero.
+   * Default constructor initializes all values to zero or null.
    */
   public DNA()
   {
@@ -30,7 +30,7 @@ public class DNA
   }
 
   /**
-   * DNA Built from creature
+   * DNA Built from creature.  Pass in a built creature to make dna
    * @param c       Creature to build from.
    */
   public DNA(OurCreature c)
@@ -47,7 +47,7 @@ public class DNA
   }
 
   /**
-   * Get number of blocks according to DNA.
+   * Get number of blocks according to DNA.  May not be up to date.
    * @return   numBlocks.
    */
   public int getNumBlocks()
@@ -87,7 +87,7 @@ public class DNA
   /**
    * Get center coordinates for a block.  This vector is separate from the
    * creature structure, but can be used to alter the DNA.
-   * @param iD       int BlockID
+   * @param iD       int BlockID.
    * @return         Vector3f center coordinates, return null.
    */
   public Vector3f getBlockCenter(int iD)
@@ -104,7 +104,7 @@ public class DNA
 
 
   /**
-   * Build creature with DNA
+   * Build creature with DNA.  Called from OurCreature constructor.
    * @param c       Creature to build.
    */
   public void initializeCreature(Creature c)
@@ -141,6 +141,11 @@ public class DNA
     }
   }
 
+  /**
+   * Get length of DNA that is used for crossover. (Maybe random access?)
+   * blocks * (vectors + 1) + blocks * (numNeurons * 5)
+   * @return      the length of the dna used for crossover
+   */
   public int getLength()
   {
     return length;
@@ -148,7 +153,10 @@ public class DNA
 
 
   /**
-   * Alter a block's angle array.
+   * Alter a block's angle array.  Pass in new length 3 float array of the
+   * format {angleX, angleY, angleZ} (in radians)  This sets the angle array in
+   * the DNA. Joel's Creature constructor converts to a Quaternion, we don't
+   * have to worry about it.
    * @param newAngles       new value for the angles.
    * @param id              blockDNA to alter.
    */
@@ -161,7 +169,8 @@ public class DNA
   }
 
   /**
-   * Alter one of a block's size and shape vectors.
+   * Alter one of a block's size and shape vectors.  Specified by BlockVector
+   * enum.
    * @param newVector       new value for the vector.
    * @param id              blockDNA to alter.
    * @param type            the type of vector to alter.
@@ -191,7 +200,7 @@ public class DNA
   }
 
   /**
-   * Alter neuron constantValue
+   * Alter neuron constantValue.
    * @param blockID       block to alter.
    * @param neuronNum     neuron to alter.
    * @param constNum      rule to alter.
@@ -264,7 +273,7 @@ public class DNA
   }
 
   /**
-   * Is block index valid
+   * Is block index valid.
    * @param i       index to check.
    * @return        is parameter valid.
    */
@@ -281,7 +290,7 @@ public class DNA
   }
 
   /**
-   * Validate the indices for neuron value
+   * Validate the indices for neuron value.
    * @param block     index of block to alter
    * @param neuron    index of neuron to alter
    * @param i         index of rule to alter
@@ -305,7 +314,7 @@ public class DNA
 
   /**
    * Helper method that creates and returns a new vector from a block's size
-   * and shape array
+   * and shape array.
    * @param dnaNum        block to get vector from.
    * @param type          which vector we want.
    * @return              new vector3f
@@ -353,7 +362,6 @@ public class DNA
       blockID = b.getID();
       parentID = b.getIdOfParent();
       sizeAndShape = new Vector3f[NUM_VECTORS];
-      //b.populateVectorDNA(sizeAndShape);
       neuronDNAs = new ArrayList<>();
       ArrayList<Neuron> neuronTable = b.getNeuronTable();
       for(Neuron n : neuronTable)
@@ -365,7 +373,7 @@ public class DNA
     }
 
     /**
-     * Get a copy of the creatures angle argument.
+     * Get a copy of the creatures angle array.
      * @param angleArr        float array representing rotation quaternion.
      */
     public void setAngles(float[] angleArr)
@@ -423,7 +431,7 @@ public class DNA
           bString += v.z;
           bString += ' ';
         }
-        else//TODO For testing: Remove when doing fileIO
+        else
         {
           bString += "null";
         }
@@ -467,7 +475,7 @@ public class DNA
 
       /**
        * Constructor that accepts a neuron then populates the dna values.
-       * @param n
+       * @param n  Neuron in question.
        */
       public NeuronDNA(Neuron n)
       {
