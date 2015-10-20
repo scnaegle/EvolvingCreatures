@@ -2,6 +2,7 @@ package vcreature.phenotype;
 
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.joints.HingeJoint;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import vcreature.creatureUtil.CreatureConstants;
@@ -99,10 +100,21 @@ public class OurCreature extends Creature
   @Override
   public Block addRoot(Vector3f rootCenter, Vector3f rootSize)
   {
-    Block b = super.addRoot(rootCenter, rootSize);
+    //Block b = super.addRoot(rootCenter, rootSize);
+    //blockProperties.add(makeBlockVectorArray(rootCenter, rootSize, null, null,
+     //                                         null, null));
+    //blockAngles.add(CreatureConstants.IDENTITY_QUATERNION);
+
+    return addRoot(rootCenter, rootSize, CreatureConstants.IDENTITY_QUATERNION);
+  }
+
+  @Override
+  public Block addRoot(Vector3f rootCenter, Vector3f rootSize, float[] angles)
+  {
+    Block b = super.addRoot(rootCenter, rootSize, angles);
     blockProperties.add(makeBlockVectorArray(rootCenter, rootSize, null, null,
-                                              null, null));
-    blockAngles.add(CreatureConstants.IDENTITY_QUATERNION);
+        null, null));
+    blockAngles.add(angles);
     return b;
   }
 
@@ -251,6 +263,10 @@ public class OurCreature extends Creature
     blockProperties[BlockVector.JOINT_B.ordinal()] = jointB;
     blockProperties[BlockVector.AXIS_A.ordinal()] = axisA;
     blockProperties[BlockVector.AXIS_B.ordinal()] = axisB;
+    for(int i = 0; i < blockProperties.length; ++i)
+    {
+      System.out.println(blockProperties[i]);
+    }
     return blockProperties;
   }
 
@@ -259,27 +275,47 @@ public class OurCreature extends Creature
    */
   private void makeFlappyBird()
   {
-    Vector3f torsoCenter = new Vector3f( 0.0f, 2.5f, 0.0f);
+    //a Center is only needed for the root.
+    //Note: This is intentionally placed 10 meters above the ground.
+    //The Creature method placeOnGround() will be used to place it on the ground before starting the simulation.
+    Vector3f torsoCenter = new Vector3f( 0.0f, 12.5f, 0.0f);
+
     Vector3f torsoSize = new Vector3f( 2.0f, 1.5f, 1.5f);
     Vector3f leg1Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
     Vector3f leg2Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
 
-    Block torso = addRoot(torsoCenter, torsoSize);
+    //Euler rotation angles (x,y,z) aka (pitch, yaw, rall)).
+    //Note: Euler angles are applying in order: (y, z, x) aka (yaw, roll, pitch).
+    float[] eulerAngles = {0, FastMath.PI/6.0f, 0};
 
-    Vector3f pivotA = new Vector3f( 2.0f, -1.5f,  0.0f); //Center of hinge in parents block's coordinates
-    Vector3f pivotB = new Vector3f(-3.0f,  0.5f,  0.0f); //Center of hinge in child block's coordinates
+
+    Block torso = addRoot(torsoCenter, torsoSize, eulerAngles);
+
+    Vector3f pivotA = new Vector3f( 2.0f, -1.5f,  0.0f); //Center of hinge in the block's coordinates
+    Vector3f pivotB = new Vector3f(-3.0f,  0.5f,  0.0f); //Center of hinge in the block's coordinates
 
 
-    Block leg1  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg1Size, torso, pivotA, pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    //Notice that even though the blocks are rotated 30 degrees, since the pivot points and pivot axes are
+    //   specified in each block's local coordinates, there is no change to these values.
+    Block leg1  = addBlock(eulerAngles, leg1Size,torso, pivotA,  pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
 
-    Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in parents  block's coordinates
-    Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in childs block's coordinates
 
-    Block leg2  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+
+    Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in the block's coordinates
+    Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in the block's coordinates
+
+    Block leg2  = addBlock(eulerAngles, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+
+
+
+
 
     torso.setMaterial(Block.MATERIAL_GREEN);
     leg1.setMaterial(Block.MATERIAL_RED);
     leg2.setMaterial(Block.MATERIAL_BLUE);
+
+    placeOnGround();
+
 
     Neuron leg1Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
         EnumNeuronInput.CONSTANT, null);
@@ -315,32 +351,47 @@ public class OurCreature extends Creature
 
   private void makeNotFlappy()
   {
-    Vector3f torsoCenter = new Vector3f( 0.0f, 2.5f, 0.0f);
-    Vector3f torsoSize = new Vector3f( 1.5f, 1.5f, 1.5f);
-    Vector3f leg1Size  = new Vector3f( 3.0f, 0.5f, 0.5f);
-    Vector3f leg2Size  = new Vector3f( 3.0f, 0.5f, 0.5f);
+    //a Center is only needed for the root.
+    //Note: This is intentionally placed 10 meters above the ground.
+    //The Creature method placeOnGround() will be used to place it on the ground before starting the simulation.
+    Vector3f torsoCenter = new Vector3f( 0.0f, 12.5f, 0.0f);
 
-    Block torso = addRoot(torsoCenter, torsoSize);
+    Vector3f torsoSize = new Vector3f( 2.0f, 1.5f, 1.5f);
+    Vector3f leg1Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
+    Vector3f leg2Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
 
-    Vector3f pivotA = new Vector3f( 2.0f, -1.5f,  0.0f); //Center of hinge in parents block's coordinates
-    Vector3f pivotB = new Vector3f(-3.0f,  0.5f,  0.0f); //Center of hinge in child block's coordinates
+    //Euler rotation angles (x,y,z) aka (pitch, yaw, rall)).
+    //Note: Euler angles are applying in order: (y, z, x) aka (yaw, roll, pitch).
+    float[] eulerAngles = {0, FastMath.PI/6.0f, 0};
 
 
-    Block leg1  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg1Size, torso, pivotA, pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    Block torso = addRoot(torsoCenter, torsoSize, eulerAngles);
 
-    Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in parents  block's coordinates
-    Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in childs block's coordinates
+    Vector3f pivotA = new Vector3f( 2.0f, -1.5f,  0.0f); //Center of hinge in the block's coordinates
+    Vector3f pivotB = new Vector3f(-3.0f,  0.5f,  0.0f); //Center of hinge in the block's coordinates
 
-    Block leg2  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
 
-    Vector3f pivotE = new Vector3f(-3.0f, 0.0f,  0.0f); //Center of hinge in parents  block's coordinates
-    Vector3f pivotF = new Vector3f( 3.0f,  0.0f,  0.0f); //Center of hinge in childs block's coordinates
+    //Notice that even though the blocks are rotated 30 degrees, since the pivot points and pivot axes are
+    //   specified in each block's local coordinates, there is no change to these values.
+    Block leg1  = addBlock(eulerAngles, leg1Size,torso, pivotA,  pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
 
-    Block leg3  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg2Size,leg2, pivotE,  pivotF, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+
+
+    Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in the block's coordinates
+    Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in the block's coordinates
+
+    Block leg2  = addBlock(eulerAngles, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+
+
+
+
 
     torso.setMaterial(Block.MATERIAL_GREEN);
     leg1.setMaterial(Block.MATERIAL_RED);
     leg2.setMaterial(Block.MATERIAL_BLUE);
+
+    placeOnGround();
+
 
     Neuron leg1Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
         EnumNeuronInput.CONSTANT, null);
@@ -373,14 +424,23 @@ public class OurCreature extends Creature
     leg2.addNeuron(leg2Neuron1);
     leg2.addNeuron(leg2Neuron2);
 
+    Vector3f pivotE = new Vector3f(-3.0f, 0.0f,  0.0f); //Center of hinge in parents  block's coordinates
+    Vector3f pivotF = new Vector3f( 3.0f,  0.0f,  0.0f); //Center of hinge in childs block's coordinates
+
+    Block leg3  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg2Size,leg2, pivotE,  pivotF, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+
+    torso.setMaterial(Block.MATERIAL_GREEN);
+    leg1.setMaterial(Block.MATERIAL_RED);
+    leg2.setMaterial(Block.MATERIAL_BLUE);
+
     Neuron leg3Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
         EnumNeuronInput.CONSTANT, null);
 
-    leg1Neuron1.setInputValue(Neuron.C,11);
-    leg1Neuron1.setInputValue(Neuron.D,-Float.MAX_VALUE);
-
     Neuron leg3Neuron2 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
         EnumNeuronInput.CONSTANT, null);
+
+    leg3Neuron1.setInputValue(Neuron.C,11);
+    leg3Neuron1.setInputValue(Neuron.D,-Float.MAX_VALUE);
 
     leg3Neuron2.setInputValue(Neuron.C,10);
     leg3Neuron2.setInputValue(Neuron.D,Float.MAX_VALUE);
