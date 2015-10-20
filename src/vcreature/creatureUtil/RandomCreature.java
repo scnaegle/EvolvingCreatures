@@ -68,9 +68,9 @@ public class RandomCreature extends OurCreature
     Vector3f rootSize = new Vector3f();
 
     //choose random x,y,z values between 1 and 10
-    rootSize.x = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
-    rootSize.y = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
-    rootSize.z = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
+    rootSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
+    rootSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
+    rootSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
 
     //bump up the root node so it doesn't overlap with floor
     //bumpUpCreature();
@@ -99,9 +99,9 @@ public class RandomCreature extends OurCreature
     Vector3f childJoint = new Vector3f();
 
     //create random sizes for child block
-    childSize.x = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
-    childSize.y = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
-    childSize.z = ((rand.nextInt(9)+1) + rand.nextFloat())/2;
+    childSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
+    childSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
+    childSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
 
     //select a random surface on parent to add child to
     parentSurface = rand.nextInt(6);
