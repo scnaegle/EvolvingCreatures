@@ -49,7 +49,6 @@ public class OurCreature extends Creature
     this(physWorld, visWorld);
     this.dna = dna;
     this.dna.initializeCreature(this);
-    placeOnGround();
   }
 
   /**
