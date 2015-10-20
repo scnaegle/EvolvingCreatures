@@ -231,6 +231,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private void initKeys() {
     inputManager.addMapping("Quit", new KeyTrigger(KeyInput.KEY_Q));
     inputManager.addMapping("Toggle Camera Rotation", new KeyTrigger(KeyInput.KEY_P));
+    inputManager.addMapping("Change Creature", new KeyTrigger(KeyInput.KEY_C));
 
     // Add the names to the action listener.
     inputManager.addListener(this, "Quit");
@@ -241,6 +242,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   {
     if (isPressed && name.equals("Toggle Camera Rotation"))
     { isCameraRotating = !isCameraRotating;
+    }
+    else if (isPressed && name.equals("Change Creature")) {
+      System.out.format("Creature Fitness (Maximum height of lowest point) = %.3f meters]\n", myCreature.getFitness());
+
+      myCreature.remove();
+//      myCreature = new FlappyBird2(physicsSpace, rootNode);
+
+      cameraAngle = (float)(Math.PI/2.0);
+      elapsedSimulationTime = 0.0f;
     }
     else if (name.equals("Quit"))
     {
