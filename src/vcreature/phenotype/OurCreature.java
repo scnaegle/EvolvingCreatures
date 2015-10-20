@@ -4,10 +4,11 @@ import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import vcreature.creatureUtil.CreatureConstants;
 import vcreature.creatureUtil.DNA;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 
 /**
  * @author Justin Thomas(jthomas105@unm.edu)
@@ -19,6 +20,7 @@ public class OurCreature extends Creature
   private PhysicsSpace physicsSpace;
   private Node visualWorld;
   private ArrayList<Vector3f[]> blockProperties;
+  private ArrayList<float[]> blockAngles;
 
   //====================Begin Constructors======================================
   /**
@@ -32,6 +34,7 @@ public class OurCreature extends Creature
     physicsSpace = physicsWorld;
     this.visualWorld = visualWorld;
     blockProperties = new ArrayList<>();
+    blockAngles = new ArrayList<>();
   }
 
   /**
@@ -57,59 +60,17 @@ public class OurCreature extends Creature
   public OurCreature(PhysicsSpace physWorld, Node visWorld, boolean isFlappy)
   {
     this(physWorld, visWorld);
-    Vector3f torsoCenter = new Vector3f( 0.0f, 2.5f, 0.0f);     Vector3f torsoSize = new Vector3f( 2.0f, 1.5f, 1.5f);
-    Vector3f leg1Center  = new Vector3f( 5.0f, 0.5f, 0.0f);     Vector3f leg1Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
-    Vector3f leg2Center  = new Vector3f(-5.0f, 0.5f, 0.0f);     Vector3f leg2Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
-
-    Block torso = addRoot(torsoCenter, torsoSize);
-
-    Vector3f pivotA = new Vector3f( 2.0f, -1.5f,  0.0f); //Center of hinge in parents block's coordinates
-    Vector3f pivotB = new Vector3f(-3.0f,  0.5f,  0.0f); //Center of hinge in child block's coordinates
-
-
-    Block leg1  = addBlock(leg1Center, leg1Size,torso, pivotA,  pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
-
-    Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in parents  block's coordinates
-    Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in childs block's coordinates
-
-    Block leg2  = addBlock(leg2Center, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
-
-    torso.setMaterial(Block.MATERIAL_GREEN);
-    leg1.setMaterial(Block.MATERIAL_RED);
-    leg2.setMaterial(Block.MATERIAL_BLUE);
-
-    Neuron leg1Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
-        EnumNeuronInput.CONSTANT, null);
-
-    leg1Neuron1.setInputValue(Neuron.C,11);
-    leg1Neuron1.setInputValue(Neuron.D,-Float.MAX_VALUE);
-
-    Neuron leg1Neuron2 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
-        EnumNeuronInput.CONSTANT, null);
-
-    leg1Neuron2.setInputValue(Neuron.C,10);
-    leg1Neuron2.setInputValue(Neuron.D,Float.MAX_VALUE);
-
-    leg1.addNeuron(leg1Neuron1);
-    leg1.addNeuron(leg1Neuron2);
-
-
-    Neuron leg2Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
-        EnumNeuronInput.CONSTANT, null);
-
-    leg2Neuron1.setInputValue(Neuron.C,11);
-    leg2Neuron1.setInputValue(Neuron.D,Float.MAX_VALUE);
-
-    Neuron leg2Neuron2 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
-        EnumNeuronInput.CONSTANT, null);
-
-    leg2Neuron2.setInputValue(Neuron.C,10);
-    leg2Neuron2.setInputValue(Neuron.D,-Float.MAX_VALUE);
-
-    leg2.addNeuron(leg2Neuron1);
-    leg2.addNeuron(leg2Neuron2);
+    if(isFlappy)
+    {
+      makeFlappyBird();
+    }
+    else
+    {
+      makeNotFlappy();
+    }
   }
   //==================End Constructors==========================================
+
 
   /**
    * Remove whole creature, temp fix until joel updates.
@@ -129,6 +90,7 @@ public class OurCreature extends Creature
   }
 
   /**
+   * @deprecated
    * Create root block.
    * @param rootCenter        Location of block.
    * @param rootSize          Size of block.
@@ -140,8 +102,35 @@ public class OurCreature extends Creature
     Block b = super.addRoot(rootCenter, rootSize);
     blockProperties.add(makeBlockVectorArray(rootCenter, rootSize, null, null,
                                               null, null));
+    blockAngles.add(CreatureConstants.IDENTITY_QUATERNION);
     return b;
   }
+
+  /**
+   * Add block, calls super.addBlock().  Also logs important vectors and block
+   * angles.
+   * @param eulerAngles
+   * @param halfsize half the extent (in meters) of the block in the x, y and z direction.
+   * For example, a block with extent in the x dimension of 0.5 would extend from 0.5 meters from
+   * the origin in the -x direction and 0.5 meters from the origin in the +x direction.
+   * @param parent Block instance onto which this block will be joined.
+   * @param pivotA Location in local coordinates of the pivot point on the parent block.
+   * Local coordinates means the location on the block relitive to the block's center with zero rotation.
+   * @param pivotB Location in local coordinates of the pivot point on this block.
+   * @param axisA One-degree of freedom hinge axis in local coordinates of the parent block.
+   * @param axisB One-degree of freedom hinge axis in local coordinates of the this block.
+   * @return
+   */
+  @Override
+  public Block addBlock(float[] eulerAngles, Vector3f halfsize, Block parent, Vector3f pivotA, Vector3f pivotB, Vector3f axisA, Vector3f axisB)
+  {
+    Vector3f bCenter = new Vector3f();
+    Block b = super.addBlock(eulerAngles,halfsize,parent,pivotA,pivotB,axisA,axisB);
+    blockProperties.add(makeBlockVectorArray(b.getCenter(bCenter), halfsize, pivotA, pivotB, axisA, axisB));
+    blockAngles.add(Arrays.copyOf(eulerAngles, eulerAngles.length));
+    return b;
+  }
+
 
   /**
    * Add block to the creature.  Log it in an accessible location.
@@ -191,6 +180,19 @@ public class OurCreature extends Creature
   }
 
   /**
+   * Get float array representing the rotation of the specifed block.
+   * Caution! sends pointer to array.
+   * @param id        block's ID
+   * @return          float array representing the Quaternion block was made
+   *                  with.
+   */
+  public float[] getBlockAngles(int id)
+  {
+    return blockAngles.get(id);
+  }
+
+
+  /**
    * Get a deep copy of specified vector info for the specified block.
    * @param id        id of block.
    * @param v         vector type
@@ -199,6 +201,19 @@ public class OurCreature extends Creature
   public Vector3f getBlockVectorCopy(int id, BlockVector v)
   {
     return new Vector3f(getBlockVector(id, v));
+  }
+
+  /**
+   * Get dna object.
+   * @return        dna object
+   */
+  public DNA getDNA()
+  {
+    if(dna == null)
+    {
+      dna = new DNA(this);
+    }
+    return dna;
   }
 
   /**
@@ -230,12 +245,147 @@ public class OurCreature extends Creature
                                           Vector3f axisA, Vector3f axisB)
   {
     Vector3f[] blockProperties = new Vector3f[6];
-    blockProperties[BlockVector.CENTER.ordinal()] = center;
+    blockProperties[BlockVector.CENTER.ordinal()] = new Vector3f(center);
     blockProperties[BlockVector.SIZE.ordinal()] = size;
     blockProperties[BlockVector.JOINT_A.ordinal()] = jointA;
     blockProperties[BlockVector.JOINT_B.ordinal()] = jointB;
     blockProperties[BlockVector.AXIS_A.ordinal()] = axisA;
     blockProperties[BlockVector.AXIS_B.ordinal()] = axisB;
     return blockProperties;
+  }
+
+  /**
+   * Make flappy bird.
+   */
+  private void makeFlappyBird()
+  {
+    Vector3f torsoCenter = new Vector3f( 0.0f, 2.5f, 0.0f);
+    Vector3f torsoSize = new Vector3f( 2.0f, 1.5f, 1.5f);
+    Vector3f leg1Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
+    Vector3f leg2Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
+
+    Block torso = addRoot(torsoCenter, torsoSize);
+
+    Vector3f pivotA = new Vector3f( 2.0f, -1.5f,  0.0f); //Center of hinge in parents block's coordinates
+    Vector3f pivotB = new Vector3f(-3.0f,  0.5f,  0.0f); //Center of hinge in child block's coordinates
+
+
+    Block leg1  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg1Size, torso, pivotA, pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+
+    Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in parents  block's coordinates
+    Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in childs block's coordinates
+
+    Block leg2  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+
+    torso.setMaterial(Block.MATERIAL_GREEN);
+    leg1.setMaterial(Block.MATERIAL_RED);
+    leg2.setMaterial(Block.MATERIAL_BLUE);
+
+    Neuron leg1Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg1Neuron1.setInputValue(Neuron.C,11);
+    leg1Neuron1.setInputValue(Neuron.D,-Float.MAX_VALUE);
+
+    Neuron leg1Neuron2 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg1Neuron2.setInputValue(Neuron.C,10);
+    leg1Neuron2.setInputValue(Neuron.D,Float.MAX_VALUE);
+
+    leg1.addNeuron(leg1Neuron1);
+    leg1.addNeuron(leg1Neuron2);
+
+
+    Neuron leg2Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg2Neuron1.setInputValue(Neuron.C,11);
+    leg2Neuron1.setInputValue(Neuron.D,Float.MAX_VALUE);
+
+    Neuron leg2Neuron2 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg2Neuron2.setInputValue(Neuron.C,10);
+    leg2Neuron2.setInputValue(Neuron.D,-Float.MAX_VALUE);
+
+    leg2.addNeuron(leg2Neuron1);
+    leg2.addNeuron(leg2Neuron2);
+  }
+
+  private void makeNotFlappy()
+  {
+    Vector3f torsoCenter = new Vector3f( 0.0f, 2.5f, 0.0f);
+    Vector3f torsoSize = new Vector3f( 1.5f, 1.5f, 1.5f);
+    Vector3f leg1Size  = new Vector3f( 3.0f, 0.5f, 0.5f);
+    Vector3f leg2Size  = new Vector3f( 3.0f, 0.5f, 0.5f);
+
+    Block torso = addRoot(torsoCenter, torsoSize);
+
+    Vector3f pivotA = new Vector3f( 2.0f, -1.5f,  0.0f); //Center of hinge in parents block's coordinates
+    Vector3f pivotB = new Vector3f(-3.0f,  0.5f,  0.0f); //Center of hinge in child block's coordinates
+
+
+    Block leg1  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg1Size, torso, pivotA, pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+
+    Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in parents  block's coordinates
+    Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in childs block's coordinates
+
+    Block leg2  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+
+    Vector3f pivotE = new Vector3f(-3.0f, 0.0f,  0.0f); //Center of hinge in parents  block's coordinates
+    Vector3f pivotF = new Vector3f( 3.0f,  0.0f,  0.0f); //Center of hinge in childs block's coordinates
+
+    Block leg3  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg2Size,leg2, pivotE,  pivotF, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+
+    torso.setMaterial(Block.MATERIAL_GREEN);
+    leg1.setMaterial(Block.MATERIAL_RED);
+    leg2.setMaterial(Block.MATERIAL_BLUE);
+
+    Neuron leg1Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg1Neuron1.setInputValue(Neuron.C,11);
+    leg1Neuron1.setInputValue(Neuron.D,-Float.MAX_VALUE);
+
+    Neuron leg1Neuron2 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg1Neuron2.setInputValue(Neuron.C,10);
+    leg1Neuron2.setInputValue(Neuron.D,Float.MAX_VALUE);
+
+    leg1.addNeuron(leg1Neuron1);
+    leg1.addNeuron(leg1Neuron2);
+
+
+    Neuron leg2Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg2Neuron1.setInputValue(Neuron.C,11);
+    leg2Neuron1.setInputValue(Neuron.D,Float.MAX_VALUE);
+
+    Neuron leg2Neuron2 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg2Neuron2.setInputValue(Neuron.C,10);
+    leg2Neuron2.setInputValue(Neuron.D,-Float.MAX_VALUE);
+
+    leg2.addNeuron(leg2Neuron1);
+    leg2.addNeuron(leg2Neuron2);
+
+    Neuron leg3Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg1Neuron1.setInputValue(Neuron.C,11);
+    leg1Neuron1.setInputValue(Neuron.D,-Float.MAX_VALUE);
+
+    Neuron leg3Neuron2 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg3Neuron2.setInputValue(Neuron.C,10);
+    leg3Neuron2.setInputValue(Neuron.D,Float.MAX_VALUE);
+
+    leg3.addNeuron(leg3Neuron1);
+    leg3.addNeuron(leg3Neuron2);
   }
 }

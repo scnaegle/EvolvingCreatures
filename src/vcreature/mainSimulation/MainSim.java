@@ -159,7 +159,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    
     Block.initStaticMaterials(assetManager);
     //create "Flappy Bird"
-    myCreature = new OurCreature(physicsSpace, rootNode, true);
+    myCreature = new OurCreature(physicsSpace, rootNode, false);
     //myCreature = new RandomCreature(physicsSpace, rootNode);
 
     //TODO Remove, building homemade creature
@@ -169,6 +169,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     ourCreature = new OurCreature(physicsSpace, rootNode, dna);
     dna = new DNA(ourCreature);
     System.out.println(dna);
+    System.out.println("DNA length " + dna.getLength());
 
     initLighting();
     initKeys();
@@ -386,6 +387,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     this.speed = speed;
     physicsSpace.setMaxSubSteps(speed * 4);
     settings.setFrequency(speed * 60);
+    this.setSettings(settings);
+    this.restart();
   }
 
   //=====begin ScreenController implementation================================
@@ -419,6 +422,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     System.out.println(jsonIn);
   }
 
+  /*
   /**
    * Test DNA object.
    */

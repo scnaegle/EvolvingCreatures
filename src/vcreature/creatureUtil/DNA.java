@@ -6,6 +6,7 @@ import vcreature.mainSimulation.MainSim;
 import vcreature.phenotype.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author Justin Thomas 10/14/2015
@@ -16,14 +17,8 @@ import java.util.ArrayList;
 
 public class DNA
 {
-  /*
-   * BlockVector is organized for BlockDNA's size and shape array.
-   * BlockVector.enum.ordinal() corresponds to the index of the array where
-   * you will find that vector.
-   */
-
   private int numBlocks;
-  private int length; //TODO calculate in constructor.
+  private int length;
   private BlockDNA[] blockDNAs;
 
   /**
@@ -40,13 +35,24 @@ public class DNA
    */
   public DNA(OurCreature c)
   {
+    length = 0;
     blockDNAs = new BlockDNA[CreatureConstants.MAX_BLOCKS];
     numBlocks = c.getNumberOfBodyBlocks();
     for(int i = 0; i < numBlocks; ++i)
     {
       blockDNAs[i] = new BlockDNA(c.getBlockByID(i));
       c.populateVectorDNA(i, blockDNAs[i].sizeAndShape);
+      blockDNAs[i].setAngles(c.getBlockAngles(i));
     }
+  }
+
+  /**
+   * Get number of blocks according to DNA.
+   * @return   numBlocks.
+   */
+  public int getNumBlocks()
+  {
+    return numBlocks;
   }
 
   /**
@@ -96,15 +102,111 @@ public class DNA
       //if there is dna, and it's parent exists, add block
       if(blockDNAs[i] != null && c.getBlockByID(blockDNAs[i].parentID) != null)
       {
-        c.addBlock(newVector(i, BlockVector.CENTER),
-                    newVector(i, BlockVector.SIZE),
-                    c.getBlockByID(blockDNAs[i].parentID),
-                    newVector(i, BlockVector.JOINT_A),
-                    newVector(i, BlockVector.JOINT_B),
-                    newVector(i, BlockVector.AXIS_A),
-                    newVector(i, BlockVector.AXIS_B));
+        BlockDNA bDNA = blockDNAs[i];
+        if(bDNA.angles == null)
+        {
+          c.addBlock(CreatureConstants.IDENTITY_QUATERNION,
+                      newVector(i, BlockVector.SIZE),
+                      c.getBlockByID(bDNA.parentID),
+                      newVector(i, BlockVector.JOINT_A),
+                      newVector(i, BlockVector.JOINT_B),
+                      newVector(i, BlockVector.AXIS_A),
+                      newVector(i, BlockVector.AXIS_B));
+        }
+        else
+        {
+          c.addBlock(bDNA.angles, newVector(i, BlockVector.SIZE),
+                                            c.getBlockByID(bDNA.parentID),
+                                            newVector(i, BlockVector.JOINT_A),
+                                            newVector(i, BlockVector.JOINT_B),
+                                            newVector(i, BlockVector.AXIS_A),
+                                            newVector(i, BlockVector.AXIS_B));
+        }
         blockDNAs[i].addNeurons(c.getBlockByID(blockDNAs[i].blockID));
       }
+    }
+  }
+
+  public int getLength()
+  {
+    return length;
+  }
+
+
+  /**
+   * Alter a block's angle array.
+   * @param newAngles       new value for the angles.
+   * @param id              blockDNA to alter.
+   */
+  public void alterAngles(float[] newAngles, int id)
+  {
+    if(validateBlockIndex(id))
+    {
+      blockDNAs[id].angles = Arrays.copyOf(newAngles, 3);
+    }
+  }
+
+  /**
+   * Alter one of a block's size and shape vectors.
+   * @param newVector       new value for the vector.
+   * @param id              blockDNA to alter.
+   * @param type            the type of vector to alter.
+   */
+  public void alterVector(Vector3f newVector, int id, BlockVector type)
+  {
+    if(validateBlockIndex(id))
+    {
+      blockDNAs[id].sizeAndShape[type.ordinal()] = new Vector3f(newVector);
+    }
+  }
+
+  /**
+   * Alter neuron's input type.
+   * @param blockID       blockID
+   * @param neuronNum     what neuron
+   * @param inputNum      what position in the input type array
+   * @param type          new type.
+   */
+  public void alterNeuronInput(int blockID, int neuronNum, int inputNum,
+                               EnumNeuronInput type)
+  {
+    if(validateNeuronIndices(blockID, neuronNum, inputNum))
+    {
+      blockDNAs[blockID].neuronDNAs.get(neuronNum).inputTypes[inputNum] = type;
+    }
+  }
+
+  /**
+   * Alter neuron constantValue
+   * @param blockID       block to alter.
+   * @param neuronNum     neuron to alter.
+   * @param constNum      rule to alter.
+   * @param constant      value to set.
+   */
+  public void alterNeuronConstant(int blockID, int neuronNum, int constNum,
+                                  float constant)
+  {
+    if(validateNeuronIndices(blockID, neuronNum, constNum))
+    {
+      blockDNAs[blockID].neuronDNAs.get(neuronNum).constantValues[constNum]
+                                                                     = constant;
+    }
+  }
+
+  /**
+   * Alter neuron blockIndex value
+   * @param blockID         block to alter.
+   * @param neuronNum       neuron to alter.
+   * @param blockNum        which rule.
+   * @param blockIndexVal   value to set blockIndex to.
+   */
+  public void alterNeuronBlock(int blockID, int neuronNum, int blockNum,
+                                  int blockIndexVal)
+  {
+    if(validateNeuronIndices(blockID, neuronNum, blockNum))
+    {
+      blockDNAs[blockID].neuronDNAs.get(neuronNum).constantValues[blockNum]
+          = blockIndexVal;
     }
   }
 
@@ -112,7 +214,6 @@ public class DNA
    * Build a string representation of the DNA.  The string representation will
    * one int, followed by a series of floats.  All delineated by spaces, and
    * ended with a newline.
-   * //TODO StringBuilder for not n00bish
    * @return String representation of dna
    */
   @Override
@@ -128,11 +229,50 @@ public class DNA
       }
       else//TODO For testing: Remove when doing fileIO
       {
-        stringOut += "null ";
+        stringOut += "null\n";
       }
-      stringOut += '\n';
     }
     return stringOut;
+  }
+
+  /**
+   * Is block index valid
+   * @param i       index to check.
+   * @return        is parameter valid.
+   */
+  private boolean validateBlockIndex(int i)
+  {
+    if(0 <= i && i < numBlocks)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  /**
+   * Validate the indices for neuron value
+   * @param block     index of block to alter
+   * @param neuron    index of neuron to alter
+   * @param i         index of rule to alter
+   * @return          parameters are valid.
+   */
+  private boolean validateNeuronIndices(int block, int neuron, int i)
+  {
+    boolean isValid = false;
+    if(validateBlockIndex(block))
+    {
+      if(0 <= neuron && neuron < blockDNAs[block].neuronDNAs.size())
+      {
+        if(0 <= i && i < Neuron.TOTAL_INPUTS)
+        {
+          isValid = true;
+        }
+      }
+    }
+    return isValid;
   }
 
   /**
@@ -157,7 +297,9 @@ public class DNA
     private final int NUM_VECTORS = 6;
     private int blockID, parentID;
     private Vector3f[] sizeAndShape;
+    private float[] angles;
     private ArrayList<NeuronDNA> neuronDNAs;
+    private int blockDNASize = 7;
 
     /**
      * Default constructor creates a blank block.
@@ -189,7 +331,18 @@ public class DNA
       for(Neuron n : neuronTable)
       {
         neuronDNAs.add(new NeuronDNA(n));
+        blockDNASize += Neuron.TOTAL_INPUTS;
       }
+      length += blockDNASize;
+    }
+
+    /**
+     * Get a copy of the creatures angle argument.
+     * @param angleArr        float array representing rotation quaternion.
+     */
+    public void setAngles(float[] angleArr)
+    {
+      angles = Arrays.copyOf(angleArr, angleArr.length);
     }
 
     /**
@@ -213,16 +366,24 @@ public class DNA
       }
     }
 
+
     /**
-     * Get string representation of the block
+     * Get string representation of the block.
+     * @return string representation of the block
      */
     public String getString()
     {
       String bString = new String();
       bString += blockID;
-      bString += ' ';
+      bString += '\n';
       bString += parentID;
-      bString += ' ';
+      bString += '\n';
+      for (float f : angles)
+      {
+        bString += f;
+        bString += ' ';
+      }
+      bString += '\n';
       for (Vector3f v : sizeAndShape)
       {
         if (v != null)
@@ -236,20 +397,24 @@ public class DNA
         }
         else//TODO For testing: Remove when doing fileIO
         {
-          bString += "null ";
+          bString += "null";
         }
-        if(neuronDNAs != null)
+        bString += '\n';
+      }
+      if(neuronDNAs != null)
+      {
+        bString += neuronDNAs.size();
+        bString += '\n';
+        for(NeuronDNA nDNA : neuronDNAs)
         {
-          for(NeuronDNA nDNA : neuronDNAs)
-          {
-            bString += nDNA.getString();
-          }
-        }
-        else
-        {
-          bString += "null ";
+          bString += nDNA.getString();
         }
       }
+      else
+      {
+        bString += 0;
+      }
+      bString += '\n';
       return bString;
     }
 
@@ -286,6 +451,10 @@ public class DNA
         }
       }
 
+      /**
+       * String representation of neuron dna.
+       * @return        string with neuron rules.
+       */
       public String getString()
       {
         String nString = new String();
@@ -303,7 +472,7 @@ public class DNA
           nString += constantValues[i];
           nString += ' ';
           nString += blockIndex[i];
-          nString += ' ';
+          nString += '\n';
         }
         return nString;
       }
