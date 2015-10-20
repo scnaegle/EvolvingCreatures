@@ -47,6 +47,15 @@ public class DNA
   }
 
   /**
+   * Get number of blocks according to DNA.
+   * @return   numBlocks.
+   */
+  public int getNumBlocks()
+  {
+    return numBlocks;
+  }
+
+  /**
    * Adjust the height of the creature.  Change the y values of
    * vectors that control creature's initial location
    * @param deltaY        amount to change by.
