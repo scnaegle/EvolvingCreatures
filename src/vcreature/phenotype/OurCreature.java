@@ -124,7 +124,12 @@ public class OurCreature extends Creature
   }
 
   /**
-   * Current Root constructor.
+   * Current Root constructor.  What happens:
+   * 1.) Call parent constructor.
+   * 2.)call makeBlockVectorArray(rootCenter, rootSize) to store info that DNA
+   * constructor will use.
+   * 3.) add array created in step 2 to blockProperties.
+   * 4.) add angles array to angles list.
    * @param rootCenter        root location.
    * @param rootSize          block size.
    * @param angles            angle orientation
@@ -135,13 +140,18 @@ public class OurCreature extends Creature
   {
     Block b = super.addRoot(rootCenter, rootSize, angles);
     blockProperties.add(makeBlockVectorArray(rootCenter, rootSize));
-    blockAngles.add(angles);
+    blockAngles.add(Arrays.copyOf(angles, angles.length));
     return b;
   }
 
   /**
    * Add block, calls super.addBlock().  Also logs important vectors and block
-   * angles.
+   * angles.  What happens:
+   * 1.) Call parent constructor.
+   * 2.)call makeBlockVectorArray(new block, halfsize, axis of rotation a & b)
+   * to store info that DNA constructor will use.
+   * 3.) add array created in step 2 to blockProperties.
+   * 4.) add copy of angles array to angles list.
    * @param eulerAngles
    * @param halfsize half the extent (in meters) of the block in the x, y and z direction.
    * For example, a block with extent in the x dimension of 0.5 would extend from 0.5 meters from
@@ -190,6 +200,8 @@ public class OurCreature extends Creature
   /**
    * Populate the DNA's Size and shape array with all the right vectors.  Pass
    * in block id and vector array.
+   * This is called from the DNA constructor, with the blockID and DNA's
+   * sizeAndShape array.  This array corresponds with blockProperties exactly.
    * @param id        id of block to change.
    * @param vecArr       sizeAndShape array from DNA => BlockDNA
    */
@@ -283,7 +295,7 @@ public class OurCreature extends Creature
   }
 
   /**
-   * Get dna object.
+   * Get dna object.  If DNA has not been made, make new DNA.
    * @return        dna object
    */
   public DNA getDNA()
@@ -309,9 +321,9 @@ public class OurCreature extends Creature
   }
 
   /**
-   * make blockProperties array for Root Block
-   * Make an array containing information on block location, size, and axis of
-   * rotation.
+   * make blockProperties array for Root Block.  Stores location (center) and
+   * halfsize that will be passed to constructor.  Joint related properties are
+   * set to null.  Use when adding root.
    * @param center        block location
    * @param size          block size
    * @return              Vector3f containing axis' that we need access to.
@@ -331,6 +343,9 @@ public class OurCreature extends Creature
 
   /**
    * Make block properties array for standard block.  Use when adding blocks.
+   * Center is set to (0,0,0) because it is no longer used.
+   * size is halfsize that is passed to the constructor.
+   * joint related vectors are local coordinates relative to the block's center.
    * @param b
    * @param size
    * @param axisA

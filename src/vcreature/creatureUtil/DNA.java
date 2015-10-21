@@ -30,7 +30,12 @@ public class DNA
   }
 
   /**
-   * DNA Built from creature.  Pass in a built creature to make dna
+   * DNA Built from creature.  Pass in a built creature to make dna.
+   * 1.) For each block in the creature call BlockDNA constructor.
+   * Most of the work is done there.
+   * 2.) Call populateVectorDNA with blockDNA index(corresponds to ID), and
+   * sizeAndShape array(corresponds with OurCreature.blockProperties list
+   * element).
    * @param c       Creature to build from.
    */
   public DNA(OurCreature c)
@@ -47,7 +52,7 @@ public class DNA
   }
 
   /**
-   * Get number of blocks according to DNA.  May not be up to date.
+   * Get number of blocks according to DNA.
    * @return   numBlocks.
    */
   public int getNumBlocks()
@@ -104,7 +109,13 @@ public class DNA
 
 
   /**
-   * Build creature with DNA.  Called from OurCreature constructor.
+   * Build creature with DNA.  Called from OurCreature constructor when a
+   * creature is being built from DNA. What happens:
+   * 1.) Call add root.
+   * 2.) For each blockDNA that is not null, call addBlock, if angles aren't
+   * included, it sends {0,0,0} as the angle
+   * 3.) Call BlockDNA.add neurons with the current block as the argument to add
+   * neuron info.
    * @param c       Creature to build.
    */
   public void initializeCreature(Creature c)
@@ -245,6 +256,7 @@ public class DNA
     if(validateBlockIndex(index))
     {
       blockDNAs[index] = new BlockDNA(b);
+      calculateNumBlocks();
     }
   }
 
@@ -323,6 +335,18 @@ public class DNA
   private Vector3f newVector(int dnaNum, BlockVector type)
   {
     return new Vector3f(blockDNAs[dnaNum].sizeAndShape[type.ordinal()]);
+  }
+
+  private void calculateNumBlocks()
+  {
+    numBlocks = 0;
+    for(BlockDNA bDNA : blockDNAs)
+    {
+      if(bDNA != null)
+      {
+        numBlocks ++;
+      }
+    }
   }
 
   //============================Nested BlockDNA================================
