@@ -134,8 +134,7 @@ public class OurCreature extends Creature
   public Block addRoot(Vector3f rootCenter, Vector3f rootSize, float[] angles)
   {
     Block b = super.addRoot(rootCenter, rootSize, angles);
-    blockProperties.add(makeBlockVectorArray(rootCenter, rootSize, null, null,
-        null, null));
+    blockProperties.add(makeBlockVectorArray(rootCenter, rootSize));
     blockAngles.add(angles);
     return b;
   }
@@ -159,9 +158,7 @@ public class OurCreature extends Creature
   public Block addBlock(float[] eulerAngles, Vector3f halfsize, Block parent, Vector3f pivotA, Vector3f pivotB, Vector3f axisA, Vector3f axisB)
   {
     Block b = super.addBlock(eulerAngles,halfsize,parent,pivotA,pivotB,axisA,axisB);
-    Vector3f bCenter = new Vector3f();
-    bCenter = new Vector3f(b.getStartCenter(bCenter));
-    blockProperties.add(makeBlockVectorArray(bCenter, halfsize, pivotA, pivotB, axisA, axisB));
+    blockProperties.add(makeBlockVectorArray(b, halfsize, axisA, axisB));
     blockAngles.add(Arrays.copyOf(eulerAngles, eulerAngles.length));
     return b;
   }
@@ -186,8 +183,7 @@ public class OurCreature extends Creature
   {
     Block b = super.addBlock(center, size, parent, pivotA, pivotB, axisA,
         axisB);
-    blockProperties.add(makeBlockVectorArray(center, size, pivotA, pivotB,
-                                              axisA, axisB));
+    blockProperties.add(makeBlockVectorArray(b, size, axisA, axisB));
     return b;
   }
 
@@ -313,28 +309,47 @@ public class OurCreature extends Creature
   }
 
   /**
+   * make blockProperties array for Root Block
    * Make an array containing information on block location, size, and axis of
    * rotation.
    * @param center        block location
    * @param size          block size
-   * @param jointA        joint location a.
-   * @param jointB        joint location b.
-   * @param axisA         axis of rotation a.
-   * @param axisB         axis of rotation b.
    * @return              Vector3f containing axis' that we need access to.
    */
-  private Vector3f[] makeBlockVectorArray(Vector3f center, Vector3f size,
-                                          Vector3f jointA, Vector3f jointB,
-                                          Vector3f axisA, Vector3f axisB)
+  private Vector3f[] makeBlockVectorArray(Vector3f center, Vector3f size)
   {
     Vector3f[] blockProperties = new Vector3f[6];
     blockProperties[BlockVector.CENTER.ordinal()] = center;
     blockProperties[BlockVector.SIZE.ordinal()] = size;
-    blockProperties[BlockVector.JOINT_A.ordinal()] = jointA;
-    blockProperties[BlockVector.JOINT_B.ordinal()] = jointB;
-    blockProperties[BlockVector.AXIS_A.ordinal()] = axisA;
-    blockProperties[BlockVector.AXIS_B.ordinal()] = axisB;
+    blockProperties[BlockVector.JOINT_A.ordinal()] = null;
+    blockProperties[BlockVector.JOINT_B.ordinal()] = null;
+    blockProperties[BlockVector.AXIS_A.ordinal()] = null;
+    blockProperties[BlockVector.AXIS_B.ordinal()] = null;
 
+    return blockProperties;
+  }
+
+  /**
+   * Make block properties array for standard block.  Use when adding blocks.
+   * @param b
+   * @param size
+   * @param axisA
+   * @param axisB
+   * @return
+   */
+  private Vector3f[] makeBlockVectorArray(Block b, Vector3f size, Vector3f axisA,
+                                          Vector3f axisB)
+  {
+    Vector3f[] blockProperties = new Vector3f[6];
+    blockProperties[BlockVector.CENTER.ordinal()] = Vector3f.ZERO;
+    blockProperties[BlockVector.SIZE.ordinal()] = size;
+    if(b.getJoint() != null)
+    {
+      blockProperties[BlockVector.JOINT_A.ordinal()] = b.getJoint().getPivotA();
+      blockProperties[BlockVector.JOINT_B.ordinal()] = b.getJoint().getPivotB();
+      blockProperties[BlockVector.AXIS_A.ordinal()] = axisA;
+      blockProperties[BlockVector.AXIS_B.ordinal()] = axisB;
+    }
     return blockProperties;
   }
 

@@ -162,11 +162,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     //create "Flappy Bird"
     ourCreature = new OurCreature(physicsSpace, rootNode, true);
     testDNA = ourCreature.getDNA();
-    System.out.println(testDNA);
-    ourCreature.detach();
+    //System.out.println(testDNA);
+    ourCreature.remove();
     //myCreature = new RandomCreature(physicsSpace, rootNode);
     ourCreature = new OurCreature(physicsSpace, rootNode, testDNA);
-    System.out.println(ourCreature.getDNA());
+    //System.out.println(ourCreature.getDNA());
+    ourCreature.placeOnGround();
+    testDNA = ourCreature.getDNA();
+    ourCreature.remove();
+    ourCreature = new OurCreature(physicsSpace, rootNode, testDNA);
     ourCreature.placeOnGround();
 
 
