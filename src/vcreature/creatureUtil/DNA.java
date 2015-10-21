@@ -353,6 +353,18 @@ public class DNA
   /**
    * The DNA for each individual block.  To be stored in an array in the main
    * object.
+   * sizeAndShape array:
+   *  0: BlockVectors.CENTER: Center of the block in world coordinates, used for
+   *  root block, not used for child blocks (is there for reference).
+   *  1: BlockVectors.SIZE: Dimensions of a block used for construction (1/2 the
+   *  size of the final block in each direction).
+   *  2: BlockVectors.JOINT_A: Joint pivot position in coordinates relative to the
+   *  parent block's local coordinate system(if parentBlock.startCenter were at
+   *  0,0,0).
+   *  3: BlockVectors.JOINT_B: Joint pivot position in coordinates relative to this
+   *  block's coordinate system (if thisBlock.startCenter were at 0,0,0).
+   *  4 & 5: BlockVectors.AXIS_A & BlockVectors.AXIS_B: Axis of rotation of the
+   *  block's hingeJoint.
    */
   private class BlockDNA
   {

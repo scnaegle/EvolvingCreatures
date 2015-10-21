@@ -16,15 +16,32 @@ import java.util.Arrays;
 /**
  * @author Justin Thomas(jthomas105@unm.edu)
  * Our Creature extends Joel's creature.
+ *
+ *
+ * blockProperties array:
+ *  0: BlockVectors.CENTER: Center of the block in world coordinates, used for
+ *  root block, not used for child blocks (is there for reference).
+ *  1: BlockVectors.SIZE: Dimensions of a block used for construction (1/2 the
+ *  size of the final block in each direction).
+ *  2: BlockVectors.JOINT_A: Joint pivot position in coordinates relative to the
+ *  parent block's local coordinate system(if parentBlock.startCenter were at
+ *  0,0,0).
+ *  3: BlockVectors.JOINT_B: Joint pivot position in coordinates relative to this
+ *  block's coordinate system (if thisBlock.startCenter were at 0,0,0).
+ *  4 & 5: BlockVectors.AXIS_A & BlockVectors.AXIS_B: Axis of rotation of the
+ *  block's hingeJoint.
  */
+
 public class OurCreature extends Creature
 {
   private DNA dna;
   private PhysicsSpace physicsSpace;
   private Node visualWorld;
-  private ArrayList<Vector3f[]> blockProperties;
   private ArrayList<float[]> blockAngles;
   private Vector3f tmpVec3 = new Vector3f();
+  private ArrayList<Vector3f[]> blockProperties;
+
+
 
   //====================Begin Constructors======================================
   /**
@@ -203,7 +220,7 @@ public class OurCreature extends Creature
    * This is called from the DNA constructor, with the blockID and DNA's
    * sizeAndShape array.  This array corresponds with blockProperties exactly.
    * @param id        id of block to change.
-   * @param vecArr       sizeAndShape array from DNA => BlockDNA
+   * @param vecArr       sizeAndShape array from dna.blockDNAs[i]
    */
   public void populateVectorDNA(int id, Vector3f[] vecArr)
   {
@@ -343,7 +360,7 @@ public class OurCreature extends Creature
 
   /**
    * Make block properties array for standard block.  Use when adding blocks.
-   * Center is set to (0,0,0) because it is no longer used.
+   * Center is set to block.startCenter but is not used.
    * size is halfsize that is passed to the constructor.
    * joint related vectors are local coordinates relative to the block's center.
    * @param b
@@ -356,7 +373,8 @@ public class OurCreature extends Creature
                                           Vector3f axisB)
   {
     Vector3f[] blockProperties = new Vector3f[6];
-    blockProperties[BlockVector.CENTER.ordinal()] = Vector3f.ZERO;
+    tmpVec3 = b.getStartCenter(tmpVec3);
+    blockProperties[BlockVector.CENTER.ordinal()] = new Vector3f(tmpVec3);
     blockProperties[BlockVector.SIZE.ordinal()] = size;
     if(b.getJoint() != null)
     {
