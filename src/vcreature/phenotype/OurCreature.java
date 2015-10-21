@@ -1,9 +1,11 @@
 package vcreature.phenotype;
 
 import com.jme3.bullet.PhysicsSpace;
+import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import vcreature.creatureUtil.CreatureConstants;
 import vcreature.creatureUtil.DNA;
@@ -22,6 +24,7 @@ public class OurCreature extends Creature
   private Node visualWorld;
   private ArrayList<Vector3f[]> blockProperties;
   private ArrayList<float[]> blockAngles;
+  private Vector3f tmpVec3 = new Vector3f();
 
   //====================Begin Constructors======================================
   /**
@@ -72,6 +75,17 @@ public class OurCreature extends Creature
     placeOnGround();
   }
   //==================End Constructors==========================================
+
+  public void detachTest()
+  {
+    Block b;
+    b = getBlockByID(getNumberOfBodyBlocks()-1);
+    physicsSpace.remove(b.getPhysicsControl());
+    if (b.getJoint() != null) physicsSpace.remove(b.getJoint());
+    physicsSpace.remove(b.getPhysicsControl());
+    blockProperties.remove(getNumberOfBodyBlocks()-1);
+    blockAngles.remove(getNumberOfBodyBlocks()-1);
+  }
 
 
   /**
@@ -200,6 +214,52 @@ public class OurCreature extends Creature
                                                         BlockVector.AXIS_B));
     }
   }
+
+  public float getLowestPoint()
+  {
+    Block tempBlock;
+    float currentHeightOfLowestPoint = Float.MAX_VALUE;
+    for (int i = 0; i < getNumberOfBodyBlocks(); ++i)
+    {
+      tempBlock = getBlockByID(i);
+      float height = tempBlock.getHeight();
+      if (height < currentHeightOfLowestPoint) currentHeightOfLowestPoint = height;
+    }
+    return currentHeightOfLowestPoint;
+  }
+
+
+  /**
+   * Temporary function which bumps up a creature to floor level
+   * Replaces Joel's placeOnGround until I learn how to work this class better
+   */
+  public void bumpUp()
+  {
+    Block tempBlock;
+    Vector3f[] tempVecArray;
+    Vector3f tempVec;
+    float lowestPoint = -getLowestPoint();
+    for (int i = 0; i < getNumberOfBodyBlocks()-1; ++i)
+    {
+      tempBlock = getBlockByID(i);
+      RigidBodyControl physicsControl = tempBlock.getPhysicsControl();
+      physicsControl.getPhysicsLocation(tmpVec3);
+      tmpVec3.y -= lowestPoint;
+      physicsControl.setPhysicsLocation(tmpVec3);
+      tempVecArray = blockProperties.get(i);
+      tempVec = tempVecArray[0];
+      tempVec.y = tempVec.y + lowestPoint;
+    }
+  }
+
+  public void removeSubTreeOurCreature(Block block)
+  {
+    int blockId = block.getID();
+    //super.removeSubTree(block);
+
+    blockProperties.remove(blockId);
+  }
+
 
   /**
    * Get float array representing the rotation of the specifed block.
