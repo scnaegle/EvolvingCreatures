@@ -115,7 +115,8 @@ public class Block
     
     //Copies only the address, but in the creature class, 
     //  this addesss was created with new and is not reused
-    startCenter   = center; 
+    startCenter   = center;
+    System.out.println("startCenter" + startCenter);
     startRotation = rotation;
     
     sizeX = size.x*2;

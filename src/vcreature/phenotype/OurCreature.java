@@ -158,9 +158,10 @@ public class OurCreature extends Creature
   @Override
   public Block addBlock(float[] eulerAngles, Vector3f halfsize, Block parent, Vector3f pivotA, Vector3f pivotB, Vector3f axisA, Vector3f axisB)
   {
-    Vector3f bCenter = new Vector3f();
     Block b = super.addBlock(eulerAngles,halfsize,parent,pivotA,pivotB,axisA,axisB);
-    blockProperties.add(makeBlockVectorArray(b.getCenter(bCenter), halfsize, pivotA, pivotB, axisA, axisB));
+    Vector3f bCenter = new Vector3f();
+    bCenter = new Vector3f(b.getStartCenter(bCenter));
+    blockProperties.add(makeBlockVectorArray(bCenter, halfsize, pivotA, pivotB, axisA, axisB));
     blockAngles.add(Arrays.copyOf(eulerAngles, eulerAngles.length));
     return b;
   }
@@ -327,7 +328,7 @@ public class OurCreature extends Creature
                                           Vector3f axisA, Vector3f axisB)
   {
     Vector3f[] blockProperties = new Vector3f[6];
-    blockProperties[BlockVector.CENTER.ordinal()] = new Vector3f(center);
+    blockProperties[BlockVector.CENTER.ordinal()] = center;
     blockProperties[BlockVector.SIZE.ordinal()] = size;
     blockProperties[BlockVector.JOINT_A.ordinal()] = jointA;
     blockProperties[BlockVector.JOINT_B.ordinal()] = jointB;
