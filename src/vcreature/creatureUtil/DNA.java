@@ -110,7 +110,8 @@ public class DNA
   public void initializeCreature(Creature c)
   {
     //create root block
-    c.addRoot(newVector(0, BlockVector.CENTER), newVector(0, BlockVector.SIZE));
+    c.addRoot(newVector(0, BlockVector.CENTER), newVector(0, BlockVector.SIZE),
+                        CreatureConstants.IDENTITY_QUATERNION);
     for(int i = 1; i < CreatureConstants.MAX_BLOCKS; ++i)
     {
       //if there is dna, and it's parent exists, add block

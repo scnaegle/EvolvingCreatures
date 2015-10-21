@@ -69,6 +69,7 @@ public class OurCreature extends Creature
     {
       makeNotFlappy();
     }
+    placeOnGround();
   }
   //==================End Constructors==========================================
 
@@ -320,7 +321,6 @@ public class OurCreature extends Creature
     leg1.setMaterial(Block.MATERIAL_RED);
     leg2.setMaterial(Block.MATERIAL_BLUE);
 
-    placeOnGround();
 
 
     Neuron leg1Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
@@ -399,7 +399,6 @@ public class OurCreature extends Creature
     leg1.setMaterial(Block.MATERIAL_RED);
     leg2.setMaterial(Block.MATERIAL_BLUE);
 
-    placeOnGround();
 
 
     Neuron leg1Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
