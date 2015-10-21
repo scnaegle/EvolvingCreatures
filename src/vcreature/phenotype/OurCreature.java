@@ -26,8 +26,8 @@ import java.util.Arrays;
  *  2: BlockVectors.JOINT_A: Joint pivot position in coordinates relative to the
  *  parent block's local coordinate system(if parentBlock.startCenter were at
  *  0,0,0).
- *  3: BlockVectors.JOINT_B: Joint pivot position in coordinates relative to this
- *  block's coordinate system (if thisBlock.startCenter were at 0,0,0).
+ *  3: BlockVectors.JOINT_B: Joint pivot position in coordinates relative to
+ *  this block's coordinate system (if thisBlock.startCenter were at 0,0,0).
  *  4 & 5: BlockVectors.AXIS_A & BlockVectors.AXIS_B: Axis of rotation of the
  *  block's hingeJoint.
  */
