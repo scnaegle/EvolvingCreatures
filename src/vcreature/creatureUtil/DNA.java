@@ -287,7 +287,7 @@ public class DNA
     int otherLength = other.numBlocks;
     int length;
     length = thisLength < otherLength ? thisLength : otherLength;
-    int crossPoint = rand.nextInt(length - 1) + 1;
+    int crossPoint = rand.nextInt(length) + 1;
     output[THIS] = new DNA();
     output[OTHER] = new DNA();
     int i;
