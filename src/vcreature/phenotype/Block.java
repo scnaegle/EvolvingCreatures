@@ -115,7 +115,7 @@ public class Block
     
     //Copies only the address, but in the creature class, 
     //  this addesss was created with new and is not reused
-    startCenter   = center;
+    startCenter   = center; 
     startRotation = rotation;
     
     sizeX = size.x*2;
@@ -146,8 +146,6 @@ public class Block
     physicsControl.setDamping(PhysicsConstants.LINEAR_DAMPINING, 
             PhysicsConstants.ANGULAR_DAMPINING);
   }
-  
-  
 
   
   /**
@@ -173,12 +171,19 @@ public class Block
   }
 
   /**
-   *
-   * @param neuron
+   * Adds the given Neuron to this blocks Neuron Table.
+   * At the time this Neuron is added, if any of its
+   * blockIds is UNDEFINED, then that blockId is set to the id of this block.
+   * @param neuron to be added to Neuron Table.
    */
   public void addNeuron(Neuron neuron)
   {
-     neuronTable.add(neuron);
+    for (int i=0; i<Neuron.TOTAL_INPUTS; i++)
+    { if (neuron.getBlockIdx(i) == Neuron.UNDEFINED)
+      { neuron.setBlockIdx(i,id);
+      }
+    }
+    neuronTable.add(neuron);
   }
   
   
@@ -209,9 +214,13 @@ public class Block
   /**
    *
    * @return the current angle in the physics simulation of the joint 
-   * to this block's parent. 
+   * to this block's parent. Returns 0 if there is no parent (if this is 
+   * the root).
    */
-  public float getJointAngle() { return jointToParent.getHingeAngle(); }
+  public float getJointAngle() 
+  { if (jointToParent == null) return 0;
+    return jointToParent.getHingeAngle(); 
+  }
   
   
   /**
@@ -237,7 +246,11 @@ public class Block
     return output; 
   }
   
-  public Quaternion getStartRotation(Quaternion  output) 
+  
+  public Quaternion getStartRotation() {return startRotation;}
+  
+  
+  public Quaternion getRotation(Quaternion  output) 
   {
     return physicsControl.getPhysicsRotation(output);
   }
@@ -252,7 +265,9 @@ public class Block
   {
     BoundingBox box = (BoundingBox) geometry.getWorldBound();
     tmpVec3 = box.getMin(tmpVec3);
-    return tmpVec3.y;
+    //System.out.println("Block["+id+"].getHeight() = "+tmpVec3.y);
+    float height = Math.max(0,tmpVec3.y);
+    return height;
   }
   
   

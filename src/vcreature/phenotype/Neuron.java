@@ -39,7 +39,13 @@ package vcreature.phenotype;
 
 public class Neuron
 {
-
+   /**
+   * When a Neuron is created, its block index is set to UNDEFINED.
+   * Then, when it is added to the Neuron list of a joint, if the block inded is
+   * still UNDEFINED, it is set to the block's index.
+   */
+  public static final int UNDEFINED = -1;
+  
   /**
    * Constant used to specify input A.
    */
@@ -119,6 +125,10 @@ public class Neuron
     
     operator[1] = EnumOperator.IDENTITY;
     operator[3] = EnumOperator.IDENTITY;
+    
+    for (int i=0; i<blockIndex.length; i++)
+    { blockIndex[i] = UNDEFINED;
+    }
   }
   
   /**
@@ -144,7 +154,7 @@ public class Neuron
    * @param i
    * @return
    */
-  public int   getBlockIdx(int i) {return blockIndex[i];}
+  public int getBlockIdx(int i) {return blockIndex[i];}
   
   
   /**
@@ -242,10 +252,25 @@ public class Neuron
   
   public String toString()
   {
-    String out = "Neuron: if {" + type[0] + " " + operator[0] + " " + type[1] + 
-        " --> " + operator[1] + "} > {" + type[2] + 
-        " then {" + type[3] + ", " + operator[3] + " " + type[4] + " --> " + operator[4];
+    String out = "Neuron: if {" + inputToString(0) + " " + operator[0] + " " + 
+            inputToString(1) + " --> " + operator[1] + "} > {" + 
+            inputToString(2) +  " then {" + 
+            inputToString(3) + ", " + operator[2] + " " + 
+            inputToString(4) + " --> " + operator[3];
     return out;
   }
- 
+  
+  public String inputToString(int inputIdx)
+  {
+    String out = type[inputIdx].toString();
+    if (type[inputIdx] == EnumNeuronInput.CONSTANT) 
+    { out += "["+constantValue[inputIdx]+"]";
+    }
+    else if (type[inputIdx] == EnumNeuronInput.JOINT || 
+             type[inputIdx] == EnumNeuronInput.HEIGHT ||
+             type[inputIdx] == EnumNeuronInput.TOUCH) 
+    { out += "["+blockIndex[inputIdx]+"]";
+    }
+    return out;
+  }
 }
