@@ -105,10 +105,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
   private OurCreature myCreature;
+  private boolean isCameraRotating = true;
+
   private DNA testDNA;
   //private RandomCreature myCreature;
   private OurCreature ourCreature; //TODO testing, remove.
-  private boolean isCameraRotating = true;
 
   //Nifty gui
   private Nifty nifty;
@@ -331,7 +332,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     //   Your application will have more work to do than to spend cycles rendering faster than the
     //   capture rate of the RED Camera used to shoot Lord of the Rings.
     settings.setVSync(true);
-    settings.setFrequency(60);//Frames per second
+    settings.setFrequency((int)app.speed * 60);//Frames per second
     settings.setTitle("Flappy Bird Creature");
 
     System.out.println("Starting App");
@@ -339,7 +340,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     app.setShowSettings(false);
     app.setSettings(settings);
     if (app.headless) {
-    app.start(JmeContext.Type.Headless);
+      app.start(JmeContext.Type.Headless);
     } else {
       app.start();
     }
