@@ -535,8 +535,8 @@ public class OurCreature extends Creature
     leg2.addNeuron(leg2Neuron1);
     leg2.addNeuron(leg2Neuron2);
 
-    Vector3f pivotE = new Vector3f(-1.0f, 0.0f,  0.0f); //Center of hinge in parents  block's coordinates
-    Vector3f pivotF = new Vector3f( 1.0f,  0.0f,  0.0f); //Center of hinge in childs block's coordinates
+    Vector3f pivotE = new Vector3f(-3.0f, -0.5f,  0.0f); //Center of hinge in parents  block's coordinates
+    Vector3f pivotF = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in childs block's coordinates
 
     Block leg3  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg2Size,leg2, pivotE,  pivotF, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
 
@@ -551,10 +551,10 @@ public class OurCreature extends Creature
         EnumNeuronInput.CONSTANT, null);
 
     leg3Neuron1.setInputValue(Neuron.C,11);
-    leg3Neuron1.setInputValue(Neuron.D,-Float.MAX_VALUE);
+    leg3Neuron1.setInputValue(Neuron.D,Float.MAX_VALUE);
 
     leg3Neuron2.setInputValue(Neuron.C,10);
-    leg3Neuron2.setInputValue(Neuron.D,Float.MAX_VALUE);
+    leg3Neuron2.setInputValue(Neuron.D,-Float.MAX_VALUE);
 
     leg3.addNeuron(leg3Neuron1);
     leg3.addNeuron(leg3Neuron2);
