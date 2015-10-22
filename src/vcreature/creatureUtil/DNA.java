@@ -25,6 +25,7 @@ public class DNA
   private int length;
   private BlockDNA[] blockDNAs;
   private DNA[] output;
+  private Vector3f tempVec3;
 
   /**
    * Default constructor initializes all values to zero or null.
@@ -34,6 +35,7 @@ public class DNA
     blockDNAs = new BlockDNA[CreatureConstants.MAX_BLOCKS];
     output = new DNA[2];
     rand = new Random();
+    tempVec3 = new Vector3f();
   }
 
   /**
@@ -252,14 +254,7 @@ public class DNA
     }
   }
 
-  /**
-   * Crossover method to adjust joint A
-   * @param b
-   */
-  public void alterJointA(BlockDNA b)
-  {
-    //
-  }
+
 
   /**
    * Add a block to the DNA.  If the blockID is already in use, it will be
@@ -281,31 +276,42 @@ public class DNA
     }
   }
 
+  /**
+   * Perform single crossover.  On the block level right now.
+   * @param other
+   * @return
+   */
   public DNA[] singleCrossover(DNA other)
   {
     int thisLength = this.numBlocks;
     int otherLength = other.numBlocks;
     int length;
-    System.out.println("this " + thisLength + " other " + otherLength);
     length = thisLength < otherLength ? thisLength : otherLength;
     int crossPoint = rand.nextInt(length - 1) + 1;
     output[THIS] = new DNA();
     output[OTHER] = new DNA();
     int i;
+    System.out.println(crossPoint);
     for(i = 0; i < crossPoint; ++i)
     {
       output[THIS].blockDNAs[i] = new BlockDNA(this.blockDNAs[i]);//
+      output[THIS].blockDNAs[i].alterJointA(output[THIS]);
       output[OTHER].blockDNAs[i] = new BlockDNA(other.blockDNAs[i]);
+      output[OTHER].blockDNAs[i].alterJointA(output[OTHER]);
     }
-    System.out.println(i);
     for(int j = i; j < otherLength; ++j)
     {
       output[THIS].blockDNAs[j] = new BlockDNA(other.blockDNAs[j]);
+      System.out.println(output[THIS].blockDNAs[j].sizeAndShape[2]);
+      output[THIS].blockDNAs[j].alterJointA(output[THIS]);
+      System.out.println(output[THIS].blockDNAs[j].sizeAndShape[2]);
+
+
     }
-    System.out.println(i);
     for(int j = i; j < thisLength; ++j)
     {
       output[OTHER].blockDNAs[j] = new BlockDNA(this.blockDNAs[j]);
+      output[OTHER].blockDNAs[j].alterJointA(output[OTHER]);
     }
     output[0].recalculateDNALength();
     output[0].calculateNumBlocks();
@@ -507,6 +513,23 @@ public class DNA
     }
 
     /**
+     * Crossover method to adjust joint A to correct placement.
+     */
+    public void alterJointA(DNA dna)
+    {
+      int parentIndex = parentID;
+      if(validateBlockIndex(parentIndex))
+      {
+        Vector3f thisJointA = sizeAndShape[BlockVector.JOINT_A.ordinal()];
+        Vector3f parentSize = dna.blockDNAs[parentIndex].sizeAndShape[BlockVector.SIZE.ordinal()];
+        tempVec3 = new Vector3f(getFloatSign(thisJointA.x),
+                                getFloatSign(thisJointA.y),
+                                getFloatSign(thisJointA.z));
+        sizeAndShape[BlockVector.JOINT_A.ordinal()] = parentSize.mult(tempVec3);
+      }
+    }
+
+    /**
      * Get a copy of the creatures angle array.
      * @param angleArr        float array representing rotation quaternion.
      */
@@ -586,6 +609,18 @@ public class DNA
       }
       bString += '\n';
       return bString;
+    }
+
+    private float getFloatSign(float f)
+    {
+      if(f != 0.0f)
+      {
+        return f/Math.abs(f);
+      }
+      else
+      {
+        return 0.0f;
+      }
     }
 
     //==============Nested NeuronDNA===========================================
