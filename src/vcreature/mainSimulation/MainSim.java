@@ -159,18 +159,16 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     
    
     Block.initStaticMaterials(assetManager);
-    //create "Flappy Bird"
+
+    //Test Crossover
     ourCreature = new OurCreature(physicsSpace, rootNode, true);
     testDNA = ourCreature.getDNA();
-    //System.out.println(testDNA);
     ourCreature.remove();
-    //myCreature = new RandomCreature(physicsSpace, rootNode);
-    ourCreature = new OurCreature(physicsSpace, rootNode, testDNA);
-    //System.out.println(ourCreature.getDNA());
-    ourCreature.placeOnGround();
-    testDNA = ourCreature.getDNA();
-    ourCreature.remove();
-    ourCreature = new OurCreature(physicsSpace, rootNode, testDNA);
+    OurCreature otherCreature = new OurCreature(physicsSpace, rootNode, false);
+    DNA testDNA2 = otherCreature.getDNA();
+    otherCreature.remove();
+    DNA[] crossed = testDNA.singleCrossover(testDNA2);
+    ourCreature = new OurCreature(physicsSpace, rootNode, crossed[0]);
     ourCreature.placeOnGround();
 
 

@@ -7,6 +7,7 @@ import vcreature.phenotype.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * @author Justin Thomas 10/14/2015
@@ -17,9 +18,13 @@ import java.util.Arrays;
 
 public class DNA
 {
+  private final int THIS = 0;
+  private final int OTHER = 1;
+  private Random rand;
   private int numBlocks;
   private int length;
   private BlockDNA[] blockDNAs;
+  private DNA[] output;
 
   /**
    * Default constructor initializes all values to zero or null.
@@ -27,6 +32,8 @@ public class DNA
   public DNA()
   {
     blockDNAs = new BlockDNA[CreatureConstants.MAX_BLOCKS];
+    output = new DNA[2];
+    rand = new Random();
   }
 
   /**
@@ -40,8 +47,8 @@ public class DNA
    */
   public DNA(OurCreature c)
   {
+    this();
     length = 0;
-    blockDNAs = new BlockDNA[CreatureConstants.MAX_BLOCKS];
     numBlocks = c.getNumberOfBodyBlocks();
     for(int i = 0; i < numBlocks; ++i)
     {
@@ -246,6 +253,15 @@ public class DNA
   }
 
   /**
+   * Crossover method to adjust joint A
+   * @param b
+   */
+  public void alterJointA(BlockDNA b)
+  {
+    //
+  }
+
+  /**
    * Add a block to the DNA.  If the blockID is already in use, it will be
    * overwritten by the new block. If the index is invalid nothing will happen.
    * @param b       block to add.
@@ -255,10 +271,50 @@ public class DNA
     int index = b.getID();
     if(validateBlockIndex(index))
     {
+      if(blockDNAs[index] != null)
+      {
+        length -= blockDNAs[index].blockDNASize;
+      }
       blockDNAs[index] = new BlockDNA(b);
+      length += blockDNAs[index].blockDNASize;
       calculateNumBlocks();
     }
   }
+
+  public DNA[] singleCrossover(DNA other)
+  {
+    int thisLength = this.numBlocks;
+    int otherLength = other.numBlocks;
+    int length;
+    System.out.println("this " + thisLength + " other " + otherLength);
+    length = thisLength < otherLength ? thisLength : otherLength;
+    int crossPoint = rand.nextInt(length - 1) + 1;
+    output[THIS] = new DNA();
+    output[OTHER] = new DNA();
+    int i;
+    for(i = 0; i < crossPoint; ++i)
+    {
+      output[THIS].blockDNAs[i] = new BlockDNA(this.blockDNAs[i]);//
+      output[OTHER].blockDNAs[i] = new BlockDNA(other.blockDNAs[i]);
+    }
+    System.out.println(i);
+    for(int j = i; j < otherLength; ++j)
+    {
+      output[THIS].blockDNAs[j] = new BlockDNA(other.blockDNAs[j]);
+    }
+    System.out.println(i);
+    for(int j = i; j < thisLength; ++j)
+    {
+      output[OTHER].blockDNAs[j] = new BlockDNA(this.blockDNAs[j]);
+    }
+    output[0].recalculateDNALength();
+    output[0].calculateNumBlocks();
+    output[1].recalculateDNALength();
+    output[1].calculateNumBlocks();
+    return output;
+  }
+
+
 
   /**
    * Build a string representation of the DNA.  The string representation will
@@ -349,6 +405,21 @@ public class DNA
     }
   }
 
+  /**
+   * Recalculate number of elements in DNA.
+   */
+  private void recalculateDNALength()
+  {
+    length = 0;
+    for(BlockDNA bDNA : blockDNAs)
+    {
+      if(bDNA != null)
+      {
+        length += bDNA.blockDNASize;
+      }
+    }
+  }
+
   //============================Nested BlockDNA================================
   /**
    * The DNA for each individual block.  To be stored in an array in the main
@@ -396,10 +467,9 @@ public class DNA
      */
     public BlockDNA(Block b)
     {
+      this();
       blockID = b.getID();
       parentID = b.getIdOfParent();
-      sizeAndShape = new Vector3f[NUM_VECTORS];
-      neuronDNAs = new ArrayList<>();
       ArrayList<Neuron> neuronTable = b.getNeuronTable();
       for(Neuron n : neuronTable)
       {
@@ -407,6 +477,33 @@ public class DNA
         blockDNASize += Neuron.TOTAL_INPUTS;
       }
       length += blockDNASize;
+    }
+
+    /**
+     * Construct BlockDNA from other blockDNA.
+     * @param other       Blueprint to build from.
+     */
+    public BlockDNA(BlockDNA other)
+    {
+      this();
+      this.blockID = other.blockID;
+      this.parentID = other.parentID;
+      for(int i = 0; i < NUM_VECTORS; ++i)
+      {
+        if(other.sizeAndShape[i] != null)
+        {
+          this.sizeAndShape[i] = new Vector3f(other.sizeAndShape[i]);
+        }
+        else
+        {
+          this.sizeAndShape[i] = null;
+        }
+      }
+      this.angles = Arrays.copyOf(other.angles, other.angles.length);
+      for(int i = 0; i < other.neuronDNAs.size(); ++i)
+      {
+        this.neuronDNAs.add(new NeuronDNA(other.neuronDNAs.get(i)));
+      }
     }
 
     /**
@@ -521,6 +618,20 @@ public class DNA
           inputTypes[i] = n.getInputType(i);
           constantValues[i] = n.getInputValue(i);
           blockIndex[i] = n.getBlockIdx(i);
+        }
+      }
+
+      /**
+       * Construct NeuronDNA from other NeuronDNA
+       * @param other       the blueprint to build from.
+       */
+      public NeuronDNA(NeuronDNA other)
+      {
+        for(int i = 0; i < NUM_RULES; ++i)
+        {
+          inputTypes[i] = other.inputTypes[i];
+          constantValues[i] = other.constantValues[i];
+          blockIndex[i] = other.blockIndex[i];
         }
       }
 
