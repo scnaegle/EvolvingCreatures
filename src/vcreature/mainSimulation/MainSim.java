@@ -114,6 +114,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   //Nifty gui
   private Nifty nifty;
 
+  private ArrayList<BulletAppState> bulletAppStates = new ArrayList<>();
+
 
   @Override
   public void simpleInitApp()
@@ -121,16 +123,20 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     /**
      * Set up Physics
      */
-    bulletAppState = new BulletAppState();
+//    bulletAppState = new BulletAppState();
+//    stateManager.attach(bulletAppState);
+//    physicsSpace = bulletAppState.getPhysicsSpace();
+//    //bulletAppState.setDebugEnabled(true);
+//
+//    physicsSpace.setGravity(PhysicsConstants.GRAVITY);
+//    physicsSpace.setAccuracy(PhysicsConstants.PHYSICS_UPDATE_RATE);
+//    physicsSpace.setMaxSubSteps(4);
+//    speed = 1;
+
+    bulletAppState = createAndSetUpNewBulletAppState();
     stateManager.attach(bulletAppState);
     physicsSpace = bulletAppState.getPhysicsSpace();
-    //bulletAppState.setDebugEnabled(true);
-
-    physicsSpace.setGravity(PhysicsConstants.GRAVITY);
-    physicsSpace.setAccuracy(PhysicsConstants.PHYSICS_UPDATE_RATE);
-    physicsSpace.setMaxSubSteps(4);
-    speed = 1;
-
+   
 
 
     //Set up inmovable floor
@@ -201,6 +207,18 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     System.out.println("input: " + input_file);
     System.out.println("debug: " + debug);
     System.out.println("settings: " + settings);
+  }
+
+  private BulletAppState createAndSetUpNewBulletAppState() {
+    BulletAppState bulletAppState = new BulletAppState();
+    stateManager.attach(bulletAppState);
+    PhysicsSpace physicsSpace = bulletAppState.getPhysicsSpace();
+    //bulletAppState.setDebugEnabled(true);
+
+    physicsSpace.setGravity(PhysicsConstants.GRAVITY);
+    physicsSpace.setAccuracy(PhysicsConstants.PHYSICS_UPDATE_RATE);
+    physicsSpace.setMaxSubSteps(4);
+    return bulletAppState;
   }
 
   private void setCreatureConstants() {
