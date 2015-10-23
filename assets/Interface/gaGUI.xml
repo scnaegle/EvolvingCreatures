@@ -23,6 +23,12 @@
         <control id="speedSlider" width="90%" align="center" valign="center" name="horizontalSlider"
                  vertical="optional" horizontal="optional" forceSelection="true" />
 
+        <control name="label" text="Max Number of Blocks:" align="center" valign="top" />
+        <control id="maxNumBlocksField" width="90%" align="center" name="textfield" />
+
+        <control name="label" text="Max Population Count:" align="center" valign="top" />
+        <control id="maxPopulationField" width="90%" align="center" name="textfield" />
+
         <!--<control name="button" label="Submit" id="SubmitButton" align="right"/>-->
       </panel>
       <panel id="fitness_params" width="20%" height="50%" childLayout="vertical" backgroundColor="#00f8">

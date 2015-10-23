@@ -41,6 +41,12 @@ public class NiftySelectController implements ScreenController
     speed_slider.setMin(1);
     speed_slider.setMax(50);
     speed_slider.setButtonStepSize(5);
+
+    TextField max_num_blocks_field = screen.findNiftyControl("maxNumBlocksField", TextField.class);
+    max_num_blocks_field.setText(app.max_num_blocks + "");
+
+    TextField max_population_field = screen.findNiftyControl("maxPopulationField", TextField.class);
+    max_population_field.setText(app.starting_population_count + "");
   }
 
   @NiftyEventSubscriber(id = "threadCountSelectionBox")
@@ -76,6 +82,24 @@ public class NiftySelectController implements ScreenController
       System.out.println("speed selection: " + event.getValue());
     }
     app.setSpeed((int) event.getValue());
+  }
+
+  @NiftyEventSubscriber(id = "maxNumBlocksField")
+  public void onMaxNumBlocksFieldChanged(final String id, final TextFieldChangedEvent event) {
+    int selection = Integer.parseInt(event.getText());
+    if (app.debug) {
+      System.out.println("max number of blocks: " + selection);
+    }
+    app.setMaxNumBlocks(selection);
+  }
+
+  @NiftyEventSubscriber(id = "maxPopulationField")
+  public void onMaxPopulationFieldChanged(final String id, final TextFieldChangedEvent event) {
+    int selection = Integer.parseInt(event.getText());
+    if (app.debug) {
+      System.out.println("max population: " + selection);
+    }
+    app.setMaxPopulation(selection);
   }
 
   @Override

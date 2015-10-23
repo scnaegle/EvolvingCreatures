@@ -16,13 +16,13 @@ public class HillClimbing
 {
   private ArrayList<OurCreature> population;
   private ArrayList<OurCreature> mutatedPopulation;
-  private OurCreature randomCreature;
+  private DNA bestfitDNA;
   private PhysicsSpace physicsSpace;
   private Node rootNode;
   private Random generator;
-  private DNA dna;
   private final int NEURON_COUNT = Neuron.TOTAL_INPUTS;
   private float elapsedTime = 0.0f;
+  private float bestFitness = 0.0f;
 
   public HillClimbing(ArrayList<OurCreature> population, PhysicsSpace space, Node root)
   {
@@ -43,7 +43,8 @@ public class HillClimbing
    */
   private float fitnessTest(Creature sample)
   {
-    sample.updateBrain(elapsedTime);
+    System.out.println("Fitness before :" + sample.getFitness());
+    System.out.println("Update brain: " + sample.updateBrain(elapsedTime));
     return sample.getFitness();
   }
 
@@ -54,7 +55,7 @@ public class HillClimbing
    * @param center of the new block
    * @param size of the new block
    */
-  private void deepCopyBlock(Block originalBlock, Vector3f center, Vector3f size)
+  /*private void deepCopyBlock(Block originalBlock, Vector3f center, Vector3f size)
   {
     Block parent = randomCreature.getBlockByID(originalBlock.getIdOfParent());
     Vector3f pivotA = new Vector3f(originalBlock.getJoint().getPivotA());
@@ -62,7 +63,7 @@ public class HillClimbing
     Block block = randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
 
     copyBlockNeurons(originalBlock, block);
-  }
+  }*/
 
   /**
    * Copies all the neurons from the original block
@@ -100,16 +101,15 @@ public class HillClimbing
   }
 
   /**
-   * Mutates a blocks size by picking a random float to add or
-   * subtract from the current size, and picks a x,y,z at random
-   * to alter size
-   * @param originalBlock original block that will be mutated
-   * @param center center of block
-   * @param size current size of the original block
-   * @param isRoot if the original block is a root block
-   * @return the new mutated size is not equal to the original size, true, else false
+   * Mutates a block size by altering the dna
+   * Will pick x,y, or z at random and pick a random
+   * float change up to 1.0 to add to the selected direction
+   * @param dna DNA that is being mutated
+   * @param size original size of the block in the dna
+   * @param targetID the ID of the block being mutated
+   * @return if new size is different from original size
    */
-  private boolean mutateBlockSize(Block originalBlock, Vector3f center, Vector3f size, boolean isRoot)
+  private boolean mutateBlockSize(DNA dna, Vector3f size, int targetID)
   {
     Vector3f originalSize = new Vector3f(size);
     float x = 0;
@@ -160,71 +160,44 @@ public class HillClimbing
         break;
     }
     size.addLocal(x, y, z);
+    dna.alterVector(size, targetID, BlockVector.SIZE);
 
-    Block mutatedBlock;
-    //TODO: use new add block methods
-    if(isRoot) mutatedBlock = randomCreature.addRoot(center,size);
-    else
-    {
-      Block parent = randomCreature.getBlockByID(originalBlock.getIdOfParent());
-      Vector3f pivotA = new Vector3f(originalBlock.getJoint().getPivotA());
-      Vector3f pivotB = new Vector3f(originalBlock.getJoint().getPivotB());
-      mutatedBlock = randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
-      copyBlockNeurons(originalBlock,mutatedBlock);
-    }
     return !originalSize.equals(size);
   }
 
-  /**
-   * Mutates the structure of a block
-   * Copies all other components of the sample creature
-   * from the population that isn't being changed
-   * @param sample single creature from the population
-   * @param targetBlockID the id for the block that will be mutated
-   */
-  private void mutateBlock(OurCreature sample, int targetBlockID)
+  //TODO: mutate neuron
+  public boolean mutateBlockNeuron()
   {
-    Block currentBlock;
-    Vector3f center;
-    Vector3f size;
-    float sizeX;
-    float sizeY;
-    float sizeZ;
+    return false;
+  }
 
-    randomCreature = new OurCreature(physicsSpace,rootNode);
-    dna = new DNA(sample);
+  /**
+   * Mutates the DNA of the target block given by the ID
+   * //TODO: add more info
+   * @param originalDNA DNA of the creature before mutation
+   * @param mutatedDNA DNA copy of the originalDNA to mutate without losing information
+   * @param sample OurCreature from the given population to due fitness test on //TODO: will probably want to remove
+   * @param targetBlockID ID of the block that is being mutated
+   * @return if mutation is successful or not
+   */
+  private boolean mutateBlock(DNA originalDNA, DNA mutatedDNA, OurCreature sample, int targetBlockID)
+  {
+    Vector3f size = originalDNA.getBlockSize(targetBlockID);
+    OurCreature fitnessTestCreature;
+    float originalFitness = fitnessTest(sample);
+    float testFitness;
+    if(originalFitness > bestFitness) bestfitDNA = originalDNA;
 
-    for(int i = 0; i < sample.getNumberOfBodyBlocks(); i++)
+    if(mutateBlockSize(mutatedDNA, size, targetBlockID))
     {
-      currentBlock = sample.getBlockByID(i);
-      sizeX = currentBlock.getSizeX()/2;
-      sizeY = currentBlock.getSizeY()/2;
-      sizeZ = currentBlock.getSize()/2;
-      center = new Vector3f(dna.getBlockCenter(i));
-      size = new Vector3f(sizeX,sizeY,sizeZ);
-
-      if(i != targetBlockID)
-      {
-        if(i != 0)
-        {
-          deepCopyBlock(currentBlock,center,size);
-        }
-        else randomCreature.addRoot(center,size);
-      }
-      else//Mutate Block here
-      {
-        if(i == 0) mutateBlockSize(currentBlock,center,size,true);
-        else
-        {
-          if(mutateBlockSize(currentBlock,center,size, false))
-          {
-            //TODO: test fitness
-          }
-        }
-        System.out.println("Simulated fitness: " + fitnessTest(randomCreature));
-
-      }
+      fitnessTestCreature = new OurCreature(physicsSpace,rootNode,mutatedDNA);
+      testFitness = fitnessTest(fitnessTestCreature);
+      fitnessTestCreature.detach();
+      System.out.println("New fitness: " + testFitness);
+      if(originalFitness < testFitness) return true;
     }
+
+    return false;
   }
 
   /**
@@ -240,20 +213,30 @@ public class HillClimbing
 
   /**
    * Will perform the hill climbing on the given population when called.
-   * TODO: will need it to go through the population
    */
   public void hillClimb() {
     int blockID;
+    int index = 0;
     OurCreature creature;
+    boolean isMutated = false;
+    DNA dna;
+    DNA mutatedDNA;
     for(int i = 0; i < population.size(); i++)
     {
       creature = population.remove(i);
-      OurCreature clone = new OurCreature(physicsSpace,null); //TODO: test to see if clone will jump without affecting GUI
+      dna = new DNA(creature);
+      mutatedDNA = new DNA(creature);
       final int MAX_NUM_BLOCKS = creature.getNumberOfBodyBlocks();
-      //NOTE: may want mutateBlock to return boolean then if all mutates don't improve fitness come back here and choose new block
-      blockID = generator.nextInt(MAX_NUM_BLOCKS);
-      mutateBlock(creature, blockID);
-      mutatedPopulation.add(randomCreature);
+
+      while(index < MAX_NUM_BLOCKS && !isMutated)
+      {
+        blockID = generator.nextInt(MAX_NUM_BLOCKS);
+        if(mutateBlock(dna, mutatedDNA, creature, blockID)) isMutated = true;
+        index++;
+      }
+
+      if(isMutated) mutatedPopulation.add(new OurCreature(physicsSpace,rootNode,bestfitDNA));
+      else mutatedPopulation.add(new OurCreature(physicsSpace,rootNode,dna));
     }
     population = mutatedPopulation;
   }
@@ -263,6 +246,9 @@ public class HillClimbing
    * TODO: grab a random creature from population, or pick best fit one
    * @return creature from this population
    */
-  public OurCreature getCreature(){return randomCreature;}
+  public OurCreature getCreature()
+  {
+    return mutatedPopulation.get(0);
+  }
 
 }

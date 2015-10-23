@@ -131,7 +131,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     physicsSpace.setMaxSubSteps(4);
     speed = 1;
 
-   
 
 
     //Set up inmovable floor
@@ -332,7 +331,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     //   Your application will have more work to do than to spend cycles rendering faster than the
     //   capture rate of the RED Camera used to shoot Lord of the Rings.
     settings.setVSync(true);
-    settings.setFrequency((int)app.speed * 60);//Frames per second
+    settings.setFrequency((int) app.speed * 60);//Frames per second
     settings.setTitle("Flappy Bird Creature");
 
     System.out.println("Starting App");
@@ -391,6 +390,16 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     settings.setFrequency(speed * 60);
     this.setSettings(settings);
     this.restart();
+  }
+
+  public void setMaxNumBlocks(int max_num_blocks) {
+    this.max_num_blocks = max_num_blocks;
+    setCreatureConstants();
+  }
+
+  public void setMaxPopulation(int max_population) {
+    this.starting_population_count = max_population;
+    setCreatureConstants();
   }
 
   //=====begin ScreenController implementation================================
