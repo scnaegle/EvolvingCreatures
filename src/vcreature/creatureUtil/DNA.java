@@ -145,8 +145,7 @@ public class DNA
                       c.getBlockByID(bDNA.parentID),
                       newVector(i, BlockVector.JOINT_A),
                       newVector(i, BlockVector.JOINT_B),
-                      newVector(i, BlockVector.AXIS_A),
-                      newVector(i, BlockVector.AXIS_B));
+                      newVector(i, BlockVector.AXIS_A));
         }
         else
         {
@@ -154,8 +153,7 @@ public class DNA
                                             c.getBlockByID(bDNA.parentID),
                                             newVector(i, BlockVector.JOINT_A),
                                             newVector(i, BlockVector.JOINT_B),
-                                            newVector(i, BlockVector.AXIS_A),
-                                            newVector(i, BlockVector.AXIS_B));
+                                            newVector(i, BlockVector.AXIS_A));
         }
         blockDNAs[i].addNeurons(c.getBlockByID(blockDNAs[i].blockID));
       }

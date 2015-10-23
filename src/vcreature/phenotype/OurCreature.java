@@ -178,6 +178,36 @@ public class OurCreature extends Creature
    * Local coordinates means the location on the block relitive to the block's center with zero rotation.
    * @param pivotB Location in local coordinates of the pivot point on this block.
    * @param axisA One-degree of freedom hinge axis in local coordinates of the parent block.
+   * @return
+   */
+  @Override
+  public Block addBlock(float[] eulerAngles, Vector3f halfsize, Block parent,
+                        Vector3f pivotA, Vector3f pivotB, Vector3f axisA)
+  {
+    Block b = super.addBlock(eulerAngles,halfsize,parent,pivotA,pivotB,axisA);
+    blockProperties.add(makeBlockVectorArray(b, halfsize, axisA, axisA));
+    blockAngles.add(Arrays.copyOf(eulerAngles, eulerAngles.length));
+    return b;
+  }
+
+  /**
+   * @deprecated
+   * Add block, calls super.addBlock().  Also logs important vectors and block
+   * angles.  What happens:
+   * 1.) Call parent constructor.
+   * 2.)call makeBlockVectorArray(new block, halfsize, axis of rotation a & b)
+   * to store info that DNA constructor will use.
+   * 3.) add array created in step 2 to blockProperties.
+   * 4.) add copy of angles array to angles list.
+   * @param eulerAngles
+   * @param halfsize half the extent (in meters) of the block in the x, y and z direction.
+   * For example, a block with extent in the x dimension of 0.5 would extend from 0.5 meters from
+   * the origin in the -x direction and 0.5 meters from the origin in the +x direction.
+   * @param parent Block instance onto which this block will be joined.
+   * @param pivotA Location in local coordinates of the pivot point on the parent block.
+   * Local coordinates means the location on the block relitive to the block's center with zero rotation.
+   * @param pivotB Location in local coordinates of the pivot point on this block.
+   * @param axisA One-degree of freedom hinge axis in local coordinates of the parent block.
    * @param axisB One-degree of freedom hinge axis in local coordinates of the this block.
    * @return
    */
