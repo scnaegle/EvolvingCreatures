@@ -116,6 +116,22 @@ public class DNA
     return null;
   }
 
+  /**
+   * Get size of a block.  Used to alter DNA
+   * @param iD int BlockID
+   * @return Vector3f size of block, return null
+   */
+  public Vector3f getBlockSize(int iD)
+  {
+    for(BlockDNA bDNA : blockDNAs)
+    {
+      if(bDNA.blockID == iD)
+      {
+        return bDNA.sizeAndShape[BlockVector.SIZE.ordinal()];
+      }
+    }
+    return null;
+  }
 
   /**
    * Build creature with DNA.  Called from OurCreature constructor when a
@@ -287,7 +303,7 @@ public class DNA
     int otherLength = other.numBlocks;
     int length;
     length = thisLength < otherLength ? thisLength : otherLength;
-    int crossPoint = rand.nextInt(length - 1) + 1;
+    int crossPoint = rand.nextInt(length) + 1;
     output[THIS] = new DNA();
     output[OTHER] = new DNA();
     int i;

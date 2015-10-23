@@ -399,6 +399,12 @@ public class OurCreature extends Creature
     Vector3f torsoSize = new Vector3f( 2.0f, 1.5f, 1.5f);
     Vector3f leg1Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
     Vector3f leg2Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
+    Vector3f leg3Size = new Vector3f(1.0f, 0.5f, 3.0f);
+    Vector3f pivot3A = new Vector3f(0.0f, -1.5f, 1.5f);
+    Vector3f pivot3B = new Vector3f(0.0f, 0.5f, -3.0f);
+    Vector3f pivot4A = new Vector3f(0.0f, -1.5f, -1.5f);
+    Vector3f pivot4B = new Vector3f(0.0f, 0.5f, 3.0f);
+
 
     //Euler rotation angles (x,y,z) aka (pitch, yaw, rall)).
     //Note: Euler angles are applying in order: (y, z, x) aka (yaw, roll, pitch).
@@ -421,16 +427,12 @@ public class OurCreature extends Creature
     Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in the block's coordinates
 
     Block leg2  = addBlock(eulerAngles, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
-
-
-
-
+    Block leg3 = addBlock(eulerAngles, leg3Size, torso, pivot3A, pivot3B, Vector3f.UNIT_X, Vector3f.UNIT_X);
+    Block leg4 = addBlock(eulerAngles, leg3Size, torso, pivot4A, pivot4B, Vector3f.UNIT_X, Vector3f.UNIT_X);
 
     torso.setMaterial(Block.MATERIAL_GREEN);
     leg1.setMaterial(Block.MATERIAL_RED);
     leg2.setMaterial(Block.MATERIAL_BLUE);
-
-
 
     Neuron leg1Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
         EnumNeuronInput.CONSTANT, null);
@@ -462,6 +464,10 @@ public class OurCreature extends Creature
 
     leg2.addNeuron(leg2Neuron1);
     leg2.addNeuron(leg2Neuron2);
+    leg3.addNeuron(leg2Neuron1);
+    leg3.addNeuron(leg2Neuron2);
+    leg4.addNeuron(leg1Neuron1);
+    leg4.addNeuron(leg1Neuron2);
   }
 
   /**
@@ -476,7 +482,7 @@ public class OurCreature extends Creature
 
     Vector3f torsoSize = new Vector3f( 2.0f, 1.5f, 1.5f);
     Vector3f leg1Size  = new Vector3f( 1.0f, 1.0f, 1.0f);
-    Vector3f leg2Size  = new Vector3f( 3.0f, 0.5f, 1.0f);
+    Vector3f leg2Size  = new Vector3f( 1.0f, 1.0f, 1.0f);
 
     //Euler rotation angles (x,y,z) aka (pitch, yaw, rall)).
     //Note: Euler angles are applying in order: (y, z, x) aka (yaw, roll, pitch).
@@ -494,7 +500,7 @@ public class OurCreature extends Creature
     Block leg1  = addBlock(eulerAngles, leg1Size,torso, pivotA,  pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
 
     Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in the block's coordinates
-    Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in the block's coordinates
+    Vector3f pivotD = new Vector3f( 1.0f,  1.0f,  0.0f); //Center of hinge in the block's coordinates
 
     Block leg2  = addBlock(eulerAngles, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
 
@@ -536,9 +542,9 @@ public class OurCreature extends Creature
     leg2.addNeuron(leg2Neuron2);
 
     Vector3f pivotE = new Vector3f(-3.0f, -0.5f,  0.0f); //Center of hinge in parents  block's coordinates
-    Vector3f pivotF = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in childs block's coordinates
+    Vector3f pivotF = new Vector3f( 1.0f,  1.0f,  0.0f); //Center of hinge in childs block's coordinates
 
-    Block leg3  = addBlock(CreatureConstants.IDENTITY_QUATERNION, leg2Size,leg2, pivotE,  pivotF, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    Block leg3  = addBlock(eulerAngles, leg2Size,leg2, pivotE,  pivotF, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
 
     torso.setMaterial(Block.MATERIAL_GREEN);
     leg1.setMaterial(Block.MATERIAL_RED);
