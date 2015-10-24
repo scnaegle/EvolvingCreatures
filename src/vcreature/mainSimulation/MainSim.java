@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import vcreature.creatureUtil.CreatureConstants;
 import vcreature.creatureUtil.JSONHandler;
 import vcreature.creatureUtil.RandomCreature;
+import vcreature.hillClimbing.HillClimbing;
 import vcreature.phenotype.Creature;
 import vcreature.phenotype.OurCreature;
 import vcreature.phenotype.PhysicsConstants;
@@ -104,12 +105,13 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
-  private OurCreature myCreature;
   private boolean isCameraRotating = true;
 
   private DNA testDNA;
   //private RandomCreature myCreature;
-  private OurCreature ourCreature; //TODO testing, remove.
+  private OurCreature myCreature;
+  private ArrayList<DNA> population;
+  private HillClimbing hillClimbing;
 
   //Nifty gui
   private Nifty nifty;
@@ -161,16 +163,21 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     Block.initStaticMaterials(assetManager);
 
     //Test Crossover
-    ourCreature = new OurCreature(physicsSpace, rootNode, true);
-    testDNA = ourCreature.getDNA();
-    DNA testDNA1 = new DNA(testDNA);
-    ourCreature.remove();
-    OurCreature otherCreature = new OurCreature(physicsSpace, rootNode, false);
-    DNA testDNA2 = otherCreature.getDNA();
-    otherCreature.remove();
-    DNA[] crossed = testDNA1.singleCrossover(testDNA2);
-    ourCreature = new OurCreature(physicsSpace, rootNode, crossed[1]);
-    ourCreature.placeOnGround();
+//    ourCreature = new OurCreature(physicsSpace, rootNode, true);
+//    testDNA = ourCreature.getDNA();
+//    DNA testDNA1 = new DNA(testDNA);
+//    ourCreature.remove();
+//    OurCreature otherCreature = new OurCreature(physicsSpace, rootNode, false);
+//    DNA testDNA2 = otherCreature.getDNA();
+//    otherCreature.remove();
+//    DNA[] crossed = testDNA1.singleCrossover(testDNA2);
+//    ourCreature = new OurCreature(physicsSpace, rootNode, crossed[1]);
+//    ourCreature.placeOnGround();
+
+    myCreature = new OurCreature(physicsSpace, rootNode, true);
+    population = new ArrayList<>();
+    population.add(new DNA(myCreature));
+    hillClimbing = new HillClimbing(population, physicsSpace, rootNode);
 
 
     initLighting();
@@ -257,8 +264,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
     else if (name.equals("Quit"))
     {
-      //TODO put back: System.out.format("Creature Fitness (Maximium height of lowest point) = %.3f meters]\n", myCreature.getFitness());
-      System.out.format("Creature Fitness (Maximium height of lowest point) = %.3f meters]\n", ourCreature.getFitness());
+      System.out.format("Creature Fitness (Maximium height of lowest point) = %.3f meters]\n", myCreature.getFitness());
       System.exit(0);
     }
   }
@@ -272,15 +278,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     //print("simpleUpdate() elapsedSimulationTime=", (float)elapsedSimulationTime);
     //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
     //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
-    ourCreature.updateBrain(elapsedSimulationTime);
+    myCreature.updateBrain(elapsedSimulationTime);
 
     if (headless && debug)
     {
-      System.out.println("Max Fitness: " + ourCreature.getFitness());
+      System.out.println("Max Fitness: " + myCreature.getFitness());
     } else
     {
       de.lessvoid.nifty.elements.Element nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
-      nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + ourCreature.getFitness());
+      nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
     }
 
     if (isCameraRotating)
@@ -294,6 +300,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       tmpVec3 = new Vector3f(x, 10.0f, z);
       cam.setLocation(tmpVec3);
       cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
+    }
+
+    if (elapsedSimulationTime > 17) {
+      hillClimbing.hillClimb();
+
+      myCreature.detach();
+      myCreature = new OurCreature(physicsSpace, rootNode, hillClimbing.getBestfitDNA());
+      myCreature.placeOnGround();
+      elapsedSimulationTime = 0.0f;
     }
   }
  
