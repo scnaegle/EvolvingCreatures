@@ -305,7 +305,6 @@ public class DNA
     output[THIS] = new DNA();
     output[OTHER] = new DNA();
     int i;
-    System.out.println(crossPoint);
     for(i = 0; i < crossPoint; ++i)
     {
       output[THIS].blockDNAs[i] = new BlockDNA(this.blockDNAs[i]);//
