@@ -14,9 +14,10 @@ import java.util.Random;
  * A class containing the DNA description of the block.  Will have a tostring
  * method for saving the creature, getters and setters to manipulate the block.
  * Will have a deep copy method/constructor.
+ * Comparable on fitness.
  */
 
-public class DNA
+public class DNA implements Comparable
 {
   private final int THIS = 0;
   private final int OTHER = 1;
@@ -26,6 +27,7 @@ public class DNA
   private BlockDNA[] blockDNAs;
   private DNA[] output;
   private Vector3f tempVec3;
+  private float fitness;
 
   /**
    * Default constructor initializes all values to zero or null.
@@ -36,6 +38,7 @@ public class DNA
     output = new DNA[2];
     rand = new Random();
     tempVec3 = new Vector3f();
+    fitness = 0;
   }
 
   /**
@@ -58,6 +61,48 @@ public class DNA
       c.populateVectorDNA(i, blockDNAs[i].sizeAndShape);
       blockDNAs[i].setAngles(c.getBlockAngles(i));
     }
+  }
+
+  /**
+   * Construct from another DNA
+   * @param other       otherDNA
+   */
+  public DNA(DNA other)
+  {
+    this();
+    this.length = other.length;
+    this.numBlocks = other.numBlocks;
+    for(int i = 0; i < CreatureConstants.MAX_BLOCKS; ++i)
+    {
+      if(other.blockDNAs[i] != null)
+      {
+        this.blockDNAs[i] = new BlockDNA(other.blockDNAs[i]);
+      }
+      else
+      {
+        this.blockDNAs[i] = null;
+      }
+    }
+    calculateNumBlocks();
+    recalculateDNALength();
+  }
+
+  /**
+   * Store fitness in dna
+   * @param newFitness        the fitness score
+   */
+  public void storeFitness(int newFitness)
+  {
+    fitness = newFitness;
+  }
+
+  /**
+   * Get last fitness score.
+   * @return        this fitness score.
+   */
+  public float getFitness()
+  {
+    return fitness;
   }
 
   /**
@@ -330,6 +375,33 @@ public class DNA
   }
 
 
+  /**
+   * Implement comparable.  DNA compares on fitness.
+   * @param other       other DNA object.
+   * @return            -1 if this fitness is less than other.
+   *                    0 if this fitness is equal to other.
+   *                    1 if this fitness is greater than other.
+   */
+  public int compareTo(Object other)
+  {
+    DNA o = (DNA)other;
+    if(this == o)
+    {
+      return 0;
+    }
+    else if(this.fitness < o.getFitness())
+    {
+      return -1;
+    }
+    else if (this.fitness > o.getFitness())
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
+  }
 
   /**
    * Build a string representation of the DNA.  The string representation will

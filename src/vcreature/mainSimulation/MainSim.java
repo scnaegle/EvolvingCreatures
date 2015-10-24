@@ -163,11 +163,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     //Test Crossover
     ourCreature = new OurCreature(physicsSpace, rootNode, true);
     testDNA = ourCreature.getDNA();
+    DNA testDNA1 = new DNA(testDNA);
     ourCreature.remove();
     OurCreature otherCreature = new OurCreature(physicsSpace, rootNode, false);
     DNA testDNA2 = otherCreature.getDNA();
     otherCreature.remove();
-    DNA[] crossed = testDNA.singleCrossover(testDNA2);
+    DNA[] crossed = testDNA1.singleCrossover(testDNA2);
     ourCreature = new OurCreature(physicsSpace, rootNode, crossed[1]);
     ourCreature.placeOnGround();
 
