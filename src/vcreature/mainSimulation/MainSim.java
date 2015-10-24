@@ -13,6 +13,7 @@ import vcreature.creatureUtil.CreatureConstants;
 import vcreature.creatureUtil.JSONHandler;
 import vcreature.creatureUtil.RandomCreature;
 import vcreature.hillClimbing.HillClimbing;
+import vcreature.creatureUtil.*;
 import vcreature.phenotype.Creature;
 import vcreature.phenotype.OurCreature;
 import vcreature.phenotype.PhysicsConstants;
@@ -37,7 +38,6 @@ import com.jme3.light.AmbientLight;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.system.AppSettings;
-import vcreature.creatureUtil.DNA;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -105,10 +105,13 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
+
+  private RandCreature r_creature;
+
   private boolean isCameraRotating = true;
 
   private DNA testDNA;
-  //private RandomCreature myCreature;
+
   private OurCreature myCreature;
   private ArrayList<DNA> population;
   private HillClimbing hillClimbing;
@@ -166,6 +169,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     Block.initStaticMaterials(assetManager);
 
     //Test Crossover
+
 //    ourCreature = new OurCreature(physicsSpace, rootNode, true);
 //    testDNA = ourCreature.getDNA();
 //    DNA testDNA1 = new DNA(testDNA);
@@ -182,6 +186,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     population.add(new DNA(myCreature));
     hillClimbing = new HillClimbing(population, physicsSpace, rootNode);
 
+    /*
+    r_creature = new RandCreature(physicsSpace, rootNode);
+    DNA randomDNA = new DNA(r_creature);
+    r_creature.remove();
+    myCreature = new OurCreature(physicsSpace, rootNode, randomDNA);
+    */
 
     initLighting();
     initKeys();

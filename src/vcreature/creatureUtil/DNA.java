@@ -87,6 +87,20 @@ public class DNA implements Comparable
     recalculateDNALength();
   }
 
+  public DNA(RandCreature c)
+  {
+    this();
+    length = 0;
+    numBlocks = c.body.size();
+    for (int i = 0; i < numBlocks; ++i)
+    {
+      blockDNAs[i] = new BlockDNA(c.body.get(i));
+      c.populateVectorDNA(i, blockDNAs[i].sizeAndShape);
+      blockDNAs[i].setAngles(c.getBlockAngles(i));
+    }
+  }
+
+
   /**
    * Store fitness in dna
    * @param newFitness        the fitness score

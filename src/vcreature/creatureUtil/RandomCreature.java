@@ -1,11 +1,12 @@
 package vcreature.creatureUtil;
 
 import com.jme3.bullet.PhysicsSpace;
+import com.jme3.collision.CollisionResults;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
-import vcreature.phenotype.Block;
-import vcreature.phenotype.Creature;
-import vcreature.phenotype.OurCreature;
+import com.jme3.bounding.BoundingBox;
+import vcreature.phenotype.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -31,6 +32,8 @@ import java.util.Random;
 public class RandomCreature extends OurCreature
 {
   private static Random rand = new Random();
+  private PhysicsSpace physicsSpace;
+  private Node visualWorld;
   private static float[] axisAligned = {0,0,0};
 
   /**
@@ -42,11 +45,12 @@ public class RandomCreature extends OurCreature
   {
     super(physicsSpace, jMonkeyRootNode);
 
-    //int blockNumber = rand.nextInt(3)+1;
+    this.physicsSpace = physicsSpace;
+    this.visualWorld = jMonkeyRootNode;
 
-    //int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS)+1;
+    int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS)+1;
 
-    int blockNumber = 2;
+    //int blockNumber = 10;
 
     makeRoot();
 
@@ -56,7 +60,7 @@ public class RandomCreature extends OurCreature
       addRandomBlock(parentBlock);
     }
 
-    placeOnGround();
+    bumpUp();
   }
 
   /**
@@ -65,18 +69,17 @@ public class RandomCreature extends OurCreature
   private Block makeRoot()
   {
     Vector3f rootCenter = new Vector3f(0f,0f,0f);
-    Vector3f rootSize = new Vector3f();
+    Vector3f rootSize = new Vector3f(0f,0f,0f);
 
     //choose random x,y,z values between 1 and 10
+
     rootSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     rootSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     rootSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
 
-    //bump up the root node so it doesn't overlap with floor
-    //bumpUpCreature();
-    rootCenter.y = rootSize.y;
+    System.out.println("Parent Size: " + rootSize.x + " " + rootSize.y + " " + rootSize.z);
 
-    return addRoot(rootCenter, rootSize);
+    return addRoot(rootCenter, rootSize, axisAligned);
   }
 
   private void addRandomBlock(int index)
@@ -90,30 +93,97 @@ public class RandomCreature extends OurCreature
     int parentSurface;
     int childSurface;
 
+    Block newBlock;
+    Neuron newNeuron;
+
     //new vectors for child block
-    Vector3f childSize = new Vector3f();
-    Vector3f childCenter = new Vector3f();
+    Vector3f childSize = new Vector3f(0f,0f,0f);
+    Vector3f parentSize = new Vector3f(parent.getSizeX()/2, parent.getSizeY()/2, parent.getSize()/2);
 
     //vectors for the joints between the parents and the child
-    Vector3f parentJoint = new Vector3f();
-    Vector3f childJoint = new Vector3f();
+    Vector3f parentJoint = new Vector3f(0f,0f,0f);
+    Vector3f childJoint = new Vector3f(0f,0f,0f);
+
+    Vector3f rotationAxis = new Vector3f(0f,0f,0f);
 
     //create random sizes for child block
     childSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     childSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     childSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
 
+
     //select a random surface on parent to add child to
     parentSurface = rand.nextInt(6);
     childSurface = correspondingChildSurface(parentSurface); //find corresponding surface on child
 
+    rotationAxis = randomAxis(parentSurface, rotationAxis);
+
+
     //make a new joint vector on the parent and on the child
-    getSurfaceVector(parentJoint, parentSurface, parent);
+    getSurfaceVector(parentJoint, parentSurface, parentSize);
     getSurfaceVector(childJoint, childSurface, childSize);
 
+    //Vector3f parentCenter = new Vector3f();
+    //Vector3f childCenter = getChildCenter(parent.getCenter(parentCenter), parentJoint, childJoint);
+
+    //newBlock = new Block(physicsSpace, visualWorld, getNumberOfBodyBlocks()+1, childCenter, childSize, Quaternion.IDENTITY);
+
     //addBlock
-    addBlock(axisAligned, childSize, parent, parentJoint, childJoint, Vector3f.ZERO, Vector3f.ZERO);
+    addBlock(axisAligned, childSize, parent, parentJoint, childJoint, rotationAxis, rotationAxis);
+
+    //if (!removeIfIntersection())
+    //{
+      newNeuron = makeRandomNeuron();
+      newBlock = getBlockByID(getNumberOfBodyBlocks()-1);
+      newBlock.addNeuron(newNeuron);
+    //}
   }
+
+  public boolean removeIfIntersection()
+  {
+    int newBlockID = getNumberOfBodyBlocks()-1;
+    CollisionResults collisionResults = new CollisionResults();
+
+    Block newBlock = getBlockByID(newBlockID);
+    Block compareBlock;
+
+    for (int i = 0 ; i < newBlockID; ++i)
+    {
+      compareBlock = getBlockByID(i);
+      BoundingBox box = (BoundingBox) compareBlock.getGeometry().getWorldBound();
+      newBlock.getGeometry().collideWith(box, collisionResults);
+
+      if ((newBlock.getIdOfParent() != compareBlock.getID()) && collisionResults.size() > 0)
+      {
+        detachTest();
+        return true;
+      }
+
+      collisionResults.clear();
+    }
+    return false;
+  }
+
+  private Neuron makeRandomNeuron()
+  {
+    //float seconds = (rand.nextInt(20)+1) + rand.nextFloat();
+    float seconds = 3;
+    float impulse = Float.MAX_VALUE;
+    int sign = rand.nextInt(2);
+
+    Neuron n = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT, EnumNeuronInput.CONSTANT, null);
+
+    if (sign == 1)
+    {
+      impulse = -impulse;
+    }
+
+    n.setInputValue(Neuron.C, seconds);
+    n.setInputValue(Neuron.D, impulse);
+
+    return n;
+  }
+
 
   /**
    * Makes a vector to a joint a child block's surface
@@ -154,38 +224,6 @@ public class RandomCreature extends OurCreature
     }
   }
 
-  private void getSurfaceVector(Vector3f joint, int surface, Block b)
-  {
-    switch (surface) {
-      case 0: joint.y = b.getSizeY();
-              joint.x = randomSurfacePoint(b.getSizeX());
-              joint.z = randomSurfacePoint(b.getSize());
-        break;
-      case 1: joint.y = -b.getSizeY();
-              joint.x = randomSurfacePoint(b.getSizeX());
-              joint.z = randomSurfacePoint(b.getSize());
-        break;
-      case 2: joint.x = b.getSizeX();
-              joint.y = randomSurfacePoint(b.getSizeY());
-              joint.z = randomSurfacePoint(b.getSize());
-        break;
-      case 3: joint.x = -b.getSizeX();
-              joint.y = randomSurfacePoint(b.getSizeY());
-              joint.z = randomSurfacePoint(b.getSize());
-        break;
-      case 4: joint.z = b.getSize();
-              joint.x = randomSurfacePoint(b.getSizeX());
-              joint.y = randomSurfacePoint(b.getSizeY());
-        break;
-      case 5: joint.z = b.getSize();
-              joint.x = randomSurfacePoint(b.getSizeX());
-              joint.y = randomSurfacePoint(b.getSizeY());
-        break;
-      default:
-        break;
-    }
-  }
-
   /**
    * Corresponding ints to surfaces on blocks
    * 0 = +y;
@@ -217,14 +255,73 @@ public class RandomCreature extends OurCreature
     return childSurface;
   }
 
-  private float randomSurfacePoint(float bounds)
+  private Vector3f randomAxis(int surface, Vector3f axis)
   {
-    return bounds;
+    switch (surface){
+      case 0: randomYorZ(axis);
+        break;
+      case 1: randomYorZ(axis);
+        break;
+      case 2: randomXorZ(axis);
+        break;
+      case 3: randomXorZ(axis);
+        break;
+      case 4: randomXorY(axis);
+        break;
+      case 5: randomXorY(axis);
+        break;
+      default: axis = Vector3f.ZERO;
+        break;
+    }
+    return axis;
   }
-    /*
+
+  private Vector3f randomYorZ(Vector3f axis)
+  {
+    int random = rand.nextInt(2);
+    if (random == 0)
+    {
+      axis = Vector3f.UNIT_Y;
+    }
+    else
+    {
+      axis = Vector3f.UNIT_Z;
+    }
+    return axis;
+  }
+
+  private Vector3f randomXorZ(Vector3f axis)
+  {
+    int random = rand.nextInt(2);
+    if (random == 0)
+    {
+      axis = Vector3f.UNIT_X;
+    }
+    else
+    {
+      axis = Vector3f.UNIT_Z;
+    }
+    return axis;
+  }
+
+  private Vector3f randomXorY(Vector3f axis)
+  {
+    int random = rand.nextInt(2);
+    if (random == 0)
+    {
+      axis = Vector3f.UNIT_X;
+    }
+    else
+    {
+      axis = Vector3f.UNIT_Y;
+    }
+    return axis;
+  }
+
+
   private float randomSurfacePoint(float bounds)
   {
-    int sign = rand.nextInt(1);
+    int sign = rand.nextInt(2);
     int scale = (int) bounds;
 
     float point = rand.nextInt(scale+1) + rand.nextFloat();
@@ -235,5 +332,16 @@ public class RandomCreature extends OurCreature
     }
 
     return point;
-  }*/
+  }
+
+  private Vector3f getChildCenter(Vector3f parentCenter, Vector3f parentJoint, Vector3f childJoint)
+  {
+    Vector3f childCenter = new Vector3f();
+
+    childCenter.add(parentCenter);
+    childCenter.add(parentJoint);
+    childCenter.add(childJoint);
+
+    return childCenter;
+  }
 }
