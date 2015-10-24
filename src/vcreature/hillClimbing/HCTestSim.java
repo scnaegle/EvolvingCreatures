@@ -47,8 +47,9 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
   private OurCreature myCreature;
+  private OurCreature myCreature2;
   private boolean isCameraRotating = true;
-  private ArrayList<OurCreature> population;
+  private ArrayList<DNA> population;
 
   //Nifty gui
   private Nifty nifty;
@@ -111,8 +112,8 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
     */
     flyCam.setDragToRotate(true);
 
-    population = new ArrayList<OurCreature>();
-    population.add(myCreature);
+    population = new ArrayList<DNA>();
+    population.add(new DNA(myCreature));
     hillClimbing = new HillClimbing(population, physicsSpace, rootNode);//would want it here to set up hill climbing
   }
 
@@ -165,11 +166,14 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
   public void simpleUpdate(float deltaSeconds)
   {
     elapsedSimulationTime += deltaSeconds;
+    hillClimbing.setElapsedTime(elapsedSimulationTime);
+
     //print("simpleUpdate() elapsedSimulationTime=", (float)elapsedSimulationTime);
     //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
+    //System.out.println("Simulation time: " + elapsedSimulationTime);
     myCreature.updateBrain(elapsedSimulationTime);
 
-    System.out.println("Max Fitness: " + myCreature.getFitness());
+    //System.out.println("Max Fitness: " + myCreature.getFitness());
 
     if (isCameraRotating)
     {
@@ -184,13 +188,13 @@ public class HCTestSim extends SimpleApplication implements ActionListener, Scre
       cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
     }
     //TODO: make myCreature be best creature from population
-    if(myCreature.getFitness() < 20 && elapsedSimulationTime > 17.0f)
+    if(elapsedSimulationTime > 17)
     {
-      hillClimbing.setElapsedTime(elapsedSimulationTime);
+
       hillClimbing.hillClimb();
 
       myCreature.detach();
-      myCreature = hillClimbing.getCreature();
+      myCreature = new OurCreature(physicsSpace,rootNode,hillClimbing.getBestfitDNA());
       myCreature.placeOnGround();
       elapsedSimulationTime = 0.0f;
     }

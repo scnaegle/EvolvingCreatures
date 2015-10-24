@@ -14,21 +14,18 @@ import java.util.Random;
  */
 public class HillClimbing
 {
-  private ArrayList<OurCreature> population;
-  private ArrayList<OurCreature> mutatedPopulation;
+  private ArrayList<DNA> population;
+  private ArrayList<Float> elapsedTime = new ArrayList<Float>();
   private DNA bestfitDNA;
   private PhysicsSpace physicsSpace;
   private Node rootNode;
   private Random generator;
   private final int NEURON_COUNT = Neuron.TOTAL_INPUTS;
-  private float elapsedTime = 0.0f;
   private float bestFitness = 0.0f;
 
-  public HillClimbing(ArrayList<OurCreature> population, PhysicsSpace space, Node root)
+  public HillClimbing(ArrayList<DNA> population, PhysicsSpace space, Node root)
   {
     this.population = population;
-    mutatedPopulation = new ArrayList<OurCreature>();
-    //creature = sample;
     physicsSpace = space;
     rootNode = root;
     generator = new Random();
@@ -38,66 +35,24 @@ public class HillClimbing
    * Simulates the creature and gets the fitness of it.
    * At moment, creature will attempt to jump twice, need
    * to decouple creatures from gui
-   * @param sample creature to do fitness test on
+   * @param sampleDNA DNA of the creature to do fitness test on
    * @return fitness value of creature
    */
-  private float fitnessTest(Creature sample)
+  private float fitnessTest(DNA sampleDNA)
   {
-    System.out.println("Fitness before :" + sample.getFitness());
-    System.out.println("Update brain: " + sample.updateBrain(elapsedTime));
-    return sample.getFitness();
-  }
+    float fitness;
+    OurCreature sample = new OurCreature(physicsSpace,rootNode,sampleDNA);
+   // System.out.println("Fitness before :" + sample.getFitness());
 
-  /**
-   * Will add a new block that is an exact copy of originalBlock
-   * to the creature being modified
-   * @param originalBlock from the creature
-   * @param center of the new block
-   * @param size of the new block
-   */
-  /*private void deepCopyBlock(Block originalBlock, Vector3f center, Vector3f size)
-  {
-    Block parent = randomCreature.getBlockByID(originalBlock.getIdOfParent());
-    Vector3f pivotA = new Vector3f(originalBlock.getJoint().getPivotA());
-    Vector3f pivotB = new Vector3f(originalBlock.getJoint().getPivotB());
-    Block block = randomCreature.addBlock(center,size,parent,pivotA,pivotB,Vector3f.UNIT_Z,Vector3f.UNIT_Z);
-
-    copyBlockNeurons(originalBlock, block);
-  }*/
-
-  /**
-   * Copies all the neurons from the original block
-   * to the mutated block
-   * @param originalBlock starting block
-   * @param mutatedBlock block that is having mutations
-   */
-  private void copyBlockNeurons(Block originalBlock, Block mutatedBlock)
-  {
-    Neuron neuron;
-    EnumNeuronInput a;
-    EnumNeuronInput b;
-    EnumNeuronInput c;
-    EnumNeuronInput d;
-    EnumNeuronInput e;
-
-    //loop through neuron table
-    for(Neuron blockNeuron : originalBlock.getNeuronTable())
+    //TODO: need loop to even get a non zero fitness, seems like physics aren't taking affect
+    for(float time : elapsedTime)
     {
-      a = blockNeuron.getInputType(0);
-      b = blockNeuron.getInputType(1);
-      c = blockNeuron.getInputType(2);
-      d = blockNeuron.getInputType(3);
-      e = blockNeuron.getInputType(4);
-      neuron = new Neuron(a,b,c,d,e);
-
-      for(int j = 0; j < NEURON_COUNT; j++)
-      {
-        neuron.setInputValue(j, blockNeuron.getInputValue(j));
-      }
-
-      mutatedBlock.addNeuron(neuron);
-
+     //System.out.println("Simulated Time: " + time + " Update brain: " + sample.updateBrain(time));
     }
+    fitness = sample.getFitness();
+    //System.out.println("Fitness after: " + fitness);
+    sample.detach();
+    return fitness;
   }
 
   /**
@@ -123,6 +78,7 @@ public class HillClimbing
     boolean addOp = generator.nextInt(2) == 0;
     boolean sizeNot10 = size.getX() < 10 && size.getY() < 10 && size.getZ() < 10;
     boolean sizeNot1 = size.getX() > 1 && size.getY() > 1 && size.getZ() > 1;
+
     switch (generator.nextInt(3))
     {
       case(0):
@@ -161,8 +117,7 @@ public class HillClimbing
     }
     size.addLocal(x, y, z);
     dna.alterVector(size, targetID, BlockVector.SIZE);
-
-    return !originalSize.equals(size);
+    return !(originalSize.equals(size));
   }
 
   //TODO: mutate neuron
@@ -176,25 +131,22 @@ public class HillClimbing
    * //TODO: add more info
    * @param originalDNA DNA of the creature before mutation
    * @param mutatedDNA DNA copy of the originalDNA to mutate without losing information
-   * @param sample OurCreature from the given population to due fitness test on //TODO: will probably want to remove
    * @param targetBlockID ID of the block that is being mutated
    * @return if mutation is successful or not
    */
-  private boolean mutateBlock(DNA originalDNA, DNA mutatedDNA, OurCreature sample, int targetBlockID)
+  private boolean mutateBlock(DNA originalDNA, DNA mutatedDNA, int targetBlockID)
   {
-    Vector3f size = originalDNA.getBlockSize(targetBlockID);
-    OurCreature fitnessTestCreature;
-    float originalFitness = fitnessTest(sample);
+    Vector3f size = new Vector3f(originalDNA.getBlockSize(targetBlockID));
+    float originalFitness = fitnessTest(originalDNA);
     float testFitness;
     if(originalFitness > bestFitness) bestfitDNA = originalDNA;
 
     if(mutateBlockSize(mutatedDNA, size, targetBlockID))
     {
-      fitnessTestCreature = new OurCreature(physicsSpace,rootNode,mutatedDNA);
-      testFitness = fitnessTest(fitnessTestCreature);
-      fitnessTestCreature.detach();
-      System.out.println("New fitness: " + testFitness);
+      testFitness = fitnessTest(mutatedDNA);
+     // System.out.println("New fitness: " + testFitness);
       if(originalFitness < testFitness) return true;
+      return true; //TODO: remove once fitnessTest is correct
     }
 
     return false;
@@ -208,7 +160,7 @@ public class HillClimbing
    */
   public void setElapsedTime(float time)
   {
-    elapsedTime = time;
+    elapsedTime.add(time);
   }
 
   /**
@@ -217,38 +169,39 @@ public class HillClimbing
   public void hillClimb() {
     int blockID;
     int index = 0;
-    OurCreature creature;
     boolean isMutated = false;
     DNA dna;
     DNA mutatedDNA;
+    ArrayList<DNA> mutatedPopulation = new ArrayList<DNA>();
+
     for(int i = 0; i < population.size(); i++)
     {
-      creature = population.remove(i);
-      dna = new DNA(creature);
-      mutatedDNA = new DNA(creature);
-      final int MAX_NUM_BLOCKS = creature.getNumberOfBodyBlocks();
+      dna = population.remove(i);
+      mutatedDNA = new DNA(dna);
+      if(bestfitDNA == null) bestfitDNA = dna;
+      final int MAX_NUM_BLOCKS = dna.getNumBlocks();
 
       while(index < MAX_NUM_BLOCKS && !isMutated)
       {
         blockID = generator.nextInt(MAX_NUM_BLOCKS);
-        if(mutateBlock(dna, mutatedDNA, creature, blockID)) isMutated = true;
+        if(mutateBlock(dna, mutatedDNA, blockID)) isMutated = true;
         index++;
       }
 
-      if(isMutated) mutatedPopulation.add(new OurCreature(physicsSpace,rootNode,bestfitDNA));
-      else mutatedPopulation.add(new OurCreature(physicsSpace,rootNode,dna));
+      if(isMutated) mutatedPopulation.add(mutatedDNA);
+      else mutatedPopulation.add(dna);
     }
     population = mutatedPopulation;
+    bestfitDNA = population.get(0); //TODO: remove once fitnessTest if correct
+
   }
 
   /**
-   * Grabs a creature from the hill climbing to show
-   * TODO: grab a random creature from population, or pick best fit one
-   * @return creature from this population
+   * Grabs the DNA from the population that has the best fitness.
+   * Should be used to show the current best fit creature of a population
+   * in the GUI
+   * @return DNA of the best fit creature
    */
-  public OurCreature getCreature()
-  {
-    return mutatedPopulation.get(0);
-  }
+  public DNA getBestfitDNA(){return bestfitDNA;}
 
 }
