@@ -116,6 +116,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   //Nifty gui
   private Nifty nifty;
 
+  private float previous_speed = speed;
+  private boolean isRunning = true;
+
 
   @Override
   public void simpleInitApp()
@@ -242,10 +245,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     inputManager.addMapping("Quit", new KeyTrigger(KeyInput.KEY_Q));
     inputManager.addMapping("Toggle Camera Rotation", new KeyTrigger(KeyInput.KEY_P));
     inputManager.addMapping("Change Creature", new KeyTrigger(KeyInput.KEY_C));
+    inputManager.addMapping("Pause", new KeyTrigger(KeyInput.KEY_SPACE));
 
     // Add the names to the action listener.
     inputManager.addListener(this, "Quit");
     inputManager.addListener(this, "Toggle Camera Rotation");
+    inputManager.addListener(this, "Pause");
   }
   
   public void onAction(String name, boolean isPressed, float timePerFrame) 
@@ -262,6 +267,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       cameraAngle = (float)(Math.PI/2.0);
       elapsedSimulationTime = 0.0f;
     }
+    else if (isPressed && name.equals("Pause")) {
+      System.out.println("Got here");
+      if (isRunning)
+      {
+        isRunning = false;
+      } else {
+        isRunning = true;
+      }
+    }
     else if (name.equals("Quit"))
     {
       System.out.format("Creature Fitness (Maximium height of lowest point) = %.3f meters]\n", myCreature.getFitness());
@@ -274,41 +288,46 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Override
   public void simpleUpdate(float deltaSeconds)
   {
-    elapsedSimulationTime += deltaSeconds;
-    //print("simpleUpdate() elapsedSimulationTime=", (float)elapsedSimulationTime);
-    //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
-    //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
-    myCreature.updateBrain(elapsedSimulationTime);
-
-    if (headless && debug)
+    if (isRunning)
     {
-      System.out.println("Max Fitness: " + myCreature.getFitness());
-    } else
-    {
-      de.lessvoid.nifty.elements.Element nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
-      nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
-    }
+      elapsedSimulationTime += deltaSeconds;
+      //print("simpleUpdate() elapsedSimulationTime=", (float)elapsedSimulationTime);
+      //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
+      //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
+      myCreature.updateBrain(elapsedSimulationTime);
 
-    if (isCameraRotating)
-    {
-      //Move camera continously in circle of radius 25 meters centered 10 meters
-      //  above the origin. 
-      cameraAngle += deltaSeconds * 2.0 * Math.PI / 60.0; //rotate full circle every minute
-      float x = (float) (25.0 * Math.cos(cameraAngle));
-      float z = (float) (25.0 * Math.sin(cameraAngle));
-    
-      tmpVec3 = new Vector3f(x, 10.0f, z);
-      cam.setLocation(tmpVec3);
-      cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
-    }
+      if (headless && debug)
+      {
+        System.out.println("Max Fitness: " + myCreature.getFitness());
+      }
+      else
+      {
+        de.lessvoid.nifty.elements.Element nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
+        nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
+      }
 
-    if (elapsedSimulationTime > 17) {
-      hillClimbing.hillClimb();
+      if (isCameraRotating)
+      {
+        //Move camera continously in circle of radius 25 meters centered 10 meters
+        //  above the origin.
+        cameraAngle += deltaSeconds * 2.0 * Math.PI / 60.0; //rotate full circle every minute
+        float x = (float) (25.0 * Math.cos(cameraAngle));
+        float z = (float) (25.0 * Math.sin(cameraAngle));
 
-      myCreature.detach();
-      myCreature = new OurCreature(physicsSpace, rootNode, hillClimbing.getBestfitDNA());
-      myCreature.placeOnGround();
-      elapsedSimulationTime = 0.0f;
+        tmpVec3 = new Vector3f(x, 10.0f, z);
+        cam.setLocation(tmpVec3);
+        cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
+      }
+
+      if (elapsedSimulationTime > 17)
+      {
+        hillClimbing.hillClimb();
+
+        myCreature.detach();
+        myCreature = new OurCreature(physicsSpace, rootNode, hillClimbing.getBestfitDNA());
+        myCreature.placeOnGround();
+        elapsedSimulationTime = 0.0f;
+      }
     }
   }
  
