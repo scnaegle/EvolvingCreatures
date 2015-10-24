@@ -449,16 +449,16 @@ public class OurCreature extends Creature
 
     //Notice that even though the blocks are rotated 30 degrees, since the pivot points and pivot axes are
     //   specified in each block's local coordinates, there is no change to these values.
-    Block leg1  = addBlock(eulerAngles, leg1Size,torso, pivotA,  pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    Block leg1  = addBlock(eulerAngles, leg1Size,torso, pivotA,  pivotB, Vector3f.UNIT_Z);
 
 
 
     Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in the block's coordinates
     Vector3f pivotD = new Vector3f( 3.0f,  0.5f,  0.0f); //Center of hinge in the block's coordinates
 
-    Block leg2  = addBlock(eulerAngles, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
-    Block leg3 = addBlock(eulerAngles, leg3Size, torso, pivot3A, pivot3B, Vector3f.UNIT_X, Vector3f.UNIT_X);
-    Block leg4 = addBlock(eulerAngles, leg3Size, torso, pivot4A, pivot4B, Vector3f.UNIT_X, Vector3f.UNIT_X);
+    Block leg2  = addBlock(eulerAngles, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z);
+    Block leg3 = addBlock(eulerAngles, leg3Size, torso, pivot3A, pivot3B, Vector3f.UNIT_X);
+    Block leg4 = addBlock(eulerAngles, leg3Size, torso, pivot4A, pivot4B, Vector3f.UNIT_X);
 
     torso.setMaterial(Block.MATERIAL_GREEN);
     leg1.setMaterial(Block.MATERIAL_RED);
@@ -527,12 +527,12 @@ public class OurCreature extends Creature
 
     //Notice that even though the blocks are rotated 30 degrees, since the pivot points and pivot axes are
     //   specified in each block's local coordinates, there is no change to these values.
-    Block leg1  = addBlock(eulerAngles, leg1Size,torso, pivotA,  pivotB, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    Block leg1  = addBlock(eulerAngles, leg1Size,torso, pivotA,  pivotB, Vector3f.UNIT_Z);
 
     Vector3f pivotC = new Vector3f(-2.0f, -1.5f,  0.0f); //Center of hinge in the block's coordinates
     Vector3f pivotD = new Vector3f( 1.0f,  1.0f,  0.0f); //Center of hinge in the block's coordinates
 
-    Block leg2  = addBlock(eulerAngles, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    Block leg2  = addBlock(eulerAngles, leg2Size,torso, pivotC,  pivotD, Vector3f.UNIT_Z);
 
     torso.setMaterial(Block.MATERIAL_GREEN);
     leg1.setMaterial(Block.MATERIAL_RED);
@@ -571,10 +571,10 @@ public class OurCreature extends Creature
     leg2.addNeuron(leg2Neuron1);
     leg2.addNeuron(leg2Neuron2);
 
-    Vector3f pivotE = new Vector3f(-3.0f, -0.5f,  0.0f); //Center of hinge in parents  block's coordinates
+    Vector3f pivotE = new Vector3f(-1.0f, -1.0f,  0.0f); //Center of hinge in parents  block's coordinates
     Vector3f pivotF = new Vector3f( 1.0f,  1.0f,  0.0f); //Center of hinge in childs block's coordinates
 
-    Block leg3  = addBlock(eulerAngles, leg2Size,leg2, pivotE,  pivotF, Vector3f.UNIT_Z, Vector3f.UNIT_Z);
+    Block leg3  = addBlock(eulerAngles, leg2Size,leg2, pivotE,  pivotF, Vector3f.UNIT_Z);
 
     torso.setMaterial(Block.MATERIAL_GREEN);
     leg1.setMaterial(Block.MATERIAL_RED);

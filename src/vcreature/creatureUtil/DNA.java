@@ -316,21 +316,17 @@ public class DNA
     for(int j = i; j < otherLength; ++j)
     {
       output[THIS].blockDNAs[j] = new BlockDNA(other.blockDNAs[j]);
-      System.out.println(output[THIS].blockDNAs[j].sizeAndShape[2]);
       output[THIS].blockDNAs[j].alterJointA(output[THIS]);
-      System.out.println(output[THIS].blockDNAs[j].sizeAndShape[2]);
-
-
     }
     for(int j = i; j < thisLength; ++j)
     {
       output[OTHER].blockDNAs[j] = new BlockDNA(this.blockDNAs[j]);
       output[OTHER].blockDNAs[j].alterJointA(output[OTHER]);
     }
-    output[0].recalculateDNALength();
-    output[0].calculateNumBlocks();
-    output[1].recalculateDNALength();
-    output[1].calculateNumBlocks();
+    output[THIS].recalculateDNALength();
+    output[THIS].calculateNumBlocks();
+    output[OTHER].recalculateDNALength();
+    output[OTHER].calculateNumBlocks();
     return output;
   }
 
@@ -508,6 +504,7 @@ public class DNA
       this();
       this.blockID = other.blockID;
       this.parentID = other.parentID;
+      System.out.println(this.parentID);
       for(int i = 0; i < NUM_VECTORS; ++i)
       {
         if(other.sizeAndShape[i] != null)
