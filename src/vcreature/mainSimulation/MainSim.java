@@ -469,6 +469,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    */
   private void testOut()
   {
+    DNA dna1 = myCreature.getDNA();
+    DNA dna2 = myCreature.getDNA();
+    System.out.println(dna1.equals(dna2));
     population.add(myCreature.getDNA());
     DNAio.writePopulation(population);
     TESTIO = false;

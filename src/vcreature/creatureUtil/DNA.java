@@ -2,6 +2,7 @@ package vcreature.creatureUtil;
 
 
 import com.jme3.math.Vector3f;
+import jogamp.opengl.util.av.NullGLMediaPlayer;
 import vcreature.mainSimulation.MainSim;
 import vcreature.phenotype.*;
 
@@ -418,6 +419,39 @@ public class DNA implements Comparable
   }
 
   /**
+   * Override .equals
+   * @param o
+   * @return equals or not
+   */
+  @Override
+  public boolean equals(Object o)
+  {
+    if(o == null)
+    {
+      return false;//
+    }
+    if(getClass() != o.getClass())
+    {
+      return false;
+    }
+    DNA other = (DNA) o;
+    if(this == other)
+    {
+      return true;
+    }
+    if(this.numBlocks != other.numBlocks)
+    {
+      return false;
+    }
+    boolean isEqual = true;
+    for(int i = 0; i < numBlocks; ++i)
+    {
+      isEqual = blockDNAs[i].valuesAreSame(other.blockDNAs[i]);
+    }
+    return isEqual;
+  }
+
+  /**
    * Build a string representation of the DNA.  The string representation will
    * one int, followed by a series of floats.  All delineated by spaces, and
    * ended with a newline.
@@ -703,6 +737,47 @@ public class DNA implements Comparable
       return bString;
     }
 
+    /**
+     * Check values to make sure they are the same.
+     * @param other
+     * @return
+     */
+    public boolean valuesAreSame(BlockDNA other)
+    {
+      if(blockID != other.blockID || parentID != other.parentID)
+      {
+        return false;
+      }
+      for(int i = 0; i < NUM_VECTORS; ++i)
+      {
+        if(!this.sizeAndShape[i].equals(other.sizeAndShape[i]))
+        {
+          return false;
+        }
+      }
+      if(this.neuronDNAs.size() != other.neuronDNAs.size())
+      {
+        return false;
+      }
+      else
+      {
+        for(int i = 0; i < this.neuronDNAs.size(); ++i)
+        {
+          if(!neuronDNAs.get(i).valuesAreSame(other.neuronDNAs.get(i)))
+          {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    /**
+     * Returns -1.0f, 1.0f, or 0.0f depending on the sign of the float.
+     * Used to flip the sign of elements of the parent vector.
+     * @param f       float to get sign from
+     * @return        sign.
+     */
     private float getFloatSign(float f)
     {
       if(f != 0.0f)
@@ -786,6 +861,24 @@ public class DNA implements Comparable
           nString += '\n';
         }
         return nString;
+      }
+
+      /**
+       * Compare all values to see if it is equal.
+       * @return
+       */
+      public boolean valuesAreSame(NeuronDNA other)
+      {
+        for(int i = 0; i < NUM_RULES; ++i)
+        {
+          if(this.inputTypes[i] != other.inputTypes[i] ||
+              this.constantValues[i] != other.constantValues[i] ||
+              this.blockIndex[i] != other.blockIndex[i])
+          {
+            return false;
+          }
+        }
+        return true;
       }
     }
     //===========End NeuronDNA===============================================
