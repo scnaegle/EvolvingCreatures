@@ -419,6 +419,22 @@ public class DNA implements Comparable
   }
 
   /**
+   * Override hashcode.
+   * @return
+   */
+  @Override
+  public int hashCode()
+  {
+    int result = 5;
+    int hashBase = 31;
+    result += hashBase * numBlocks;
+    for(BlockDNA bDNA : blockDNAs)
+    {
+      result += bDNA.getHash();
+    }
+    return result;
+  }
+  /**
    * Override .equals
    * @param o
    * @return equals or not
@@ -735,6 +751,34 @@ public class DNA implements Comparable
       }
       //bString += '\n';
       return bString;
+    }
+
+    /**
+     * Return a hashy number.
+     * @return      int based on members.
+     */
+    public int getHash()
+    {
+      int result;
+      int hash = 31;
+      result = hash * blockID;
+      result += hash * parentID;
+      for(Vector3f v : sizeAndShape)
+      {
+        result += hash * v.x;
+        result += hash * v.y;
+        result += hash * v.z;
+      }
+      for(NeuronDNA nDNA : neuronDNAs)
+      {
+        for(int i = 0; i < Neuron.TOTAL_INPUTS; ++i)
+        {
+          result += hash * nDNA.blockIndex[i];
+          result += hash * nDNA.constantValues[i];
+          result += hash * nDNA.inputTypes[i].ordinal();
+        }
+      }
+      return result;
     }
 
     /**
