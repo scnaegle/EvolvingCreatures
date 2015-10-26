@@ -7,6 +7,7 @@ import vcreature.creatureUtil.DNA;
 import vcreature.phenotype.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -15,6 +16,7 @@ import java.util.Random;
 public class HillClimbing
 {
   private ArrayList<DNA> population;
+  private HashMap<DNA, Float> dna_fitness = new HashMap<>();
   private ArrayList<Float> elapsedTime = new ArrayList<Float>();
   private DNA bestfitDNA;
   private PhysicsSpace physicsSpace;
@@ -40,19 +42,30 @@ public class HillClimbing
    */
   private float fitnessTest(DNA sampleDNA)
   {
-    float fitness;
+//    float fitness;
+//
+//    OurCreature sample = new OurCreature(physicsSpace,rootNode,sampleDNA);
+//    sample.placeOnGround();
+//    System.out.println("lowest point " + sample.getLowestPoint());
+//    System.out.println("Fitness before :" + sample.getFitness());
+//
+//    for(float time : elapsedTime) sample.updateBrain(time);
+//
+//    fitness = sample.getFitness();
+//    System.out.println("Fitness after: " + fitness);
+//    sample.detach();
+//    return fitness;
+    if (sampleDNA == null || !dna_fitness.containsKey(sampleDNA)) {
+      return 0;
+    } else {
+      System.out.println("dna_fitness: " + dna_fitness);
+      System.out.println("sample DNA: " + sampleDNA);
+      return dna_fitness.get(sampleDNA);
+    }
+  }
 
-    OurCreature sample = new OurCreature(physicsSpace,rootNode,sampleDNA);
-    sample.placeOnGround();
-    System.out.println("lowest point " + sample.getLowestPoint());
-    System.out.println("Fitness before :" + sample.getFitness());
-
-    for(float time : elapsedTime) sample.updateBrain(time);
-
-    fitness = sample.getFitness();
-    System.out.println("Fitness after: " + fitness);
-    sample.detach();
-    return fitness;
+  public void setDNAFitness(DNA dna, float fitness) {
+    dna_fitness.put(dna, fitness);
   }
 
   /**
@@ -144,6 +157,7 @@ public class HillClimbing
   {
     Vector3f size = new Vector3f(originalDNA.getBlockSize(targetBlockID));
     float originalFitness = fitnessTest(originalDNA);
+    System.out.println("original fitness: " + originalFitness);
     float testFitness;
     if(originalFitness > bestFitness) bestfitDNA = originalDNA;
     //TODO: can store fitness into DNA now
