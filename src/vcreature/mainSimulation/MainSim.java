@@ -8,6 +8,7 @@ import de.lessvoid.nifty.elements.render.TextRenderer;
 import vcreature.creatureUtil.CreatureConstants;
 import vcreature.hillClimbing.HillClimbing;
 import vcreature.creatureUtil.*;
+import vcreature.phenotype.Creature;
 import vcreature.phenotype.OurCreature;
 import vcreature.phenotype.PhysicsConstants;
 import vcreature.phenotype.Block;
@@ -174,6 +175,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     myCreature = new OurCreature(physicsSpace, rootNode, true);
     population = new ArrayList<>();
     population.add(new DNA(myCreature));
+    RandCreature creature;
+    for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
+      creature = new RandCreature(physicsSpace, rootNode);
+      population.add(new DNA(creature));
+      creature.remove();
+    }
     hillClimbing = new HillClimbing(population, physicsSpace, rootNode);
 
     /*
