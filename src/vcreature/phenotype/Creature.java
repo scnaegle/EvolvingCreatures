@@ -242,7 +242,6 @@ public class Creature
    */
   public final void placeOnGround()
   {
-    System.out.println("placing on ground...");
     float currentHeightOfLowestPoint = getCurrentHeightOfLowestPoint();
     for (Block block : body)
     {
@@ -250,9 +249,7 @@ public class Creature
       //geometry.move(tmpVec3);
       RigidBodyControl physicsControl = block.getPhysicsControl();
       physicsControl.getPhysicsLocation(tmpVec3);
-      System.out.println("tmpVec3 before: " + tmpVec3);
       tmpVec3.y -= currentHeightOfLowestPoint;
-      System.out.println("tmpVec3 after: " + tmpVec3);
       physicsControl.setPhysicsLocation(tmpVec3);
     }
     
