@@ -434,10 +434,6 @@ public class DNA implements Comparable
       {
         stringOut += b.getString();
       }
-      else//TODO For testing: Remove when doing fileIO
-      {
-        stringOut += "null\n";
-      }
     }
     return stringOut;
   }
@@ -703,7 +699,7 @@ public class DNA implements Comparable
       {
         bString += 0;
       }
-      bString += '\n';
+      //bString += '\n';
       return bString;
     }
 
