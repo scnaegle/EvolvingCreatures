@@ -301,6 +301,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     if (isRunning)
     {
       elapsedSimulationTime += deltaSeconds;
+      hillClimbing.setElapsedTime(elapsedSimulationTime);
       //print("simpleUpdate() elapsedSimulationTime=", (float)elapsedSimulationTime);
       //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
       //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
