@@ -41,16 +41,16 @@ public class HillClimbing
   private float fitnessTest(DNA sampleDNA)
   {
     float fitness;
-    OurCreature sample = new OurCreature(physicsSpace,rootNode,sampleDNA);
-   // System.out.println("Fitness before :" + sample.getFitness());
 
-    //TODO: need loop to even get a non zero fitness, seems like physics aren't taking affect
-    for(float time : elapsedTime)
-    {
-     //System.out.println("Simulated Time: " + time + " Update brain: " + sample.updateBrain(time));
-    }
+    OurCreature sample = new OurCreature(physicsSpace,rootNode,sampleDNA);
+    sample.placeOnGround();
+    System.out.println("lowest point " + sample.getLowestPoint());
+    System.out.println("Fitness before :" + sample.getFitness());
+
+    for(float time : elapsedTime) sample.updateBrain(time);
+
     fitness = sample.getFitness();
-    //System.out.println("Fitness after: " + fitness);
+    System.out.println("Fitness after: " + fitness);
     sample.detach();
     return fitness;
   }
@@ -120,8 +120,14 @@ public class HillClimbing
     return !(originalSize.equals(size));
   }
 
-  //TODO: mutate neuron
-  public boolean mutateBlockNeuron()
+  private boolean mutateBlockAngles(DNA dna, int targetID)
+  {
+
+    return false;
+  }
+
+  //TODO: mutate neuron: DNA has alterNeuronInput, alterNeuronConstant, alterNeuronBlock
+  private boolean mutateBlockNeuron(int targetID)
   {
     return false;
   }
@@ -140,15 +146,17 @@ public class HillClimbing
     float originalFitness = fitnessTest(originalDNA);
     float testFitness;
     if(originalFitness > bestFitness) bestfitDNA = originalDNA;
-
+    //TODO: can store fitness into DNA now
     if(mutateBlockSize(mutatedDNA, size, targetBlockID))
     {
       testFitness = fitnessTest(mutatedDNA);
-     // System.out.println("New fitness: " + testFitness);
+      System.out.println("New fitness: " + testFitness);
       if(originalFitness < testFitness) return true;
+      else mutatedDNA = new DNA(originalDNA);
       return true; //TODO: remove once fitnessTest is correct
     }
-
+    else if(mutateBlockAngles(mutatedDNA, targetBlockID));
+    else if(mutateBlockNeuron(targetBlockID));
     return false;
   }
 
