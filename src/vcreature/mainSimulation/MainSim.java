@@ -4,17 +4,10 @@ package vcreature.mainSimulation;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.jme3.system.JmeContext;
-import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.controls.ListBox;
-import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.elements.render.TextRenderer;
-import org.json.JSONObject;
 import vcreature.creatureUtil.CreatureConstants;
-import vcreature.creatureUtil.JSONHandler;
-import vcreature.creatureUtil.RandomCreature;
 import vcreature.hillClimbing.HillClimbing;
 import vcreature.creatureUtil.*;
-import vcreature.phenotype.Creature;
 import vcreature.phenotype.OurCreature;
 import vcreature.phenotype.PhysicsConstants;
 import vcreature.phenotype.Block;
@@ -41,7 +34,6 @@ import com.jme3.system.AppSettings;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 //Added 10/14/2015 justin thomas
@@ -52,9 +44,6 @@ import de.lessvoid.nifty.screen.ScreenController;
 
 //JCommander for command-line arguments
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.JCommander;
-
-import javax.lang.model.element.Element;
 
 
 public class MainSim extends SimpleApplication implements ActionListener, ScreenController
@@ -121,6 +110,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
   private float previous_speed = speed;
   private boolean isRunning = true;
+  private boolean TESTIO = true;
 
 
   @Override
@@ -338,6 +328,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         myCreature = new OurCreature(physicsSpace, rootNode, hillClimbing.getBestfitDNA());
         myCreature.placeOnGround();
         elapsedSimulationTime = 0.0f;
+
+        //TODO update dna population when appropriate.
+        //if(TESTIO)
+        //{
+          //testOut();
+        //}
       }
     }
   }
@@ -467,16 +463,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   //=========end ScreenController implementation===============================
 
   //==========TESTING METHODS=================================================
+
   /**
-   * Test json IO
+   * Test File output.
    */
-  private void jsonOps()
+  private void testOut()
   {
-    System.out.println("creature JSON: ");
-    JSONObject jsonObject = JSONHandler.toJSON(myCreature);
-    JSONHandler.writeGenomeFile(jsonObject);
-    JSONObject jsonIn = JSONHandler.readGenomeFile("dnaOut.txt");
-    System.out.println(jsonIn);
+    population.add(myCreature.getDNA());
+    DNAio.writePopulation(population);
+    TESTIO = false;
   }
 
   public class FileConverter implements IStringConverter<File>
