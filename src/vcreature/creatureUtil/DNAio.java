@@ -44,6 +44,18 @@ public class DNAio
    */
   public static void readPopulation(File f, ArrayList<DNA> population)
   {
-    //
+    //while more DNAs
+      //first line int numblocks
+      //make DNA
+      //for numblocks
+        //make blockDNA
+          //set ID (int)
+          //set parent id (int)
+          //set vector array (float 3-tuple) * 6
+          //int numNeurons (int)
+          //for numNeurons
+            //set neuron rules(5) (float, int)
+      //nextBlock
+    //if more, next line is new numblocks.
   }
 }
