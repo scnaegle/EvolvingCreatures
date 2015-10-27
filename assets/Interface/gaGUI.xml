@@ -5,36 +5,44 @@
   <useControls filename="nifty-default-controls.xml"/>
   <screen id="hud" controller="vcreature.mainSimulation.NiftySelectController">
 
-    <layer id="foreground" backgroundColor="#0000" childLayout="vertical">
-      <panel id="info_panel" width="20%" height="50%" childLayout="vertical" backgroundColor="#00f8" style="padding: 5px;">
-        <text text="GUI Settings" font="Interface/Fonts/Default.fnt" width="100%" valign="top" style="top:0px"/>
+    <layer id="foreground" backgroundColor="#0000" childLayout="horizontal">
+      <panel id="left_side" width="20%" height="100%" childLayout="vertical" backgroundColor="#00f8">
+        <panel id="info_panel" width="100%" height="50%" childLayout="vertical" backgroundColor="#00f8" style="padding: 5px;">
+          <text text="GUI Settings" font="Interface/Fonts/Default.fnt" width="100%" valign="top" style="top:0px"/>
 
-        <control name="label" text="Select number of threads:" align="center" valign="top"/>
-        <control id="threadCountSelectionBox" width="90%" align="center" valign="center" name="dropDown"
-                 vertical="optional" horizontal="optional" displayItems="6" selectionMode="Single"
-                 forceSelection="true"/>
+          <control name="label" text="Select number of threads:" align="center" valign="top"/>
+          <control id="threadCountSelectionBox" width="90%" align="center" valign="center" name="dropDown"
+                   vertical="optional" horizontal="optional" displayItems="6" selectionMode="Single"
+                   forceSelection="true"/>
 
-        <control name="label" text="Select thread to view:" align="center" valign="top"/>
-        <control id="threadViewSelectionBox" width="90%" align="center" valign="center" name="dropDown"
-                 vertical="optional" horizontal="optional" displayItems="6" selectionMode="Single"
-                 forceSelection="true"/>
+          <control name="label" text="Select thread to view:" align="center" valign="top"/>
+          <control id="threadViewSelectionBox" width="90%" align="center" valign="center" name="dropDown"
+                   vertical="optional" horizontal="optional" displayItems="6" selectionMode="Single"
+                   forceSelection="true"/>
 
-        <control name="label" text="Choose Speed:" align="center" valign="top" />
-        <control id="speedSlider" width="90%" align="center" valign="center" name="horizontalSlider"
-                 vertical="optional" horizontal="optional" forceSelection="true" />
+          <control name="label" text="Max Number of Blocks:" align="center" valign="top" />
+          <control id="maxNumBlocksField" width="90%" align="center" name="textfield" />
 
-        <control name="label" text="Max Number of Blocks:" align="center" valign="top" />
-        <control id="maxNumBlocksField" width="90%" align="center" name="textfield" />
+          <control name="label" text="Max Population Count:" align="center" valign="top" />
+          <control id="maxPopulationField" width="90%" align="center" name="textfield" />
 
-        <control name="label" text="Max Population Count:" align="center" valign="top" />
-        <control id="maxPopulationField" width="90%" align="center" name="textfield" />
-
-        <!--<control name="button" label="Submit" id="SubmitButton" align="right"/>-->
+          <!--<control name="button" label="Submit" id="SubmitButton" align="right"/>-->
+        </panel>
+        <panel id="fitness_params" width="100%" height="50%" childLayout="vertical" backgroundColor="#00f8">
+          <text text="Fitness: 0.0" id="fitness_text" font="Interface/Fonts/Default.fnt" width="100%" height="100%"
+                align="right"/>
+        </panel>
       </panel>
-      <panel id="fitness_params" width="20%" height="50%" childLayout="vertical" backgroundColor="#00f8">
-        <text text="Fitness: 0.0" id="fitness_text" font="Interface/Fonts/Default.fnt" width="100%" height="100%"
-              align="right"/>
+
+      <panel id="right_side" width="80%" height="100%" childLayout="vertical">
+        <panel id="simulation" width="100%" height="90%" childLayout="vertical"></panel>
+        <panel id="speed_panel" width="80%" height="10%" childLayout="vertical" backgroundColor="#00f8" valign="bottom">
+          <control name="label" text="Choose Speed:" align="center" valign="top" />
+          <control id="speedSlider" width="90%" align="center" valign="center" name="horizontalSlider"
+                   vertical="optional" horizontal="optional" forceSelection="true" />
+        </panel>
       </panel>
+
     </layer>
   </screen>
 </nifty>
