@@ -123,7 +123,7 @@ public class DNA implements Comparable
    * Store fitness in dna
    * @param newFitness        the fitness score
    */
-  public void storeFitness(int newFitness)
+  public void storeFitness(float newFitness)
   {
     fitness = newFitness;
   }
