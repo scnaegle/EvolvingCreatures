@@ -101,7 +101,24 @@ public class DNA implements Comparable
     }
   }
 
+  /**
+   * Get the blockDNAs array.
+   * @return
+   */
+  public BlockDNA[] getBlockDNAArray()
+  {
+    return blockDNAs;
+  }
 
+  /**
+   * Get blockDNA at index i (id)
+   * @param i
+   * @return BlockDNA at blockDNAs[i]
+   */
+  public BlockDNA getBlockDNA(int i)
+  {
+    return blockDNAs[i];
+  }
   /**
    * Store fitness in dna
    * @param newFitness        the fitness score
@@ -657,7 +674,8 @@ public class DNA implements Comparable
     }
 
     /**
-     * Crossover method to adjust joint A to correct placement.
+     * Crossover method to adjust joint A to correct placement.  This will alter
+     * the jointA position (placement in relation to the parent block.
      */
     public void alterJointA(DNA dna)
     {
