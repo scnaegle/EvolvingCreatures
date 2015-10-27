@@ -96,11 +96,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
 
-  private RandCreature r_creature;
-
   private boolean isCameraRotating = true;
-
-  private DNA testDNA;
 
   private OurCreature myCreature;
   private ArrayList<DNA> population;
@@ -109,9 +105,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   //Nifty gui
   private Nifty nifty;
 
-  private float previous_speed = speed;
   private boolean isRunning = true;
-  private boolean TESTIO = true;
 
 
   @Override
@@ -183,12 +177,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
     hillClimbing = new HillClimbing(population, physicsSpace, rootNode);
 
-    /*
-    r_creature = new RandCreature(physicsSpace, rootNode);
-    DNA randomDNA = new DNA(r_creature);
-    r_creature.remove();
-    myCreature = new OurCreature(physicsSpace, rootNode, randomDNA);
-    */
 
     initLighting();
     initKeys();
@@ -251,7 +239,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private void initKeys() {
     inputManager.addMapping("Quit", new KeyTrigger(KeyInput.KEY_Q));
     inputManager.addMapping("Toggle Camera Rotation", new KeyTrigger(KeyInput.KEY_P));
-    inputManager.addMapping("Change Creature", new KeyTrigger(KeyInput.KEY_C));
+//    inputManager.addMapping("Change Creature", new KeyTrigger(KeyInput.KEY_C));
     inputManager.addMapping("Pause", new KeyTrigger(KeyInput.KEY_SPACE));
 
     // Add the names to the action listener.
@@ -265,15 +253,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     if (isPressed && name.equals("Toggle Camera Rotation"))
     { isCameraRotating = !isCameraRotating;
     }
-    else if (isPressed && name.equals("Change Creature")) {
-      System.out.format("Creature Fitness (Maximum height of lowest point) = %.3f meters]\n", myCreature.getFitness());
-
-      myCreature.remove();
-//      myCreature = new FlappyBird2(physicsSpace, rootNode);
-
-      cameraAngle = (float)(Math.PI/2.0);
-      elapsedSimulationTime = 0.0f;
-    }
+//    else if (isPressed && name.equals("Change Creature")) {
+//      System.out.format("Creature Fitness (Maximum height of lowest point) = %.3f meters]\n", myCreature.getFitness());
+//
+//      myCreature.remove();
+//
+//      cameraAngle = (float)(Math.PI/2.0);
+//      elapsedSimulationTime = 0.0f;
+//    }
     else if (isPressed && name.equals("Pause")) {
       System.out.println("Got here");
       if (isRunning)
@@ -482,7 +469,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     System.out.println(dna1.equals(dna2));
     population.add(myCreature.getDNA());
     DNAio.writePopulation(population);
-    TESTIO = false;
   }
 
   public class FileConverter implements IStringConverter<File>
