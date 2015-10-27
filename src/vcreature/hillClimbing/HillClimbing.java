@@ -90,8 +90,8 @@ public class HillClimbing
     if(sizeChange == 0.0) sizeChange += .1;
 
     boolean addOp = generator.nextInt(2) == 0;
-    boolean sizeNot10 = size.getX() < 10 && size.getY() < 10 && size.getZ() < 10;
-    boolean sizeNot1 = size.getX() > 1 && size.getY() > 1 && size.getZ() > 1;
+    boolean sizeNot10 = size.getX() < CreatureConstants.MAX_BLOCK_SIZE && size.getY() < CreatureConstants.MAX_BLOCK_SIZE && size.getZ() < CreatureConstants.MAX_BLOCK_SIZE;
+    boolean sizeNot1 = size.getX() > CreatureConstants.MIN_BLOCK_SIZE && size.getY() > CreatureConstants.MIN_BLOCK_SIZE && size.getZ() > CreatureConstants.MIN_BLOCK_SIZE;
 
     switch (generator.nextInt(3))
     {
