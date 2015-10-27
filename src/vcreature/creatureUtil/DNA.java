@@ -447,7 +447,9 @@ public class DNA implements Comparable
     result += hashBase * numBlocks;
     for(BlockDNA bDNA : blockDNAs)
     {
-      result += bDNA.getHash();
+      if (bDNA != null) {
+        result += bDNA.getHash();
+      }
     }
     return result;
   }
