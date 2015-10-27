@@ -104,6 +104,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private OurCreature myCreature;
   private ArrayList<DNA> population;
   private HillClimbing hillClimbing;
+  private int current_creature_index = 0;
 
   //Nifty gui
   private Nifty nifty;
@@ -172,15 +173,17 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     myCreature = new OurCreature(physicsSpace, rootNode, true);
     population = new ArrayList<>();
     population.add(new DNA(myCreature));
+    myCreature.remove();
     RandCreature creature;
     for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
       creature = new RandCreature(physicsSpace, rootNode);
       population.add(new DNA(creature));
       creature.remove();
     }
-    hillClimbing = new HillClimbing(population, physicsSpace, rootNode);
+//    hillClimbing = new HillClimbing(population, physicsSpace, rootNode);
 
-
+    myCreature = new OurCreature(physicsSpace, rootNode, population.get(current_creature_index));
+    myCreature.placeOnGround();
     initLighting();
     initKeys();
 
@@ -289,7 +292,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     {
       elapsedSimulationTime += deltaSeconds;
 //      hillClimbing.setElapsedTime(elapsedSimulationTime);
-      hillClimbing.setDNAFitness(myCreature.getDNA(), myCreature.getFitness());
+//      hillClimbing.setDNAFitness(myCreature.getDNA(), myCreature.getFitness());
       //print("simpleUpdate() elapsedSimulationTime=", (float)elapsedSimulationTime);
       //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
       //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
@@ -318,14 +321,34 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
       }
 
-      if (elapsedSimulationTime > 17)
+      if (elapsedSimulationTime > CreatureConstants.SIMULATION_TIME)
       {
-        hillClimbing.hillClimb();
+        System.out.println("current creature fitness: " + myCreature.getFitness());
+        population.get(current_creature_index).storeFitness(myCreature.getFitness());
+        myCreature.remove();
+        if (current_creature_index < CreatureConstants.MAX_POPULATION) {
+          current_creature_index++;
+          myCreature = new OurCreature(physicsSpace, rootNode, population.get(current_creature_index));
+          myCreature.placeOnGround();
+          elapsedSimulationTime = 0.0f;
+        } else {
+          current_creature_index = 0;
 
-        myCreature.detach();
-        myCreature = new OurCreature(physicsSpace, rootNode, hillClimbing.getBestfitDNA());
-        myCreature.placeOnGround();
-        elapsedSimulationTime = 0.0f;
+          // Show all fitnesses
+          System.out.println("All Fitnesses: ");
+          for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
+            System.out.format("%d: %f\n", i, population.get(i).getFitness());
+          }
+          System.exit(0);
+          // TODO run hill climb on all the creatures in the population and start over with the next generation
+//          population = hillClimbing
+        }
+//        hillClimbing.hillClimb();
+//
+//        myCreature.detach();
+//        myCreature = new OurCreature(physicsSpace, rootNode, hillClimbing.getBestfitDNA());
+//        myCreature.placeOnGround();
+//        elapsedSimulationTime = 0.0f;
 
         //TODO update dna population when appropriate.
         //if(TESTIO)
