@@ -79,6 +79,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--output-frequency", description = "Defines how often we dump the Genomes to a log defined by number of seconds.")
   public static int output_frequency = 300;
 
+  @Parameter(names = "--keep-history", description = "Defines how many number of the history iterations you want to keep. This helps limit the storage memory this is being used.")
+  public static int keep_history = 10;
+
   @Parameter(names = "--output", description = "File that you woud like to output to", converter = FileConverter.class)
   public static File output_file = new File("dna_out.txt");
 
