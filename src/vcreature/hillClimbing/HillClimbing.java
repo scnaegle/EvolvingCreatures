@@ -3,6 +3,7 @@ package vcreature.hillClimbing;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import vcreature.creatureUtil.CreatureConstants;
 import vcreature.creatureUtil.DNA;
 import vcreature.phenotype.*;
 
@@ -98,33 +99,33 @@ public class HillClimbing
         temp = x;
         if(addOp && sizeNot10)
         {
-          if((temp + sizeChange) < 10) x += sizeChange;
+          if((temp + sizeChange) < CreatureConstants.MAX_BLOCK_SIZE) x += sizeChange;
         }
         else if(sizeNot1)
         {
-          if((temp - sizeChange) > 1) x -= sizeChange;
+          if((temp - sizeChange) > CreatureConstants.MIN_BLOCK_SIZE) x -= sizeChange;
         }
         break;
       case(1):
         temp = y;
         if(addOp && sizeNot10)
         {
-          if((temp + sizeChange) < 10) y += sizeChange;
+          if((temp + sizeChange) < CreatureConstants.MAX_BLOCK_SIZE) y += sizeChange;
         }
         else if(sizeNot1)
         {
-          if((temp - sizeChange) > 1) y -= sizeChange;
+          if((temp - sizeChange) > CreatureConstants.MIN_BLOCK_SIZE) y -= sizeChange;
         }
         break;
       default:
         temp = z;
         if(addOp && sizeNot10)
         {
-          if((temp + sizeChange) < 10) z += sizeChange;
+          if((temp + sizeChange) < CreatureConstants.MAX_BLOCK_SIZE) z += sizeChange;
         }
         else if(sizeNot1)
         {
-          if((temp - sizeChange) > 1) z -= sizeChange;
+          if((temp - sizeChange) > CreatureConstants.MIN_BLOCK_SIZE) z -= sizeChange;
         }
         break;
     }
