@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
-
+//TODO: 1st move joint of BlockSize to be on edge to avoid large blocks causing weird movements
 /**
  * Created by zfalgout on 10/15/15.
  */
@@ -164,7 +164,7 @@ public class HillClimbing
         mutatedDNA = new DNA(previousDNA);
         blockID = generator.nextInt(MAX_NUM_BLOCKS);
       }
-      if(previousDNA != null) System.out.println("current fitness vs old fitness" + dna.getFitness() + " " + previousDNA.getFitness());
+      //if(previousDNA != null) System.out.println("current fitness vs old fitness" + dna.getFitness() + " " + previousDNA.getFitness());
       mutationType = generator.nextInt(2);
 
       mutateBlock(dna, mutatedDNA, blockID, mutationType);
