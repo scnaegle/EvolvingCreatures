@@ -21,7 +21,7 @@ import vcreature.phenotype.*;
  * Class responsible for making a random, valid creature.
  * Intended use is to make a RandCreature in the physics space
  * save it into DNA by making a new DNA object with the RandCreature in its parameter
- * and immediately remove the RandCreature from the physics space (RandCreature.remove())
+ * and immediately remove the RandCreature from the physics space (RandCreature.removeAll())
  */
 
 public class RandCreature
@@ -37,6 +37,11 @@ public class RandCreature
 
   private float elapsedSimulationTime;
 
+  /**
+   * Default constructor for a RandomCreature
+   * @param physicsSpace physics space to simulate in
+   * @param jMonkeyRootNode RootNode of physics space to build in
+   */
   public RandCreature(PhysicsSpace physicsSpace, Node jMonkeyRootNode)
   {
     this.physicsSpace = physicsSpace;
@@ -45,7 +50,8 @@ public class RandCreature
     blockProperties = new ArrayList<>();
     blockAngles = new ArrayList<>();
 
-    int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS)+1;
+    //choose random number of blocks
+    int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS-2)+2;
 
     makeRandomRoot();
 
@@ -59,6 +65,10 @@ public class RandCreature
     bumpUp();
   }
 
+  /**
+   *
+   * @return number of body blocks
+   */
   public int getNumberOfBodyBlocks()
   {
     return body.size();
@@ -73,6 +83,11 @@ public class RandCreature
     return new DNA(this);
   }
 
+  /**
+   * Makes a random root block with random x,y,z values
+   * Axis alligned
+   * @return
+   */
   private Block makeRandomRoot()
   {
     Vector3f rootCenter = new Vector3f(0f,0f,0f);
@@ -88,13 +103,19 @@ public class RandCreature
     return addRoot(rootCenter, rootSize, axisAligned);
   }
 
+  /**
+   * Method which tries to add a random block to the passed in parent
+   * Block will have random x,y,z values and a random number of neurons attached to it
+   * Will be removed if collided with another block on spawn
+   * @param parent Block to add to
+   */
   private void addRandomBlock(Block parent)
   {
     int parentSurface;
     int childSurface;
     int childEdge;
-
-    Neuron newNeuron;
+    int parentEdge;
+    boolean edgeToEdge;
 
     Vector3f childSize = new Vector3f(0f,0f,0f);
     Vector3f parentSize = new Vector3f(parent.getSizeX()/2, parent.getSizeY()/2, parent.getSize()/2);
@@ -103,6 +124,10 @@ public class RandCreature
     Vector3f childJoint = new Vector3f(0f,0f,0f);
 
     Vector3f rotationAxis = new Vector3f(0f,0f,0f);
+    Vector3f trashAxis = new Vector3f(0f,0f,0f);
+
+    //edgeToEdge = rand.nextBoolean();
+    edgeToEdge = true;
 
     childSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     childSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
@@ -112,15 +137,25 @@ public class RandCreature
     childSurface = correspondingChildSurface(parentSurface);
     childEdge = rand.nextInt(4);
 
-    findSurfaceVectorParent(parentJoint, parentSurface, parentSize);
-    findSurfaceVectorChild(childSurface, childEdge, childJoint, childSize, rotationAxis);
+    if (edgeToEdge)
+    {
+      parentEdge = rand.nextInt(4);
+      findSurfaceVectorEdge(parentSurface, parentEdge, parentJoint, parentSize, trashAxis);
+      findSurfaceVectorEdge(childSurface, childEdge,childJoint,childSize,rotationAxis);
+    }
+
+    else
+    {
+      findSurfaceVector(parentJoint, parentSurface, parentSize);
+      findSurfaceVectorEdge(childSurface, childEdge, childJoint, childSize, rotationAxis);
+    }
+
 
     Block newBlock = addBlock(axisAligned, childSize, parent, parentJoint, childJoint, rotationAxis);
 
     if (!removeIfIntersection())
     {
-      newNeuron = makeRandomNeuron();
-      newBlock.addNeuron(newNeuron);
+      addRandomNeurons(newBlock);
       blockProperties.add(makeBlockVectorArray(newBlock, childSize, rotationAxis, rotationAxis));
       blockAngles.add(Arrays.copyOf(axisAligned, axisAligned.length));
     }
@@ -128,10 +163,32 @@ public class RandCreature
 
   }
 
-  private Neuron makeRandomNeuron()
+  /**
+   * Add a random number of neurons to a block
+   * @param block
+   */
+  private void addRandomNeurons(Block block)
+  {
+    int numberNeurons = rand.nextInt(3)+1;
+    float maxImpulse = block.getJointMaxImpulse();
+    Neuron n;
+    for (int i = 0; i <= numberNeurons; ++i)
+    {
+      n = makeRandomNeuron(maxImpulse);
+      block.addNeuron(n);
+    }
+  }
+
+  /**
+   * Makes a Neuron with a randomly chosen negative/positive max impulse
+   * and randomly chosen firing time
+   * @param maxImpulse
+   * @return
+   */
+  private Neuron makeRandomNeuron(float maxImpulse)
   {
     float seconds = (rand.nextInt(CreatureConstants.MAX_NEURON_SECONDS)+CreatureConstants.MIN_NEURON_SECONDS) + rand.nextFloat();
-    float impulse = Float.MAX_VALUE;
+    float impulse = maxImpulse;
     int sign = rand.nextInt(2);
 
     Neuron n = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT, EnumNeuronInput.CONSTANT, null);
@@ -148,6 +205,17 @@ public class RandCreature
   }
 
 
+  /**
+   * This method adds the root block to this creature. The root block is different from all other
+   * blocks in that it has no parant. This means that no joint can be given an impulse that can
+   * directly move the root block. The root block can only move as an indirect consequence of
+   * an impulse applyed to one of its decendants, by gravity or drag.
+   *
+   * @param rootCenter
+   * @param eulerAngles
+   * @param rootHalfSize
+   * @return a pointer to the root block of the creature;
+   */
   public Block addRoot(Vector3f rootCenter, Vector3f rootHalfSize, float[] eulerAngles)
   {
     if (!body.isEmpty())
@@ -163,6 +231,24 @@ public class RandCreature
     return root;
   }
 
+  /**
+   * Add a block to this creature with a hinge as the new block to the given parent at
+   * the given pivot points and along the given axis.
+   * The new block's center in world coordinates is calculated from the parent's world
+   * coordinates and the two local pivot points.
+   * The pivot on the new axis is calculated to match the povit axis on the parent.
+   *
+   * @param eulerAngles
+   * @param halfsize half the extent (in meters) of the block in the x, y and z direction.
+   * For example, a block with extent in the x dimension of 0.5 would extend from 0.5 meters from
+   * the origin in the -x direction and 0.5 meters from the origin in the +x direction.
+   * @param parent Block instance onto which this block will be joined.
+   * @param pivotA Location in local coordinates of the pivot point on the parent block.
+   * Local coordinates means the location on the block relitive to the block's center with zero rotation.
+   * @param pivotB Location in local coordinates of the pivot point on this block.
+   * @param axisA One-degree of freedom hinge axis in local coordinates of the parent block.
+   * @return a reference to the newly added block.
+   */
   public Block addBlock(float[] eulerAngles, Vector3f halfsize, Block parent, Vector3f pivotA, Vector3f pivotB, Vector3f axisA)
   {
     if (body.isEmpty())
@@ -213,7 +299,11 @@ public class RandCreature
     return block;
   }
 
-  public boolean removeIfIntersection()
+  /**
+   * finds if the most recently added block is intersecting with another block other than its parent
+   * @return true if an instersection has occured, false if otherwise
+   */
+  private boolean removeIfIntersection()
   {
     int newBlockID = getNumberOfBodyBlocks()-1;
     CollisionResults collisionResults = new CollisionResults();
@@ -269,7 +359,7 @@ public class RandCreature
     return childSurface;
   }
 
-  private void findSurfaceVectorParent(Vector3f joint, int surface, Vector3f pSize)
+  private void findSurfaceVector(Vector3f joint, int surface, Vector3f pSize)
   {
     switch (surface) {
       case 0: joint.y = pSize.y;
@@ -301,7 +391,7 @@ public class RandCreature
     }
   }
 
-  private void findSurfaceVectorChild(int childSurface, int childEdge, Vector3f joint, Vector3f cSize, Vector3f rAxis)
+  private void findSurfaceVectorEdge(int childSurface, int childEdge, Vector3f joint, Vector3f cSize, Vector3f rAxis)
   {
     if (childSurface == 0)
     {
@@ -311,12 +401,11 @@ public class RandCreature
           joint.y = cSize.y;
           joint.z = -cSize.z;
           randXorY(rAxis);
-          //XorY
           break;
         case 1:
           joint.x = cSize.x;
           joint.y = cSize.y;
-          joint.z = randomSurfacePoint(cSize.y);
+          joint.z = randomSurfacePoint(cSize.z);
           randYorZ(rAxis);
           //ZorY
 
@@ -534,6 +623,10 @@ public class RandCreature
     }
   }
 
+  /**
+   * Choose X or Z axis randomly
+   * @param rAxis
+   */
   private void randXorZ(Vector3f rAxis)
   {
     int randI = rand.nextInt(2);
@@ -547,6 +640,10 @@ public class RandCreature
     }
   }
 
+  /**
+   * Chooses Y or Z axis randomly
+   * @param rAxis
+   */
   private void randYorZ(Vector3f rAxis)
   {
     int randI = rand.nextInt(2);
@@ -560,6 +657,10 @@ public class RandCreature
     }
   }
 
+  /**
+   * chooses X or Y axis randomly
+   * @param rAxis
+   */
   private void randXorY(Vector3f rAxis)
   {
     int randI = rand.nextInt(2);
@@ -573,6 +674,11 @@ public class RandCreature
     }
   }
 
+  /**
+   * finds a random point on the surface of a block
+   * @param bounds
+   * @return float value of point on block surface
+   */
   private float randomSurfacePoint(float bounds)
   {
     int sign = rand.nextInt(2);
@@ -588,6 +694,10 @@ public class RandCreature
     return point;
   }
 
+  /**
+   * remove a block from a creature
+   * @param blockID ID of block to remove
+   */
   private void removeBlock(int blockID)
   {
     Block b = body.get(blockID);
@@ -601,11 +711,20 @@ public class RandCreature
     body.remove(b);
   }
 
+  /**
+   *
+   * @param id of block from creature
+   * @return Block from creature
+   */
   private Block getBlockByID(int id)
   {
     return body.get(id);
   }
 
+  /**
+   * method which returns the lowest point of the creature
+   * @return float value of lowest point of creature
+   */
   private float getCurrentHeightOfLowestPoint()
   {
     float lowestPoint = Float.MAX_VALUE;
@@ -624,6 +743,11 @@ public class RandCreature
     return lowestPoint;
   }
 
+  /**
+   * Method which stores the block data into a DNA accesible format
+   * @param id of the block
+   * @param vecArr Vector array to copy into
+   */
   public void populateVectorDNA(int id, Vector3f[] vecArr)
   {
     vecArr[BlockVector.CENTER.ordinal()] = new Vector3f(getBlockVector(id,
@@ -712,6 +836,10 @@ public class RandCreature
     return blockAngles.get(id);
   }
 
+
+  /**
+   * Method necessary to change all the creatures DNA values if part of the creature spawns under the floor
+   */
   public void bumpUp()
   {
     float lowestPoint = getCurrentHeightOfLowestPoint();
@@ -721,10 +849,32 @@ public class RandCreature
     }
   }
 
+
+  /**
+   * A removeAll method which works by removing children first instead of the parent
+   * Avoids all the jmonkey warning errors which tells you that you're trying to remove
+   * an invalid joint
+   */
+  public void removeAll()
+  {
+    Block toRemove;
+    while (body.size() > 0)
+    {
+      toRemove = body.get(body.size()-1);
+      physicsSpace.remove(toRemove.getPhysicsControl());
+      HingeJoint jointToParent = toRemove.getJoint();
+      if (jointToParent != null) physicsSpace.remove(jointToParent);
+      Geometry geometry = toRemove.getGeometry();
+      geometry.removeFromParent();
+
+      body.remove(body.size()-1);
+    }
+  }
+
   public void remove()
   {
     if (body.size() > 0)
-    { removeSubTree(body.get(body.size()-1));
+    { removeSubTree(body.get(0));
     }
 
     if (body.size() != 0)
