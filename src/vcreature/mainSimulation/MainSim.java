@@ -175,14 +175,23 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     population = new ArrayList<>();
     population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
     myCreature.remove();
-    RandCreature creature;
+    OurCreature creature;
     for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
+      creature = new OurCreature(physicsSpace, rootNode,true);
+      population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
+      creature.remove();
+      //creature.removeAll();
+    }
+    /* Was failing to remove so commented out
+      RandCreature creature;
+      for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
       creature = new RandCreature(physicsSpace, rootNode);
       population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
-      //creature.remove();
-      creature.removeAll();
+      creature.remove();
+      //creature.removeAll();
     }
-//    hillClimbing = new HillClimbing(population, physicsSpace, rootNode);
+     */
+    hillClimbing = new HillClimbing(population);
 
     startSimForCurrentCreature();
 
@@ -303,8 +312,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     if (isRunning)
     {
       elapsedSimulationTime += deltaSeconds;
-//      hillClimbing.setElapsedTime(elapsedSimulationTime);
-//      hillClimbing.setDNAFitness(myCreature.getDNA(), myCreature.getFitness());
       //print("simpleUpdate() elapsedSimulationTime=", (float)elapsedSimulationTime);
       //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
       //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
@@ -343,22 +350,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           startSimForCurrentCreature();
         } else {
           current_creature_index = 0;
-
           // Show all fitnesses
           System.out.println("All Fitnesses: ");
           for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
             System.out.format("%d: %f\n", i, Iterables.getLast(population.get(i)).getFitness());
           }
-          System.exit(0);
-          // TODO run hill climb on all the creatures in the population and start over with the next generation
-//          population = hillClimbing
+          population = hillClimbing.hillClimb();
+
+          // System.exit(0);
         }
-//        hillClimbing.hillClimb();
-//
-//        myCreature.detach();
-//        myCreature = new OurCreature(physicsSpace, rootNode, hillClimbing.getBestfitDNA());
-//        myCreature.placeOnGround();
-//        elapsedSimulationTime = 0.0f;
 
         //TODO update dna population when appropriate.
         //if(TESTIO)
