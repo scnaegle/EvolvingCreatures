@@ -35,6 +35,8 @@ public class RandCreature
   private static Random rand = new Random();
   private Vector3f tmpVec3 = new Vector3f();
 
+  private ArrayList<float[]> addedLocations;
+
   private float elapsedSimulationTime;
 
   /**
@@ -47,21 +49,30 @@ public class RandCreature
     this.physicsSpace = physicsSpace;
     this.jMonkeyRootNode = jMonkeyRootNode;
 
+    int parentBlockID;
+    int parentBlockSurface;
+    int parentBlockEdge;
+
+
     blockProperties = new ArrayList<>();
     blockAngles = new ArrayList<>();
+
+    addedLocations = new ArrayList<>();
 
     //choose random number of blocks
     int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS-2)+2;
 
+    //make a random sized root
     makeRandomRoot();
 
     while (this.getNumberOfBodyBlocks() < blockNumber)
     {
-      int parentBlockID = rand.nextInt(getNumberOfBodyBlocks());
+      parentBlockID = rand.nextInt(getNumberOfBodyBlocks());
       Block parent = body.get(parentBlockID);
       addRandomBlock(parent);
     }
 
+    //make creature rest on the ground
     bumpUp();
   }
 
@@ -141,7 +152,7 @@ public class RandCreature
     {
       parentEdge = rand.nextInt(4);
       findSurfaceVectorEdge(parentSurface, parentEdge, parentJoint, parentSize, trashAxis);
-      findSurfaceVectorEdge(childSurface, childEdge,childJoint,childSize,rotationAxis);
+      findSurfaceVectorEdge(childSurface, childEdge, childJoint, childSize, rotationAxis);
     }
 
     else
@@ -169,7 +180,7 @@ public class RandCreature
    */
   private void addRandomNeurons(Block block)
   {
-    int numberNeurons = rand.nextInt(3)+1;
+    int numberNeurons = rand.nextInt(CreatureConstants.MAX_NEURON_PER_BLOCK)+1;
     float maxImpulse = block.getJointMaxImpulse();
     Neuron n;
     for (int i = 0; i <= numberNeurons; ++i)

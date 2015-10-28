@@ -13,4 +13,5 @@ public class CreatureConstants {
   public static final int MIN_NEURON_SECONDS = 4;
   public static final int MAX_NEURON_SECONDS = 17;
   public static final int SIMULATION_TIME = 20;
+  public static final int MAX_NEURON_PER_BLOCK = 3;
 }
