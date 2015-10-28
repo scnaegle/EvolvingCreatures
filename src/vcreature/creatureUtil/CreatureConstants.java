@@ -10,7 +10,7 @@ public class CreatureConstants {
   public static final float[] IDENTITY_QUATERNION = {0, 0, 0};
   public static final int MIN_BLOCK_SIZE = 1;
   public static final int MAX_BLOCK_SIZE = 9;
-  public static final int MIN_NEURON_SECONDS = 2;
-  public static final int MAX_NEURON_SECONDS = 20;
-  public static final int SIMULATION_TIME = 30;
+  public static final int MIN_NEURON_SECONDS = 4;
+  public static final int MAX_NEURON_SECONDS = 17;
+  public static final int SIMULATION_TIME = 20;
 }
