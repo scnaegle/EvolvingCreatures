@@ -1,5 +1,6 @@
 package vcreature.creatureUtil;
 
+import com.google.common.collect.Iterables;
 import vcreature.mainSimulation.MainSim;
 
 import java.io.File;
@@ -16,11 +17,13 @@ public class DNAio
    * Take an array of the population's DNA and write to a file.
    * @param population        Array List of DNA objects.
    */
-  public static void writePopulation(ArrayList<DNA> population)
+  public static void writePopulation(ArrayList<ArrayList<DNA>> population)
   {
     StringBuilder outString = new StringBuilder();
-    for(DNA dna : population)
+    DNA dna;
+    for(ArrayList<DNA> generations : population)
     {
+      dna = getBestGeneration(generations);
       outString.append(dna);
       System.out.println(dna);
     }
@@ -35,6 +38,17 @@ public class DNAio
     {
       System.out.println("Could not write file");
     }
+  }
+
+  private static DNA getBestGeneration(ArrayList<DNA> generations) {
+    DNA best;
+    best = Iterables.getLast(generations);
+    for(DNA dna : generations) {
+      if (dna.getFitness() >= best.getFitness()) {
+        best = dna;
+      }
+    }
+    return best;
   }
 
   /**

@@ -106,6 +106,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private ArrayList<ArrayList<DNA>> population;
   private HillClimbing hillClimbing;
   private int current_creature_index = 0;
+  private int generation_count = 0;
 
   //Nifty gui
   private Nifty nifty;
@@ -175,22 +176,21 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     population = new ArrayList<>();
     population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
     myCreature.remove();
-    OurCreature creature;
+//    OurCreature creature;
+//    for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
+//      creature = new OurCreature(physicsSpace, rootNode,true);
+//      population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
+//      creature.remove();
+//      //creature.removeAll();
+//    }
+    // Was failing to remove so commented out
+    RandCreature creature;
     for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
-      creature = new OurCreature(physicsSpace, rootNode,true);
-      population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
-      creature.remove();
-      //creature.removeAll();
-    }
-    /* Was failing to remove so commented out
-      RandCreature creature;
-      for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
       creature = new RandCreature(physicsSpace, rootNode);
       population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
       creature.remove();
       //creature.removeAll();
     }
-     */
     hillClimbing = new HillClimbing(population);
 
     startSimForCurrentCreature();
@@ -317,14 +317,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
       myCreature.updateBrain(elapsedSimulationTime);
 
-      if (headless && debug)
+      if (headless)
       {
-        System.out.println("Max Fitness: " + myCreature.getFitness());
+        if (debug) {
+          System.out.println("Max Fitness: " + myCreature.getFitness());
+        }
       }
       else
       {
-        de.lessvoid.nifty.elements.Element nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
-        nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
+        updateGUIText();
       }
 
       if (isCameraRotating)
@@ -349,13 +350,18 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           current_creature_index++;
           startSimForCurrentCreature();
         } else {
-          current_creature_index = 0;
+          DNAio.writePopulation(population);
+
           // Show all fitnesses
           System.out.println("All Fitnesses: ");
           for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
             System.out.format("%d: %f\n", i, Iterables.getLast(population.get(i)).getFitness());
           }
+
+          current_creature_index = 0;
           population = hillClimbing.hillClimb();
+          generation_count++;
+          startSimForCurrentCreature();
 
           // System.exit(0);
         }
@@ -370,6 +376,18 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
 
+  private void updateGUIText() {
+    de.lessvoid.nifty.elements.Element nifty_element;
+
+    nifty_element = nifty.getCurrentScreen().findElementByName("generation_text");
+    nifty_element.getRenderer(TextRenderer.class).setText("Generation: " + generation_count);
+
+    nifty_element = nifty.getCurrentScreen().findElementByName("creature_id_text");
+    nifty_element.getRenderer(TextRenderer.class).setText("Creature id: " + current_creature_index);
+
+    nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
+    nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
+  }
 
 
 
