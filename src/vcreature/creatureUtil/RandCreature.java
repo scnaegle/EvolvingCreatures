@@ -17,6 +17,13 @@ import com.jme3.math.Quaternion;
 import com.jme3.scene.Geometry;
 import vcreature.phenotype.*;
 
+/**
+ * Class responsible for making a random, valid creature.
+ * Intended use is to make a RandCreature in the physics space
+ * save it into DNA by making a new DNA object with the RandCreature in its parameter
+ * and immediately remove the RandCreature from the physics space (RandCreature.remove())
+ */
+
 public class RandCreature
 {
   private final PhysicsSpace physicsSpace;
@@ -39,8 +46,6 @@ public class RandCreature
     blockAngles = new ArrayList<>();
 
     int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS)+1;
-    //int blockNumber = 3;
-
 
     makeRandomRoot();
 
@@ -616,7 +621,6 @@ public class RandCreature
       testPoint = tempVecCenter.y - tempVecSize.y;
       if (testPoint < lowestPoint) lowestPoint = testPoint;
     }
-    System.out.println("LOWEST POINT: " + lowestPoint);
     return lowestPoint;
   }
 
@@ -710,8 +714,6 @@ public class RandCreature
 
   public void bumpUp()
   {
-    //Vector3f[] tempVecArray;
-    //Vector3f tempVec;
     float lowestPoint = getCurrentHeightOfLowestPoint();
     for (int i = 0; i < getNumberOfBodyBlocks(); ++i)
     {
@@ -722,7 +724,7 @@ public class RandCreature
   public void remove()
   {
     if (body.size() > 0)
-    { removeSubTree(body.get(0));
+    { removeSubTree(body.get(body.size()-1));
     }
 
     if (body.size() != 0)

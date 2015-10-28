@@ -1,52 +1,51 @@
+ package vcreature.mainSimulation;
 
-package vcreature.mainSimulation;
+ import com.beust.jcommander.IStringConverter;
+ import com.beust.jcommander.JCommander;
+ import com.google.common.collect.Iterables;
+ import com.jme3.system.JmeContext;
+ import de.lessvoid.nifty.elements.render.TextRenderer;
+ import vcreature.creatureUtil.CreatureConstants;
+ import vcreature.hillClimbing.HillClimbing;
+ import vcreature.creatureUtil.*;
+ import vcreature.phenotype.Creature;
+ import vcreature.phenotype.OurCreature;
+ import vcreature.phenotype.PhysicsConstants;
+ import vcreature.phenotype.Block;
 
-import com.beust.jcommander.IStringConverter;
-import com.beust.jcommander.JCommander;
-import com.google.common.collect.Iterables;
-import com.jme3.system.JmeContext;
-import de.lessvoid.nifty.elements.render.TextRenderer;
-import vcreature.creatureUtil.CreatureConstants;
-import vcreature.hillClimbing.HillClimbing;
-import vcreature.creatureUtil.*;
-import vcreature.phenotype.Creature;
-import vcreature.phenotype.OurCreature;
-import vcreature.phenotype.PhysicsConstants;
-import vcreature.phenotype.Block;
+ import com.jme3.app.SimpleApplication;
+ import com.jme3.bullet.BulletAppState;
+ import com.jme3.bullet.PhysicsSpace;
+ import com.jme3.bullet.control.RigidBodyControl;
+ import com.jme3.material.Material;
+ import com.jme3.math.Vector2f;
+ import com.jme3.math.Vector3f;
+ import com.jme3.scene.Geometry;
+ import com.jme3.scene.shape.Box;
+ import com.jme3.texture.Texture;
+ import com.jme3.renderer.queue.RenderQueue.ShadowMode;
+ import com.jme3.input.controls.ActionListener;
+ import com.jme3.light.DirectionalLight;
+ import com.jme3.math.ColorRGBA;
+ import com.jme3.shadow.DirectionalLightShadowRenderer;
+ import com.jme3.light.AmbientLight;
+ import com.jme3.input.KeyInput;
+ import com.jme3.input.controls.KeyTrigger;
+ import com.jme3.system.AppSettings;
 
-import com.jme3.app.SimpleApplication;
-import com.jme3.bullet.BulletAppState;
-import com.jme3.bullet.PhysicsSpace;
-import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.material.Material;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.shape.Box;
-import com.jme3.texture.Texture;
-import com.jme3.renderer.queue.RenderQueue.ShadowMode;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.light.DirectionalLight;
-import com.jme3.math.ColorRGBA;
-import com.jme3.shadow.DirectionalLightShadowRenderer;
-import com.jme3.light.AmbientLight;
-import com.jme3.input.KeyInput;
-import com.jme3.input.controls.KeyTrigger;
-import com.jme3.system.AppSettings;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+ import java.io.File;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+ import java.util.List;
 
 //Added 10/14/2015 justin thomas
-import com.jme3.niftygui.NiftyJmeDisplay;
-import de.lessvoid.nifty.Nifty;
-import de.lessvoid.nifty.screen.Screen;
-import de.lessvoid.nifty.screen.ScreenController;
+ import com.jme3.niftygui.NiftyJmeDisplay;
+ import de.lessvoid.nifty.Nifty;
+ import de.lessvoid.nifty.screen.Screen;
+ import de.lessvoid.nifty.screen.ScreenController;
 
 //JCommander for command-line arguments
-import com.beust.jcommander.Parameter;
+ import com.beust.jcommander.Parameter;
 
 
 public class MainSim extends SimpleApplication implements ActionListener, ScreenController
@@ -97,7 +96,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private PhysicsSpace physicsSpace;
   private float cameraAngle = (float)(Math.PI/2.0);
   private float elapsedSimulationTime = 0.0f;
-  
+
   //Temporary vectors used on each frame. They here to avoid instanciating new vectors on each frame
   private Vector3f tmpVec3; //
 
@@ -154,9 +153,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     floor_phy.setFriction(PhysicsConstants.GROUND_SLIDING_FRICTION);
     floor_phy.setRestitution(PhysicsConstants.GROUND_BOUNCINESS);
     floor_phy.setDamping(PhysicsConstants.GROUND_LINEAR_DAMPINING,
-        PhysicsConstants.GROUND_ANGULAR_DAMPINING);
-    
-   
+            PhysicsConstants.GROUND_ANGULAR_DAMPINING);
+
+
     Block.initStaticMaterials(assetManager);
 
     //Test Crossover
@@ -180,7 +179,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
       creature = new RandCreature(physicsSpace, rootNode);
       population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
-      creature.remove();
+      //creature.remove();
+      creature.removeAll();
     }
 //    hillClimbing = new HillClimbing(population, physicsSpace, rootNode);
 
@@ -244,16 +244,16 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     AmbientLight ambient = new AmbientLight();
     ambient.setColor(ColorRGBA.White.mult(0.3f));
     rootNode.addLight(ambient);
-    
+
     // SHADOW
     // the second parameter is the resolution. Experiment with it! (Must be a power of 2)
     DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, 2048, 2);
     dlsr.setLight(sun);
     viewPort.addProcessor(dlsr);
   }
-  
-  
-  
+
+
+
   private void initKeys() {
     inputManager.addMapping("Quit", new KeyTrigger(KeyInput.KEY_Q));
     inputManager.addMapping("Toggle Camera Rotation", new KeyTrigger(KeyInput.KEY_P));
@@ -265,8 +265,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     inputManager.addListener(this, "Toggle Camera Rotation");
     inputManager.addListener(this, "Pause");
   }
-  
-  public void onAction(String name, boolean isPressed, float timePerFrame) 
+
+  public void onAction(String name, boolean isPressed, float timePerFrame)
   {
     if (isPressed && name.equals("Toggle Camera Rotation"))
     { isCameraRotating = !isCameraRotating;
@@ -295,7 +295,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
   }
 
-  
+
   /* Use the main event loop to trigger repeating actions. */
   @Override
   public void simpleUpdate(float deltaSeconds)
@@ -363,22 +363,22 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         //TODO update dna population when appropriate.
         //if(TESTIO)
         //{
-          //testOut();
+        //testOut();
         //}
       }
     }
   }
- 
-  
- 
 
-  
+
+
+
+
   private void print(String msg, float x)
   {
     String className = this.getClass().getSimpleName();
     System.out.format("%s.%s %.3f\n", className, msg, x);
   }
-  
+
   private void print(String msg, Vector3f vector)
   {
     String className = this.getClass().getSimpleName();
@@ -432,9 +432,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   {
     //Begin GUI setup
     NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager,
-        inputManager,
-        audioRenderer,
-        guiViewPort);
+            inputManager,
+            audioRenderer,
+            guiViewPort);
     nifty = niftyDisplay.getNifty();
     NiftySelectController controller = new NiftySelectController(this);
     nifty.fromXml("Interface/gaGUI.xml", "hud", controller);
