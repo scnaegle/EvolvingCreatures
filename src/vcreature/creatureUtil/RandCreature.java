@@ -125,7 +125,7 @@ public class RandCreature
 
   private Neuron makeRandomNeuron()
   {
-    float seconds = (rand.nextInt(20)+1) + rand.nextFloat();
+    float seconds = (rand.nextInt(CreatureConstants.MAX_NEURON_SECONDS)+CreatureConstants.MIN_NEURON_SECONDS) + rand.nextFloat();
     float impulse = Float.MAX_VALUE;
     int sign = rand.nextInt(2);
 
