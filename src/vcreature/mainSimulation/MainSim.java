@@ -3,6 +3,7 @@ package vcreature.mainSimulation;
 
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
+import com.google.common.collect.Iterables;
 import com.jme3.system.JmeContext;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import vcreature.creatureUtil.CreatureConstants;
@@ -35,6 +36,7 @@ import com.jme3.system.AppSettings;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 //Added 10/14/2015 justin thomas
@@ -102,7 +104,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private boolean isCameraRotating = true;
 
   private OurCreature myCreature;
-  private ArrayList<DNA> population;
+  private ArrayList<ArrayList<DNA>> population;
   private HillClimbing hillClimbing;
   private int current_creature_index = 0;
 
@@ -172,18 +174,18 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     myCreature = new OurCreature(physicsSpace, rootNode, true);
     population = new ArrayList<>();
-    population.add(new DNA(myCreature));
+    population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
     myCreature.remove();
     RandCreature creature;
     for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
       creature = new RandCreature(physicsSpace, rootNode);
-      population.add(new DNA(creature));
+      population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
       creature.remove();
     }
 //    hillClimbing = new HillClimbing(population, physicsSpace, rootNode);
 
-    myCreature = new OurCreature(physicsSpace, rootNode, population.get(current_creature_index));
-    myCreature.placeOnGround();
+    startSimForCurrentCreature();
+
     initLighting();
     initKeys();
 
@@ -198,6 +200,16 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     if (debug) {
       showSettings();
     }
+  }
+
+  private void startSimForCurrentCreature() {
+    myCreature = new OurCreature(physicsSpace, rootNode, Iterables.getLast(population.get(current_creature_index)));
+    myCreature.placeOnGround();
+    elapsedSimulationTime = 0.0f;
+  }
+
+  private void storeFitnessForCurrentCreature() {
+    Iterables.getLast(population.get(current_creature_index)).storeFitness(myCreature.getFitness());
   }
 
   private void showSettings() {
@@ -324,20 +336,18 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       if (elapsedSimulationTime > CreatureConstants.SIMULATION_TIME)
       {
         System.out.println("current creature fitness: " + myCreature.getFitness());
-        population.get(current_creature_index).storeFitness(myCreature.getFitness());
+        storeFitnessForCurrentCreature();
         myCreature.remove();
         if (current_creature_index < CreatureConstants.MAX_POPULATION) {
           current_creature_index++;
-          myCreature = new OurCreature(physicsSpace, rootNode, population.get(current_creature_index));
-          myCreature.placeOnGround();
-          elapsedSimulationTime = 0.0f;
+          startSimForCurrentCreature();
         } else {
           current_creature_index = 0;
 
           // Show all fitnesses
           System.out.println("All Fitnesses: ");
           for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
-            System.out.format("%d: %f\n", i, population.get(i).getFitness());
+            System.out.format("%d: %f\n", i, Iterables.getLast(population.get(i)).getFitness());
           }
           System.exit(0);
           // TODO run hill climb on all the creatures in the population and start over with the next generation
@@ -493,8 +503,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     DNA dna1 = myCreature.getDNA();
     DNA dna2 = myCreature.getDNA();
     System.out.println(dna1.equals(dna2));
-    population.add(myCreature.getDNA());
-    DNAio.writePopulation(population);
+//    population.add(myCreature.getDNA());
+//    DNAio.writePopulation(population);
   }
 
   public class FileConverter implements IStringConverter<File>
