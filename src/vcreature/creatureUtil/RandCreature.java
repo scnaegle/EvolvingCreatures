@@ -59,6 +59,15 @@ public class RandCreature
     return body.size();
   }
 
+  /**
+   * Get dna object.  If DNA has not been made, make new DNA.
+   * @return        dna object
+   */
+  public DNA getDNA()
+  {
+    return new DNA(this);
+  }
+
   private Block makeRandomRoot()
   {
     Vector3f rootCenter = new Vector3f(0f,0f,0f);
