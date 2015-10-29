@@ -317,13 +317,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
       myCreature.updateBrain(elapsedSimulationTime);
 
-      if (headless)
-      {
-        if (debug) {
-          System.out.println("Max Fitness: " + myCreature.getFitness());
-        }
+      if (debug) {
+        System.out.println("Max Fitness: " + myCreature.getFitness());
       }
-      else
+      if (!headless)
       {
         updateGUIText();
       }
@@ -352,10 +349,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         } else {
           DNAio.writePopulation(population);
 
-          // Show all fitnesses
-          System.out.println("All Fitnesses: ");
-          for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
-            System.out.format("%d: %f\n", i, Iterables.getLast(population.get(i)).getFitness());
+          if (debug) {
+            // Show all fitnesses
+            System.out.println("All Fitnesses: ");
+            for (int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
+              System.out.format("%d: %f\n", i, Iterables.getLast(population.get(i)).getFitness());
+            }
           }
 
           current_creature_index = 0;
@@ -363,14 +362,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           generation_count++;
           startSimForCurrentCreature();
 
-          // System.exit(0);
         }
-
-        //TODO update dna population when appropriate.
-        //if(TESTIO)
-        //{
-        //testOut();
-        //}
       }
     }
   }
