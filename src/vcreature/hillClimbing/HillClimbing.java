@@ -179,6 +179,8 @@ public class HillClimbing
     DNA previousDNA;
     DNA mutatedDNA;
 
+    overallAvgFitness = 0f;
+
     for(int i = 0; i < totalNumDNA; i++)
     {
       dna = Iterables.getLast(population.get(i));
