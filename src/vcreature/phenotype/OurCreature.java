@@ -494,6 +494,31 @@ public class OurCreature extends Creature
 
     leg2.addNeuron(leg2Neuron1);
     leg2.addNeuron(leg2Neuron2);
+
+    leg1Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg1Neuron1.setInputValue(Neuron.C,11);
+    leg1Neuron1.setInputValue(Neuron.D,-Float.MAX_VALUE);
+
+    leg1Neuron2 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg1Neuron2.setInputValue(Neuron.C,10);
+    leg1Neuron2.setInputValue(Neuron.D,Float.MAX_VALUE);
+
+    leg2Neuron1 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg2Neuron1.setInputValue(Neuron.C,11);
+    leg2Neuron1.setInputValue(Neuron.D,Float.MAX_VALUE);
+
+    leg2Neuron2 = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT,
+        EnumNeuronInput.CONSTANT, null);
+
+    leg2Neuron2.setInputValue(Neuron.C,10);
+    leg2Neuron2.setInputValue(Neuron.D,-Float.MAX_VALUE);
+
     leg3.addNeuron(leg2Neuron1);
     leg3.addNeuron(leg2Neuron2);
     leg4.addNeuron(leg1Neuron1);

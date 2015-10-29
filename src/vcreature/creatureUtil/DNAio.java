@@ -71,6 +71,16 @@ public class DNAio
     }
   }
 
+  /**
+   * Helper method that parses the DNA input file.  Very brittle, files must be
+   * in the exact format that writePopulation outputs.
+   * Goes line by line through the input file instantiating and filling in DNA
+   * pieces in the order that they arrive.
+   * @param f               file to parse
+   * @param population      population DNA array to fill.
+   * @return
+   * @throws IOException    IOExceptions handled in readPopulation
+   */
   private static boolean parseInput(File f, ArrayList<DNA> population) throws IOException
   {
     int numBlocks, numNeurons;

@@ -402,8 +402,6 @@ public class DNA implements Comparable
     }
   }
 
-
-
   /**
    * Add a block to the DNA.  If the blockID is already in use, it will be
    * overwritten by the new block. If the index is invalid nothing will happen.
@@ -632,6 +630,9 @@ public class DNA implements Comparable
     return new Vector3f(blockDNAs[dnaNum].sizeAndShape[type.ordinal()]);
   }
 
+  /**
+   * Count how many blocks are in the DNA
+   */
   private void calculateNumBlocks()
   {
     numBlocks = 0;
@@ -746,6 +747,11 @@ public class DNA implements Comparable
       }
     }
 
+    /**
+     * Instantiate blockDNA with ID and parent ID, to be called from DNAio
+     * @param id        blockID number.
+     * @param parent    parent ID number.
+     */
     public BlockDNA(int id, int parent)
     {
       this();
@@ -795,7 +801,6 @@ public class DNA implements Comparable
         for(int i = 0; i < nDNA.NUM_RULES; ++i)
         {
           n.setInputValue(i, nDNA.constantValues[i]);
-          System.out.println(nDNA.constantValues[i]);
           n.setBlockIdx(i, nDNA.blockIndex[i]);
         }
         b.addNeuron(n);
