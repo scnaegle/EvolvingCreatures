@@ -107,6 +107,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private HillClimbing hillClimbing;
   private int current_creature_index = 0;
   private int generation_count = 0;
+  private int viewing_creature = -1;
 
   //Nifty gui
   private Nifty nifty;
@@ -318,13 +319,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
       myCreature.updateBrain(elapsedSimulationTime);
 
-      if (headless)
-      {
-        if (debug) {
-          System.out.println("Max Fitness: " + myCreature.getFitness());
-        }
+      if (debug) {
+        System.out.println("Max Fitness: " + myCreature.getFitness());
       }
-      else
+      if (!headless)
       {
         updateGUIText();
       }
@@ -353,10 +351,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         } else {
           DNAio.writePopulation(population);
 
-          // Show all fitnesses
-          System.out.println("All Fitnesses: ");
-          for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
-            System.out.format("%d: %f\n", i, Iterables.getLast(population.get(i)).getFitness());
+          if (debug) {
+            // Show all fitnesses
+            System.out.println("All Fitnesses: ");
+            for (int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
+              System.out.format("%d: %f\n", i, Iterables.getLast(population.get(i)).getFitness());
+            }
           }
 
           current_creature_index = 0;
@@ -364,11 +364,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           generation_count++;
           startSimForCurrentCreature();
 
-          // System.exit(0);
         }
-
       }
-
     }
   }
 
@@ -470,6 +467,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
   public void setViewingThread(int viewing_thread) {
     this.viewing_thread = viewing_thread;
+  }
+
+  public void setViewingCreature(int viewing_creature) {
+    this.viewing_creature = viewing_creature;
   }
 
   public void setSpeed(int speed) {

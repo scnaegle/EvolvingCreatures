@@ -22,6 +22,8 @@ public class NiftySelectController implements ScreenController
   private DropDown thread_count_box;
   private DropDown thread_view_box;
 
+  private int viewing_creature = -1;
+
   public NiftySelectController(MainSim app) {
     this.app = app;
   }
@@ -47,6 +49,9 @@ public class NiftySelectController implements ScreenController
 
     TextField max_population_field = screen.findNiftyControl("maxPopulationField", TextField.class);
     max_population_field.setText(app.starting_population_count + "");
+
+    TextField creature_view_field = screen.findNiftyControl("creatureViewField", TextField.class);
+    creature_view_field.setText("");
   }
 
   @NiftyEventSubscriber(id = "threadCountSelectionBox")
@@ -100,6 +105,20 @@ public class NiftySelectController implements ScreenController
       System.out.println("max population: " + selection);
     }
     app.setMaxPopulation(selection);
+  }
+
+  @NiftyEventSubscriber(id = "creatureViewField")
+  public void onCreatureViewFieldChanged(final String id, final TextFieldChangedEvent event) {
+    int selection = Integer.parseInt(event.getText());
+    if (app.debug) {
+      System.out.println("creature view: " + selection);
+    }
+    this.viewing_creature = selection;
+  }
+
+  @NiftyEventSubscriber(id = "doneButton")
+  public void onDoneButtonClicked(final String id, final ButtonClickedEvent event) {
+    app.setViewingCreature(viewing_creature);
   }
 
   @Override
