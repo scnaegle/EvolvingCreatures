@@ -148,6 +148,7 @@ public class DNAio
         s.next();
       }
     }
+    s.close();
     return true;
   }
 }
