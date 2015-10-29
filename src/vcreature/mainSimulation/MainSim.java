@@ -107,6 +107,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private HillClimbing hillClimbing;
   private int current_creature_index = 0;
   private int generation_count = 0;
+  private int viewing_creature = -1;
 
   //Nifty gui
   private Nifty nifty;
@@ -465,6 +466,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
   public void setViewingThread(int viewing_thread) {
     this.viewing_thread = viewing_thread;
+  }
+
+  public void setViewingCreature(int viewing_creature) {
+    this.viewing_creature = viewing_creature;
   }
 
   public void setSpeed(int speed) {
