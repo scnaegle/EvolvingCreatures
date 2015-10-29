@@ -117,10 +117,10 @@ public class DNAio
           //for numNeurons
           for(int j = 0; j < numNeurons; ++j)
           {
+            dnaIn.addNeuronToBlock(i);
             //set neuron rules(5) (float, int)
             for(int k = 0; k < Neuron.TOTAL_INPUTS; ++k)
             {
-              dnaIn.addNeuronToBlock(i);
               neuronInputType = s.nextInt();
               neuronConstant = s.nextFloat();
               neuronBlockID = s.nextInt();

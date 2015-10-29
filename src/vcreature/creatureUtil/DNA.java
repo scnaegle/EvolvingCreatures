@@ -397,7 +397,7 @@ public class DNA implements Comparable
   {
     if(validateNeuronIndices(blockID, neuronNum, blockNum))
     {
-      blockDNAs[blockID].neuronDNAs.get(neuronNum).constantValues[blockNum]
+      blockDNAs[blockID].neuronDNAs.get(neuronNum).blockIndex[blockNum]
           = blockIndexVal;
     }
   }
@@ -728,7 +728,6 @@ public class DNA implements Comparable
       this();
       this.blockID = other.blockID;
       this.parentID = other.parentID;
-      System.out.println(this.parentID);
       for(int i = 0; i < NUM_VECTORS; ++i)
       {
         if(other.sizeAndShape[i] != null)
@@ -796,6 +795,7 @@ public class DNA implements Comparable
         for(int i = 0; i < nDNA.NUM_RULES; ++i)
         {
           n.setInputValue(i, nDNA.constantValues[i]);
+          System.out.println(nDNA.constantValues[i]);
           n.setBlockIdx(i, nDNA.blockIndex[i]);
         }
         b.addNeuron(n);
