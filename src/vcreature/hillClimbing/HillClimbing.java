@@ -1,16 +1,12 @@
 package vcreature.hillClimbing;
 
 import com.google.common.collect.Iterables;
-import com.jme3.bullet.PhysicsSpace;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
 import vcreature.creatureUtil.CreatureConstants;
 import vcreature.creatureUtil.DNA;
 import vcreature.phenotype.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Random;
 //TODO: 1st move joint of BlockSize to be on edge to avoid large blocks causing weird movements
 /**
@@ -20,12 +16,21 @@ public class HillClimbing
 {
   private ArrayList<ArrayList<DNA>> population;
   private Random generator;
+  private float overallAvgFitness;
+  private float previousOverallAvgFitness;
+  private int nonFitnessIncreaseCount;
+  private final float POPULATION_STALL_DEVIATION = 1f;
   private final int NEURON_COUNT = Neuron.TOTAL_INPUTS;
+  private boolean mutationNeeded;
 
   public HillClimbing(ArrayList<ArrayList<DNA>> population)
   {
     this.population = population;
     generator = new Random();
+    nonFitnessIncreaseCount = 0;
+    overallAvgFitness = 0f;
+    previousOverallAvgFitness = 0f;
+    mutationNeeded = false;
   }
 
   /**
@@ -38,7 +43,9 @@ public class HillClimbing
   private boolean fitnessTest(DNA sampleDNA, DNA previousDNA)
   {
     if(previousDNA == null) return true;
-    return sampleDNA.getFitness() > previousDNA.getFitness();
+    float fitness = sampleDNA.getFitness();
+    overallAvgFitness += fitness;
+    return fitness > previousDNA.getFitness();
   }
 
   /**
@@ -135,17 +142,44 @@ public class HillClimbing
   }
 
   /**
+   * Will check if the entire population's avg fitness is getting better, worse,
+   * or increase is small.  If overall avg fitness is worse than the last generation's
+   * overall avg fitness, than the counter for how many times a decrease is allowed is
+   * incremented.  If decrease happens 3 times, then a mutation is needed.
+   * If the abs deviation between this generation and last generation's fitness, is less
+   * than the stall deviation for a population, then a mutation is needed.
+   */
+  private void checkAvgFitnessDeviation()
+  {
+    if(overallAvgFitness < previousOverallAvgFitness) nonFitnessIncreaseCount++;
+    float deviation = overallAvgFitness - previousOverallAvgFitness;
+    if(nonFitnessIncreaseCount == 3 || Math.abs(deviation) < POPULATION_STALL_DEVIATION) mutationNeeded = true;
+  }
+
+  /**
+   * Checks to see if Hill Climbing is in need of the
+   * genetic algorithm to do mutations.
+   * @return if mutation is needed
+   */
+  public boolean isMutationNeeded()
+  {
+    return mutationNeeded;
+  }
+
+  /**
    * Will perform the hill climbing on the given population when called.
    */
   public ArrayList<ArrayList<DNA>> hillClimb() {
     int blockID;
     int dnaListSize;
     int mutationType; //0 for neuron mutation, else size mutation of block
+    int totalNumDNA = population.size();
+
     DNA dna;
     DNA previousDNA;
     DNA mutatedDNA;
 
-    for(int i = 0; i < population.size(); i++)
+    for(int i = 0; i < totalNumDNA; i++)
     {
       dna = Iterables.getLast(population.get(i));
       dnaListSize = population.get(i).size();
@@ -171,6 +205,10 @@ public class HillClimbing
       population.get(i).add(mutatedDNA);
 
     }
+
+    overallAvgFitness /= totalNumDNA;
+    checkAvgFitnessDeviation();
+    previousOverallAvgFitness = overallAvgFitness;
 
     return population;
   }
