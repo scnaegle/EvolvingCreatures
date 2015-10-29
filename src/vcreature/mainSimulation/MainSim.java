@@ -187,10 +187,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     // Was failing to remove so commented out
     RandCreature creature;
     for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
-      creature = new RandCreature(physicsSpace, rootNode);
+      creature = new RandCreature(physicsSpace, rootNode, true);
       population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
-      creature.remove();
-      //creature.removeAll();
+      //creature.remove();
+      creature.removeAll();
     }
     hillClimbing = new HillClimbing(population);
 

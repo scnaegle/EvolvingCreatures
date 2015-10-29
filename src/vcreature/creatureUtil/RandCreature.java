@@ -35,7 +35,7 @@ public class RandCreature
   private static Random rand = new Random();
   private Vector3f tmpVec3 = new Vector3f();
 
-  private ArrayList<float[]> addedLocations;
+  private ArrayList<IdSurfaceEdge> addedLocations;
 
   private float elapsedSimulationTime;
 
@@ -44,7 +44,7 @@ public class RandCreature
    * @param physicsSpace physics space to simulate in
    * @param jMonkeyRootNode RootNode of physics space to build in
    */
-  public RandCreature(PhysicsSpace physicsSpace, Node jMonkeyRootNode)
+  public RandCreature(PhysicsSpace physicsSpace, Node jMonkeyRootNode, boolean smartEdges)
   {
     this.physicsSpace = physicsSpace;
     this.jMonkeyRootNode = jMonkeyRootNode;
@@ -60,21 +60,55 @@ public class RandCreature
     addedLocations = new ArrayList<>();
 
     //choose random number of blocks
-    int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS-2)+2;
+    //int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS-2)+2;
+    int blockNumber = 10;
 
     //make a random sized root
     makeRandomRoot();
 
-    while (this.getNumberOfBodyBlocks() < blockNumber)
+    if (smartEdges)
     {
-      parentBlockID = rand.nextInt(getNumberOfBodyBlocks());
-      Block parent = body.get(parentBlockID);
-      addRandomBlock(parent);
+      while (this.getNumberOfBodyBlocks() < blockNumber)
+      {
+        parentBlockID = rand.nextInt(getNumberOfBodyBlocks());
+        parentBlockSurface = rand.nextInt(6);
+        parentBlockEdge = rand.nextInt(4);
+
+        IdSurfaceEdge test = new IdSurfaceEdge(parentBlockID, parentBlockSurface, parentBlockEdge);
+
+        if (!addedLocations.contains(test))
+        {
+          addedLocations.add(test);
+          Block parent = body.get(parentBlockID);
+          addRandomBlockSmart(parent, parentBlockSurface, parentBlockEdge);
+        }
+      }
+    }
+
+    else {
+      while (this.getNumberOfBodyBlocks() < blockNumber)
+      {
+        parentBlockID = rand.nextInt(getNumberOfBodyBlocks());
+        parentBlockSurface = rand.nextInt(6);
+        parentBlockEdge = rand.nextInt(4);
+
+        IdSurfaceEdge test = new IdSurfaceEdge(parentBlockID, parentBlockSurface, parentBlockEdge);
+
+        if (!addedLocations.contains(test))
+        {
+          addedLocations.add(test);
+          Block parent = body.get(parentBlockID);
+          addRandomBlock(parent, parentBlockSurface);
+        }
+      }
+
     }
 
     //make creature rest on the ground
     bumpUp();
   }
+
+
 
   /**
    *
@@ -120,13 +154,10 @@ public class RandCreature
    * Will be removed if collided with another block on spawn
    * @param parent Block to add to
    */
-  private void addRandomBlock(Block parent)
+  private void addRandomBlock(Block parent, int parentSurface)
   {
-    int parentSurface;
     int childSurface;
     int childEdge;
-    int parentEdge;
-    boolean edgeToEdge;
 
     Vector3f childSize = new Vector3f(0f,0f,0f);
     Vector3f parentSize = new Vector3f(parent.getSizeX()/2, parent.getSizeY()/2, parent.getSize()/2);
@@ -137,30 +168,17 @@ public class RandCreature
     Vector3f rotationAxis = new Vector3f(0f,0f,0f);
     Vector3f trashAxis = new Vector3f(0f,0f,0f);
 
-    //edgeToEdge = rand.nextBoolean();
-    edgeToEdge = true;
+
 
     childSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     childSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     childSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
 
-    parentSurface = rand.nextInt(6);
     childSurface = correspondingChildSurface(parentSurface);
     childEdge = rand.nextInt(4);
 
-    if (edgeToEdge)
-    {
-      parentEdge = rand.nextInt(4);
-      findSurfaceVectorEdge(parentSurface, parentEdge, parentJoint, parentSize, trashAxis);
-      findSurfaceVectorEdge(childSurface, childEdge, childJoint, childSize, rotationAxis);
-    }
-
-    else
-    {
-      findSurfaceVector(parentJoint, parentSurface, parentSize);
-      findSurfaceVectorEdge(childSurface, childEdge, childJoint, childSize, rotationAxis);
-    }
-
+    findSurfaceVector(parentJoint, parentSurface, parentSize);
+    findSurfaceVectorEdge(childSurface, childEdge, childJoint, childSize, rotationAxis);
 
     Block newBlock = addBlock(axisAligned, childSize, parent, parentJoint, childJoint, rotationAxis);
 
@@ -170,8 +188,42 @@ public class RandCreature
       blockProperties.add(makeBlockVectorArray(newBlock, childSize, rotationAxis, rotationAxis));
       blockAngles.add(Arrays.copyOf(axisAligned, axisAligned.length));
     }
+  }
 
+  private void addRandomBlockSmart(Block parent, int parentSurface, int parentEdge)
+  {
+    int childSurface;
+    int childEdge;
 
+    Vector3f childSize = new Vector3f(0f,0f,0f);
+    Vector3f parentSize = new Vector3f(parent.getSizeX()/2, parent.getSizeY()/2, parent.getSize()/2);
+
+    Vector3f parentJoint = new Vector3f(0f,0f,0f);
+    Vector3f childJoint = new Vector3f(0f,0f,0f);
+
+    Vector3f rotationAxis = new Vector3f(0f,0f,0f);
+    Vector3f trashAxis = new Vector3f(0f,0f,0f);
+
+    childSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
+    childSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
+    childSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
+
+    childSurface = correspondingChildSurface(parentSurface);
+    childEdge = correspondingChildEdge(parentEdge);
+
+    findSurfaceVectorEdge(parentSurface, parentEdge, parentJoint, parentSize, trashAxis);
+    findSurfaceVectorEdge(childSurface, childEdge, childJoint, childSize, trashAxis);
+
+    findRotationAxis(rotationAxis, parentSurface, parentEdge);
+
+    Block newBlock = addBlock(axisAligned, childSize, parent, parentJoint, childJoint, rotationAxis);
+
+    if (!removeIfIntersection())
+    {
+      addRandomNeurons(newBlock);
+      blockProperties.add(makeBlockVectorArray(newBlock, childSize, rotationAxis, rotationAxis));
+      blockAngles.add(Arrays.copyOf(axisAligned, axisAligned.length));
+    }
   }
 
   /**
@@ -198,7 +250,8 @@ public class RandCreature
    */
   private Neuron makeRandomNeuron(float maxImpulse)
   {
-    float seconds = (rand.nextInt(CreatureConstants.MAX_NEURON_SECONDS)+CreatureConstants.MIN_NEURON_SECONDS) + rand.nextFloat();
+    float seconds = rand.nextInt(CreatureConstants.MAX_NEURON_SECONDS - CreatureConstants.MIN_NEURON_SECONDS) + CreatureConstants.MIN_NEURON_SECONDS;
+    seconds += rand.nextFloat();
     float impulse = maxImpulse;
     int sign = rand.nextInt(2);
 
@@ -339,6 +392,40 @@ public class RandCreature
     return false;
   }
 
+  private int correspondingChildEdge(int parentEdge)
+  {
+    int or = rand.nextInt(2);
+    int childEdge = 0;
+    switch (parentEdge){
+      case 0:
+        if (or == 0)
+          childEdge = 0;
+        else
+          childEdge = 2;
+        break;
+      case 1:
+        if (or == 0)
+          childEdge = 1;
+        else
+          childEdge = 3;
+        break;
+      case 2:
+        if (or == 0)
+          childEdge =0;
+        else
+          childEdge = 2;
+        break;
+      case 3:
+        if (or == 0)
+          childEdge = 1;
+        else
+          childEdge = 3;
+        break;
+      default:
+        break;
+    }
+    return childEdge;
+  }
   /**
    * Corresponding ints to surfaces on blocks
    * 0 = +y;
@@ -368,6 +455,29 @@ public class RandCreature
         break;
     }
     return childSurface;
+  }
+
+  private void findRotationAxis(Vector3f rotationAxis, int parentSurface, int parentEdge)
+  {
+    if (parentSurface == 0 || parentSurface == 1)
+    {
+      if (parentEdge == 0 || parentEdge == 2) rotationAxis.set(Vector3f.UNIT_X);
+      else rotationAxis.set(Vector3f.UNIT_Z);
+    }
+    else if (parentSurface == 2 || parentSurface == 3)
+    {
+      if (parentEdge == 0 || parentEdge == 2) rotationAxis.set(Vector3f.UNIT_Z);
+      else rotationAxis.set(Vector3f.UNIT_Y);
+    }
+    else if (parentSurface == 4 || parentSurface == 5)
+    {
+      if (parentEdge == 0 || parentEdge == 2) rotationAxis.set(Vector3f.UNIT_X);
+      else rotationAxis.set(Vector3f.UNIT_Y);
+    }
+    else
+    {
+      rotationAxis.set(Vector3f.ZERO);
+    }
   }
 
   private void findSurfaceVector(Vector3f joint, int surface, Vector3f pSize)
@@ -482,6 +592,7 @@ public class RandCreature
       }
     }
 
+    //+x
     else if (childSurface == 2)
     {
       switch (childEdge) {
@@ -535,7 +646,7 @@ public class RandCreature
         case 1:
           joint.x = -cSize.x;
           joint.y = randomSurfacePoint(cSize.y);
-          joint.z = cSize.z;
+          joint.z = -cSize.z;
           randXorY(rAxis);
           //YorX
           break;
@@ -550,7 +661,7 @@ public class RandCreature
         case 3:
           joint.x = -cSize.x;
           joint.y = randomSurfacePoint(cSize.y);
-          joint.z = -cSize.z;
+          joint.z = cSize.z;
           randXorY(rAxis);
           //YorX
           break;
@@ -608,7 +719,7 @@ public class RandCreature
           //XorZ
           break;
         case 1:
-          joint.x = -cSize.x;
+          joint.x = cSize.x;
           joint.y = randomSurfacePoint(cSize.y);
           joint.z = -cSize.z;
           randYorZ(rAxis);
@@ -622,7 +733,7 @@ public class RandCreature
           //XorZ
           break;
         case 3:
-          joint.x = cSize.x;
+          joint.x = -cSize.x;
           joint.y = randomSurfacePoint(cSize.y);
           joint.z = -cSize.z;
           randYorZ(rAxis);
@@ -918,6 +1029,38 @@ public class RandCreature
     geometry.removeFromParent();
 
     body.remove(block);
+  }
+
+  private class IdSurfaceEdge
+  {
+    int id;
+    int surface;
+    int edge;
+
+    public IdSurfaceEdge(int ID, int surface, int edge)
+    {
+      this.id = ID;
+      this.surface = surface;
+      this.edge = edge;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+      if (this.id == ((IdSurfaceEdge) obj).getId() && this.surface == ((IdSurfaceEdge) obj).getSurface() && this.edge == ((IdSurfaceEdge) obj).getEdge())
+      {
+        return true;
+      }
+      else return false;
+    }
+
+    public int getId() { return id;}
+    public int getSurface() { return surface;}
+    public int getEdge() {return edge;}
+
+
+
+
   }
 
 }
