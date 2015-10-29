@@ -174,6 +174,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 //    ourCreature.placeOnGround();
 
     myCreature = new OurCreature(physicsSpace, rootNode, true);
+    //testOut();
     population = new ArrayList<>();
     population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
     myCreature.remove();
@@ -511,15 +512,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   //==========TESTING METHODS=================================================
 
   /**
-   * Test File output.
+   * Test File I/O.
    */
   private void testOut()
   {
-    DNA dna1 = myCreature.getDNA();
-    DNA dna2 = myCreature.getDNA();
-    System.out.println(dna1.equals(dna2));
-//    population.add(myCreature.getDNA());
-//    DNAio.writePopulation(population);
+    File f = new File("dna_out.txt");
+    ArrayList<DNA> testPop = new ArrayList<>();
+    DNAio.readPopulation(f, testPop);
+    myCreature = new OurCreature(physicsSpace, rootNode, testPop.get(0));
+    myCreature.placeOnGround();
   }
 
   public class FileConverter implements IStringConverter<File>

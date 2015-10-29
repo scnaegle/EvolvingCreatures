@@ -38,6 +38,7 @@ public class DNA implements Comparable
     blockDNAs = new BlockDNA[CreatureConstants.MAX_BLOCKS];
     output = new DNA[2];
     rand = new Random();
+    length = 0;
     tempVec3 = new Vector3f();
     fitness = 0;
   }
@@ -99,6 +100,16 @@ public class DNA implements Comparable
       c.populateVectorDNA(i, blockDNAs[i].sizeAndShape);
       blockDNAs[i].setAngles(c.getBlockAngles(i));
     }
+  }
+
+  /**
+   * Construct DNA of desired size (called from DNAio)
+   * @param size      value for numBlocks.
+   */
+  public DNA(int size)
+  {
+    this();
+    numBlocks = size;
   }
 
   /**
@@ -281,6 +292,23 @@ public class DNA implements Comparable
   }
 
   /**
+   * Alter angle array with primitive values
+   * @param x       float x angle
+   * @param y       float y angle
+   * @param z       float z angle
+   * @param id      block id
+   */
+  public void alterAngles(float x, float y, float z, int id)
+  {
+    if(validateBlockIndex(id))
+    {
+      blockDNAs[id].angles[0] = x;
+      blockDNAs[id].angles[1] = y;
+      blockDNAs[id].angles[2] = z;
+    }
+  }
+
+  /**
    * Alter one of a block's size and shape vectors.  Specified by BlockVector
    * enum.
    * @param newVector       new value for the vector.
@@ -292,6 +320,22 @@ public class DNA implements Comparable
     if(validateBlockIndex(id))
     {
       blockDNAs[id].sizeAndShape[type.ordinal()] = new Vector3f(newVector);
+    }
+  }
+
+  /**
+   * Alter vector with primitive values.
+   * @param x       float x value of vector.
+   * @param y       float y value of vector.
+   * @param z       float z value of vector.
+   * @param id      block id.
+   * @param type    Blockvector.ordinal()
+   */
+  public void alterVector(float x, float y, float z, int id, int type)
+  {
+    if(validateBlockIndex(id))
+    {
+      blockDNAs[id].sizeAndShape[type] = new Vector3f(x, y, z);
     }
   }
 
@@ -309,6 +353,19 @@ public class DNA implements Comparable
     {
       blockDNAs[blockID].neuronDNAs.get(neuronNum).inputTypes[inputNum] = type;
     }
+  }
+
+  /**
+   * Alter neuron's input type with primitive type.
+   * @param blockID       blockID
+   * @param neuronNum     what neuron
+   * @param inputNum      what position in the input type array
+   * @param type          new type.
+   */
+  public void alterNeuronInput(int blockID, int neuronNum, int inputNum,
+                               int type)
+  {
+    alterNeuronInput(blockID, neuronNum, inputNum, EnumNeuronInput.values()[type]);
   }
 
   /**
@@ -365,6 +422,22 @@ public class DNA implements Comparable
       length += blockDNAs[index].blockDNASize;
       calculateNumBlocks();
     }
+  }
+
+  /**
+   * Create new block with an id and parent id, to be used from a DNA file
+   * Scanner
+   * @param id        id of this block
+   * @param parent    id of parent block
+   */
+  public void addBlockToDNA(int id, int parent)
+  {
+    blockDNAs[id] = new BlockDNA(id, parent);
+  }
+
+  public void addNeuronToBlock(int blockID)
+  {
+    blockDNAs[blockID].addNeuronDNA();
   }
 
   /**
@@ -625,6 +698,7 @@ public class DNA implements Comparable
         sizeAndShape[i] = new Vector3f(0, 0, 0);
       }
       neuronDNAs = new ArrayList<>();
+      angles = new float[3];
     }
 
     /**
@@ -673,6 +747,13 @@ public class DNA implements Comparable
       }
     }
 
+    public BlockDNA(int id, int parent)
+    {
+      this();
+      blockID = id;
+      parentID = parent;
+    }
+
     /**
      * Crossover method to adjust joint A to correct placement.  This will alter
      * the jointA position (placement in relation to the parent block.
@@ -719,6 +800,14 @@ public class DNA implements Comparable
         }
         b.addNeuron(n);
       }
+    }
+
+    /**
+     * Add a neuron DNA to this block.
+     */
+    public void addNeuronDNA()
+    {
+      neuronDNAs.add(new NeuronDNA());
     }
 
 
