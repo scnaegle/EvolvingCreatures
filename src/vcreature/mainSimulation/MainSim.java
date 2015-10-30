@@ -238,6 +238,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     System.out.println("settings: " + settings);
   }
 
+  
+
   private void setCreatureConstants() {
     CreatureConstants.MAX_BLOCKS = max_num_blocks;
     CreatureConstants.MAX_POPULATION = starting_population_count;

@@ -60,8 +60,7 @@ public class RandCreature
     addedLocations = new ArrayList<>();
 
     //choose random number of blocks
-    //int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS-2)+2;
-    int blockNumber = 10;
+    int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS-2)+2;
 
     //make a random sized root
     makeRandomRoot();
@@ -203,6 +202,7 @@ public class RandCreature
 
     Vector3f rotationAxis = new Vector3f(0f,0f,0f);
     Vector3f trashAxis = new Vector3f(0f,0f,0f);
+
 
     childSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     childSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
@@ -1058,9 +1058,5 @@ public class RandCreature
     public int getSurface() { return surface;}
     public int getEdge() {return edge;}
 
-
-
-
   }
-
 }
