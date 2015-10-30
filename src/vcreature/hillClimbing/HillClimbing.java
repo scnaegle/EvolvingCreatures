@@ -8,7 +8,6 @@ import vcreature.phenotype.*;
 
 import java.util.ArrayList;
 import java.util.Random;
-//TODO: 1st move joint of BlockSize to be on edge to avoid large blocks causing weird movements
 /**
  * Created by zfalgout on 10/15/15.
  */
@@ -19,7 +18,7 @@ public class HillClimbing
   private float overallAvgFitness;
   private float previousOverallAvgFitness;
   private int nonFitnessIncreaseCount;
-  private final float POPULATION_STALL_DEVIATION = 1f;
+  private final float POPULATION_STALL_DEVIATION = 0.3f;
   private final int NEURON_COUNT = Neuron.TOTAL_INPUTS;
   private boolean mutationNeeded;
 
@@ -48,16 +47,16 @@ public class HillClimbing
     return fitness > previousDNA.getFitness();
   }
 
+
   /**
    * Mutates a block size by altering the dna
    * Will pick x,y, or z at random and pick a random
    * float change up to 1.0 to add to the selected direction
-   * @param dna DNA that is being mutated
+   * @param sampleDNA DNA that is being mutated
    * @param size original size of the block in the dna
    * @param targetID the ID of the block being mutated
-   * @return if new size is different from original size
    */
-  private void mutateBlockSize(DNA dna, Vector3f size, int targetID)
+  private void mutateBlockSize(DNA sampleDNA, Vector3f size, int targetID)
   {
     float x = 0;
     float y = 0;
@@ -70,7 +69,7 @@ public class HillClimbing
     boolean addOp = generator.nextInt(2) == 0;
     boolean sizeNot10 = size.getX() < CreatureConstants.MAX_BLOCK_SIZE && size.getY() < CreatureConstants.MAX_BLOCK_SIZE && size.getZ() < CreatureConstants.MAX_BLOCK_SIZE;
     boolean sizeNot1 = size.getX() > CreatureConstants.MIN_BLOCK_SIZE && size.getY() > CreatureConstants.MIN_BLOCK_SIZE && size.getZ() > CreatureConstants.MIN_BLOCK_SIZE;
-    //TODO: shift the joint to be at the edge again
+
     switch (generator.nextInt(3))
     {
       case(0):
@@ -108,7 +107,8 @@ public class HillClimbing
         break;
     }
     size.addLocal(x, y, z);
-    dna.alterVector(size, targetID, BlockVector.SIZE);
+    sampleDNA.alterVector(size, targetID, BlockVector.SIZE);
+    sampleDNA.alterJoints(targetID);
   }
 
 
@@ -153,7 +153,7 @@ public class HillClimbing
   {
     if(overallAvgFitness < previousOverallAvgFitness) nonFitnessIncreaseCount++;
     float deviation = overallAvgFitness - previousOverallAvgFitness;
-    if(nonFitnessIncreaseCount == 3 || Math.abs(deviation) < POPULATION_STALL_DEVIATION) mutationNeeded = true;
+    if(nonFitnessIncreaseCount == 5 || Math.abs(deviation) < POPULATION_STALL_DEVIATION) mutationNeeded = true;
   }
 
   /**
@@ -198,9 +198,10 @@ public class HillClimbing
       else
       {
         mutatedDNA = new DNA(previousDNA);
+        population.get(i).remove(dnaListSize-1);
         blockID = generator.nextInt(MAX_NUM_BLOCKS);
       }
-      //if(previousDNA != null) System.out.println("current fitness vs old fitness" + dna.getFitness() + " " + previousDNA.getFitness());
+
       mutationType = generator.nextInt(2);
 
       mutateBlock(dna, mutatedDNA, blockID, mutationType);

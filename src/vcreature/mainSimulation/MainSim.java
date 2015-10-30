@@ -363,7 +363,17 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
           current_creature_index = 0;
           population = hillClimbing.hillClimb();
+
           generation_count++;
+
+          if(hillClimbing.isMutationNeeded())
+          {
+            //TODO: GA here
+            //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
+            hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
+            generation_count = 0;
+          }
+
           startSimForCurrentCreature();
 
         }

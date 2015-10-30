@@ -340,6 +340,25 @@ public class DNA implements Comparable
   }
 
   /**
+   * Alters the joints of the block with the given id
+   * so the joints are corrected for any size changes
+   * of that block. Will also fix the joints of blocks
+   * that have ids greater than the given id.
+   * @param id of block that needs its joints altered
+   */
+  public void alterJoints(int id)
+  {
+    if(validateBlockIndex(id))
+    {
+      for(int i = id; i < getNumBlocks(); i++)
+      {
+        blockDNAs[i].alterJointA(this);//Maybe not needed??
+        blockDNAs[i].alterJointB(this);
+      }
+    }
+  }
+
+  /**
    * Alter neuron's input type.
    * @param blockID       blockID
    * @param neuronNum     what neuron
@@ -777,6 +796,22 @@ public class DNA implements Comparable
       }
     }
 
+    /**
+     * Adjusts joint B of the block to align after size has been mutated.
+     * @param dna containing the block whose B joint is being altered
+     */
+    public void alterJointB(DNA dna)
+    {
+      if(validateBlockIndex(blockID))
+      {
+        Vector3f thisJointB = sizeAndShape[BlockVector.JOINT_B.ordinal()];
+        Vector3f ourSize = dna.blockDNAs[blockID].sizeAndShape[BlockVector.SIZE.ordinal()];
+        tempVec3 = new Vector3f(getFloatSign(thisJointB.x),
+                getFloatSign(thisJointB.y),
+                getFloatSign(thisJointB.z));
+        sizeAndShape[BlockVector.JOINT_B.ordinal()] = ourSize.mult(tempVec3);
+      }
+    }
     /**
      * Get a copy of the creatures angle array.
      * @param angleArr        float array representing rotation quaternion.
