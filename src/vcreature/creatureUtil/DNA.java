@@ -222,6 +222,21 @@ public class DNA implements Comparable
   }
 
   /**
+   * Get a specific Neuron's constant value of the given block
+   * @param blockID ID of the block
+   * @param neuronNum which neuron
+   * @param constNum which neuron type's constant value
+   * @return the constant value of the neuron, -1 if not a valid neuron
+   */
+  public float getNeuronConstant(int blockID, int neuronNum, int constNum)
+  {
+    if(validateNeuronIndices(blockID, neuronNum, constNum))
+    {
+      return blockDNAs[blockID].neuronDNAs.get(neuronNum).constantValues[constNum];
+    }
+    return -1;
+  }
+  /**
    * Build creature with DNA.  Called from OurCreature constructor when a
    * creature is being built from DNA. What happens:
    * 1.) Call add root.

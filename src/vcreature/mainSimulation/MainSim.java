@@ -185,7 +185,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 //      creature.remove();
 //      //creature.removeAll();
 //    }
-    // Was failing to remove so commented out
+
     RandCreature creature;
     for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
       creature = new RandCreature(physicsSpace, rootNode, true);
@@ -429,7 +429,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     //   capture rate of the RED Camera used to shoot Lord of the Rings.
     settings.setVSync(true);
     settings.setFrequency((int) app.speed * 60);//Frames per second
-    settings.setTitle("Flappy Bird Creature");
+    settings.setTitle("Evolving Creatures");
 
     System.out.println("Starting App");
 
