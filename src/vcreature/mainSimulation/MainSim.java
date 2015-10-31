@@ -160,21 +160,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     Block.initStaticMaterials(assetManager);
 
-    //Test Crossover
-
-//    ourCreature = new OurCreature(physicsSpace, rootNode, true);
-//    testDNA = ourCreature.getDNA();
-//    DNA testDNA1 = new DNA(testDNA);
-//    ourCreature.remove();
-//    OurCreature otherCreature = new OurCreature(physicsSpace, rootNode, false);
-//    DNA testDNA2 = otherCreature.getDNA();
-//    otherCreature.remove();
-//    DNA[] crossed = testDNA1.singleCrossover(testDNA2);
-//    ourCreature = new OurCreature(physicsSpace, rootNode, crossed[1]);
-//    ourCreature.placeOnGround();
-
     myCreature = new OurCreature(physicsSpace, rootNode, true);
-    //testOut();
     population = new ArrayList<>();
     population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
     myCreature.remove();
@@ -193,6 +179,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       //creature.remove();
       creature.removeAll();
     }
+    //testOut();
     hillClimbing = new HillClimbing(population);
 
     startSimForCurrentCreature();
@@ -369,6 +356,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           if(hillClimbing.isMutationNeeded())
           {
             //TODO: GA here
+            trimPopulation();
             //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
             generation_count = 0;
@@ -378,6 +366,38 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
         }
       }
+    }
+  }
+
+  /**
+   * Throw out the not good dna from the population, then remake the population
+   * nested list with the best dna's from the hillclimb, sorted by fitness.
+   */
+  private void trimPopulation()
+  {
+    System.out.println("called trim");
+    ArrayList<DNA> newPop = new ArrayList<>();
+    DNA best;
+    //For each creature history
+    for(ArrayList<DNA> creature : population)
+    {
+      best = creature.get(0);
+      //Choose the best fit dna
+      for(DNA dna : creature)
+      {
+        if(dna.getFitness() >= best.getFitness())
+        {
+          best = dna;
+        }
+      }
+      //add to newpop
+      newPop.add(best);
+    }
+    newPop.sort(null); //sort by fitness
+    population = new ArrayList<>();
+    for(DNA dna : newPop)
+    {
+      population.add(new ArrayList<>(Arrays.asList(dna)));
     }
   }
 
@@ -529,10 +549,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private void testOut()
   {
     File f = new File("dna_out.txt");
-    ArrayList<DNA> testPop = new ArrayList<>();
-    DNAio.readPopulation(f, testPop);
-    myCreature = new OurCreature(physicsSpace, rootNode, testPop.get(0));
-    myCreature.placeOnGround();
+
+    DNAio.writePopulation(population);
+    population = new ArrayList<>();
+    DNAio.readPopulation(f, population);
+    System.out.println("Pop Size " + population.size());
   }
 
   public class FileConverter implements IStringConverter<File>
