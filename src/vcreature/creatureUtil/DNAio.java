@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -28,9 +29,8 @@ public class DNAio
     {
       dna = getBestGeneration(generations);
       outString.append(dna);
-      System.out.println(dna);
     }
-    System.out.println("outString" + outString);
+    //System.out.println("outString" + outString);
     try
     {
       FileWriter writer = new FileWriter(MainSim.output_file);
@@ -59,7 +59,7 @@ public class DNAio
    * @param f                 File input.
    * @param population        Population arraylist to fill.
    */
-  public static void readPopulation(File f, ArrayList<DNA> population)
+  public static void readPopulation(File f, ArrayList<ArrayList<DNA>> population)
   {
     try
     {
@@ -81,7 +81,7 @@ public class DNAio
    * @return
    * @throws IOException    IOExceptions handled in readPopulation
    */
-  private static boolean parseInput(File f, ArrayList<DNA> population) throws IOException
+  private static boolean parseInput(File f, ArrayList<ArrayList<DNA>> population) throws IOException
   {
     int numBlocks, numNeurons;
     int id, parentID, neuronInputType, neuronBlockID;
@@ -98,7 +98,7 @@ public class DNAio
         //for numblocks
         numBlocks = s.nextInt();
         DNA dnaIn = new DNA(numBlocks);
-        population.add(dnaIn);
+        population.add(new ArrayList<DNA>(Arrays.asList(dnaIn)));
 
         for (int i = 0; i < numBlocks; ++i)
         {
