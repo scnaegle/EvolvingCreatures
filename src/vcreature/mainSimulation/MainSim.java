@@ -169,13 +169,16 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     myCreature.remove();
 
 
-    RandCreature creature;
+    //RandCreature creature;
+    LegCreature creature;
     while(population.size() < CreatureConstants.MAX_POPULATION) {
-      creature = new RandCreature(physicsSpace, rootNode, true);
+      //creature = new RandCreature(physicsSpace, rootNode, true);
+      creature = new LegCreature(physicsSpace, rootNode);
       population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
       //creature.remove();
       creature.removeAll();
     }
+
     //testOut();
     hillClimbing = new HillClimbing(population);
 

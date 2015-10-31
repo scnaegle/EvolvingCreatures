@@ -26,21 +26,34 @@ import vcreature.phenotype.*;
 
 public class RandCreature
 {
-  private final PhysicsSpace physicsSpace;
-  private final Node jMonkeyRootNode;
+  public PhysicsSpace physicsSpace;
+  public Node jMonkeyRootNode;
   public ArrayList<Block> body = new ArrayList<>();
-  private ArrayList<Vector3f[]> blockProperties;
-  private ArrayList<float[]> blockAngles;
-  private float[] axisAligned = {0,0,0};
-  private static Random rand = new Random();
-  private Vector3f tmpVec3 = new Vector3f();
+  public ArrayList<Vector3f[]> blockProperties;
+  public ArrayList<float[]> blockAngles;
+  public float[] axisAligned = {0,0,0};
+  public static Random rand = new Random();
+  public Vector3f tmpVec3 = new Vector3f();
 
-  private ArrayList<IdSurfaceEdge> addedLocations;
+  public ArrayList<IdSurfaceEdge> addedLocations;
 
   private float elapsedSimulationTime;
 
+  public RandCreature()
+  {
+    physicsSpace = null;
+    jMonkeyRootNode = null;
+  }
+
+  public void setPhysicsAndRoot(PhysicsSpace physicsSpace, Node jMonkeyRootNode)
+  {
+    this.physicsSpace = physicsSpace;
+    this.jMonkeyRootNode = jMonkeyRootNode;
+  }
+
+
   /**
-   * Default constructor for a RandomCreature
+   * Constructor for a RandomCreature
    * @param physicsSpace physics space to simulate in
    * @param jMonkeyRootNode RootNode of physics space to build in
    */
@@ -67,7 +80,7 @@ public class RandCreature
 
     if (smartEdges)
     {
-      while (this.getNumberOfBodyBlocks() < blockNumber)
+      while (getNumberOfBodyBlocks() < blockNumber)
       {
         parentBlockID = rand.nextInt(getNumberOfBodyBlocks());
         parentBlockSurface = rand.nextInt(6);
@@ -85,7 +98,7 @@ public class RandCreature
     }
 
     else {
-      while (this.getNumberOfBodyBlocks() < blockNumber)
+      while (getNumberOfBodyBlocks() < blockNumber)
       {
         parentBlockID = rand.nextInt(getNumberOfBodyBlocks());
         parentBlockSurface = rand.nextInt(6);
@@ -132,7 +145,7 @@ public class RandCreature
    * Axis alligned
    * @return
    */
-  private Block makeRandomRoot()
+  public Block makeRandomRoot()
   {
     Vector3f rootCenter = new Vector3f(0f,0f,0f);
     Vector3f rootSize = new Vector3f(0f,0f,0f);
@@ -149,7 +162,7 @@ public class RandCreature
 
   /**
    * Method which tries to add a random block to the passed in parent
-   * Block will have random x,y,z values and a random number of neurons attached to it
+   * Block will have random x,y,z values and a random number of removes attached to it
    * Will be removed if collided with another block on spawn
    * @param parent Block to add to
    */
@@ -365,9 +378,9 @@ public class RandCreature
 
   /**
    * finds if the most recently added block is intersecting with another block other than its parent
-   * @return true if an instersection has occured, false if otherwise
+   * @return true if an intersection has happened, false if otherwise
    */
-  private boolean removeIfIntersection()
+  public boolean removeIfIntersection()
   {
     int newBlockID = getNumberOfBodyBlocks()-1;
     CollisionResults collisionResults = new CollisionResults();
@@ -801,7 +814,7 @@ public class RandCreature
    * @param bounds
    * @return float value of point on block surface
    */
-  private float randomSurfacePoint(float bounds)
+  public float randomSurfacePoint(float bounds)
   {
     int sign = rand.nextInt(2);
     int scale = (int) bounds;
@@ -820,7 +833,7 @@ public class RandCreature
    * remove a block from a creature
    * @param blockID ID of block to remove
    */
-  private void removeBlock(int blockID)
+  public void removeBlock(int blockID)
   {
     Block b = body.get(blockID);
     physicsSpace.remove(b.getPhysicsControl());
@@ -897,7 +910,7 @@ public class RandCreature
    * @param v         Vector type.
    * @return          Specified vector3f in blockProperties.
    */
-  private Vector3f getBlockVector(int id, BlockVector v)
+  public Vector3f getBlockVector(int id, BlockVector v)
   {
     return blockProperties.get(id)[v.ordinal()];
   }
@@ -912,7 +925,7 @@ public class RandCreature
    * @param size          block size
    * @return              Vector3f containing axis' that we need access to.
    */
-  private Vector3f[] makeBlockVectorArray(Vector3f center, Vector3f size)
+  public Vector3f[] makeBlockVectorArray(Vector3f center, Vector3f size)
   {
     Vector3f[] blockProperties = new Vector3f[6];
     blockProperties[BlockVector.CENTER.ordinal()] = center;
@@ -936,7 +949,7 @@ public class RandCreature
    * @param axisB
    * @return
    */
-  private Vector3f[] makeBlockVectorArray(Block b, Vector3f size, Vector3f axisA,
+  public Vector3f[] makeBlockVectorArray(Block b, Vector3f size, Vector3f axisA,
                                           Vector3f axisB)
   {
     Vector3f[] blockProperties = new Vector3f[6];
@@ -1031,7 +1044,7 @@ public class RandCreature
     body.remove(block);
   }
 
-  private class IdSurfaceEdge
+  public class IdSurfaceEdge
   {
     int id;
     int surface;
