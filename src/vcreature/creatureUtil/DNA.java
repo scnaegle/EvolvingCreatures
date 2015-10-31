@@ -718,7 +718,7 @@ public class DNA implements Comparable
     private Vector3f[] sizeAndShape;
     private float[] angles;
     private ArrayList<NeuronDNA> neuronDNAs;
-    private int blockDNASize = 7;
+    private int blockDNASize = CreatureConstants.BLOCK_DNA_BASE_SIZE;
 
     /**
      * Default constructor creates a blank block.
