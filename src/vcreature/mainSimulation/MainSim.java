@@ -160,20 +160,17 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     Block.initStaticMaterials(assetManager);
 
-    myCreature = new OurCreature(physicsSpace, rootNode, true);
+    myCreature = new OurCreature(physicsSpace, rootNode, false);
     population = new ArrayList<>();
     population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
     myCreature.remove();
-//    OurCreature creature;
-//    for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
-//      creature = new OurCreature(physicsSpace, rootNode,true);
-//      population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
-//      creature.remove();
-//      //creature.removeAll();
-//    }
+    myCreature = new OurCreature(physicsSpace, rootNode, true);
+    population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
+    myCreature.remove();
+
 
     RandCreature creature;
-    for(int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
+    while(population.size() < CreatureConstants.MAX_POPULATION) {
       creature = new RandCreature(physicsSpace, rootNode, true);
       population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
       //creature.remove();
