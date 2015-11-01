@@ -164,12 +164,13 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     Block.initStaticMaterials(assetManager);
 
+    population = new ArrayList<>();
     if (input_file != null)
     {
+      System.out.println("reading from file: " + input_file);
       DNAio.readPopulation(input_file, population);
     } else {
       myCreature = new OurCreature(physicsSpace, rootNode, false);
-      population = new ArrayList<>();
       population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
       myCreature.remove();
       myCreature = new OurCreature(physicsSpace, rootNode, true);
