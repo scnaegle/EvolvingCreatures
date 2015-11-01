@@ -356,7 +356,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           if(hillClimbing.isMutationNeeded())
           {
             //TODO: GA here
-            trimPopulation();
+            ArrayList<DNA> tempPop = trimPopulation();
+            listIntoPopulation(tempPop);
             //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
             generation_count = 0;
@@ -370,10 +371,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
   /**
-   * Throw out the not good dna from the population, then remake the population
-   * nested list with the best dna's from the hillclimb, sorted by fitness.
+   * Make and return a list of the best dna from the population
+   * @return        1D ArrayList of the best dna from the population
    */
-  private void trimPopulation()
+  private ArrayList<DNA> trimPopulation()
   {
     System.out.println("called trim");
     ArrayList<DNA> newPop = new ArrayList<>();
@@ -394,6 +395,16 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       newPop.add(best);
     }
     newPop.sort(null); //sort by fitness
+    return newPop;
+
+  }
+
+  /**
+   * Put a 1D arraylist of dna into a population array.
+   * @param newPop        1d array of DNA
+   */
+  private void listIntoPopulation(ArrayList<DNA> newPop)
+  {
     population = new ArrayList<>();
     for(DNA dna : newPop)
     {
