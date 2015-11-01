@@ -8,7 +8,6 @@
  import vcreature.creatureUtil.CreatureConstants;
  import vcreature.hillClimbing.HillClimbing;
  import vcreature.creatureUtil.*;
- import vcreature.phenotype.Creature;
  import vcreature.phenotype.OurCreature;
  import vcreature.phenotype.PhysicsConstants;
  import vcreature.phenotype.Block;
@@ -185,7 +184,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     //testOut();
     hillClimbing = new HillClimbing(population);
 
-    startSimForCurrentCreature();
+    startSimForCreature(current_creature_index);
 
     initLighting();
     initKeys();
@@ -203,10 +202,18 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
   }
 
-  private void startSimForCurrentCreature() {
-    myCreature = new OurCreature(physicsSpace, rootNode, Iterables.getLast(population.get(current_creature_index)));
-    myCreature.placeOnGround();
-    elapsedSimulationTime = 0.0f;
+  private void startSimForCreature(int creature_index) {
+    try
+    {
+      myCreature = new OurCreature(physicsSpace, rootNode, Iterables.getLast(population.get(creature_index)));
+      myCreature.placeOnGround();
+      elapsedSimulationTime = 0.0f;
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+      Iterables.getLast(population.get(creature_index)).storeFitness(0.0f);
+      creature_index++;
+      startSimForCreature(creature_index);
+    }
   }
 
   private void storeFitnessForCurrentCreature() {
@@ -305,6 +312,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   {
     if (isRunning)
     {
+      if (viewing_creature != -1 && viewing_creature >= 0 && viewing_creature < CreatureConstants.MAX_POPULATION) {
+        myCreature.remove();
+        startSimForCreature(viewing_creature);
+      }
       elapsedSimulationTime += deltaSeconds;
       //print("simpleUpdate() elapsedSimulationTime=", (float)elapsedSimulationTime);
       //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
@@ -334,27 +345,38 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
       if (elapsedSimulationTime > CreatureConstants.SIMULATION_TIME)
       {
-        System.out.println("current creature fitness: " + myCreature.getFitness());
-        storeFitnessForCurrentCreature();
-        myCreature.remove();
-        if (current_creature_index < CreatureConstants.MAX_POPULATION - 1) {
-          current_creature_index++;
-          startSimForCurrentCreature();
-        } else {
-          DNAio.writePopulation(population);
-
-          if (debug) {
-            // Show all fitnesses
-            System.out.println("All Fitnesses: ");
-            for (int i = 0; i < CreatureConstants.MAX_POPULATION; i++) {
-              System.out.format("%d: %f\n", i, Iterables.getLast(population.get(i)).getFitness());
-            }
+        if (viewing_creature != -1 && viewing_creature >= 0 && viewing_creature < CreatureConstants.MAX_POPULATION) {
+          myCreature.remove();
+          startSimForCreature(viewing_creature);
+        }
+        else
+        {
+          System.out.println("current creature fitness: " + myCreature.getFitness());
+          storeFitnessForCurrentCreature();
+          myCreature.remove();
+          if (current_creature_index < CreatureConstants.MAX_POPULATION - 1)
+          {
+            current_creature_index++;
+            startSimForCreature(current_creature_index);
           }
+          else
+          {
+            DNAio.writePopulation(population);
 
-          current_creature_index = 0;
-          population = hillClimbing.hillClimb();
+            if (debug)
+            {
+              // Show all fitnesses
+              System.out.println("All Fitnesses: ");
+              for (int i = 0; i < CreatureConstants.MAX_POPULATION; i++)
+              {
+                System.out.format("%d: %f\n", i, Iterables.getLast(population.get(i)).getFitness());
+              }
+            }
 
-          generation_count++;
+            current_creature_index = 0;
+            population = hillClimbing.hillClimb();
+
+            generation_count++;
 
           //TODO gencount > 10 in here to force crossover for testing
           if(hillClimbing.isMutationNeeded() || generation_count > 10)
@@ -370,9 +392,20 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
             generation_count = 0;
           }
+            if (hillClimbing.isMutationNeeded())
+            {
+              //TODO: GA here
+              ArrayList<DNA> tempPop = trimPopulation();
+              //TODO crossover goes here
+              listIntoPopulation(tempPop);
+              //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
+              hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
+              generation_count = 0;
+            }
 
-          startSimForCurrentCreature();
+            startSimForCreature(current_creature_index);
 
+          }
         }
       }
     }
@@ -549,7 +582,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
   public void setViewingCreature(int viewing_creature) {
+    System.out.println("Set the viewing creature...");
     this.viewing_creature = viewing_creature;
+    System.out.println("viewing creature: " + viewing_creature);
   }
 
   public void setSpeed(int speed) {
