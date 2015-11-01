@@ -164,12 +164,13 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     Block.initStaticMaterials(assetManager);
 
+    population = new ArrayList<>();
+
     if (input_file != null)
     {
       DNAio.readPopulation(input_file, population);
     } else {
       myCreature = new OurCreature(physicsSpace, rootNode, false);
-      population = new ArrayList<>();
       population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
       myCreature.remove();
       myCreature = new OurCreature(physicsSpace, rootNode, true);
@@ -639,10 +640,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private void testOut()
   {
     File f = new File("dna_out.txt");
-
     DNAio.writePopulation(population);
     population = new ArrayList<>();
-    DNAio.readPopulation(f, population);
+    File g = new File("dna_out.txt");
+    DNAio.readPopulation(g, population);
     System.out.println("Pop Size " + population.size());
   }
 
