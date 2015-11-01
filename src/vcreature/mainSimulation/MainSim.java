@@ -165,6 +165,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     Block.initStaticMaterials(assetManager);
 
     population = new ArrayList<>();
+
     if (input_file != null)
     {
       System.out.println("reading from file: " + input_file);
@@ -640,10 +641,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private void testOut()
   {
     File f = new File("dna_out.txt");
-
     DNAio.writePopulation(population);
     population = new ArrayList<>();
-    DNAio.readPopulation(f, population);
+    File g = new File("dna_out.txt");
+    DNAio.readPopulation(g, population);
     System.out.println("Pop Size " + population.size());
   }
 
