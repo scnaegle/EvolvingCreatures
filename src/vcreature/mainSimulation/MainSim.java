@@ -2,8 +2,10 @@
 
  import com.beust.jcommander.IStringConverter;
  import com.beust.jcommander.JCommander;
+ import com.beust.jcommander.converters.FileConverter;
  import com.google.common.collect.Iterables;
  import com.jme3.system.JmeContext;
+ import com.sun.org.apache.xpath.internal.SourceTree;
  import de.lessvoid.nifty.elements.render.TextRenderer;
  import vcreature.creatureUtil.CreatureConstants;
  import vcreature.hillClimbing.HillClimbing;
@@ -162,23 +164,29 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     Block.initStaticMaterials(assetManager);
 
-    myCreature = new OurCreature(physicsSpace, rootNode, false);
-    population = new ArrayList<>();
-    population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
-    myCreature.remove();
-    myCreature = new OurCreature(physicsSpace, rootNode, true);
-    population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
-    myCreature.remove();
+    if (input_file != null)
+    {
+      DNAio.readPopulation(input_file, population);
+    } else {
+      myCreature = new OurCreature(physicsSpace, rootNode, false);
+      population = new ArrayList<>();
+      population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
+      myCreature.remove();
+      myCreature = new OurCreature(physicsSpace, rootNode, true);
+      population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
+      myCreature.remove();
 
 
-    //RandCreature creature;
-    LegCreature creature;
-    while(population.size() < CreatureConstants.MAX_POPULATION) {
-      //creature = new RandCreature(physicsSpace, rootNode, true);
-      creature = new LegCreature(physicsSpace, rootNode);
-      population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
-      //creature.remove();
-      creature.removeAll();
+      //RandCreature creature;
+      LegCreature creature;
+      while (population.size() < CreatureConstants.MAX_POPULATION)
+      {
+        //creature = new RandCreature(physicsSpace, rootNode, true);
+        creature = new LegCreature(physicsSpace, rootNode);
+        population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
+        //creature.remove();
+        creature.removeAll();
+      }
     }
 
     //testOut();
@@ -638,12 +646,4 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     System.out.println("Pop Size " + population.size());
   }
 
-  public class FileConverter implements IStringConverter<File>
-  {
-    @Override
-    public File convert(String value)
-    {
-      return new File(value);
-    }
-  }
 }
