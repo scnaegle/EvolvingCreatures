@@ -116,7 +116,7 @@ public class NiftySelectController implements ScreenController
     this.viewing_creature = selection;
   }
 
-  @NiftyEventSubscriber(id = "doneButton")
+  @NiftyEventSubscriber(id = "submitButton")
   public void onDoneButtonClicked(final String id, final ButtonClickedEvent event) {
     app.setViewingCreature(viewing_creature);
   }
