@@ -357,6 +357,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           {
             //TODO: GA here
             ArrayList<DNA> tempPop = trimPopulation();
+            //TODO crossover goes here
             listIntoPopulation(tempPop);
             //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
