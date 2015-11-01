@@ -69,7 +69,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   public static int viewing_thread = 1;
 
   @Parameter(names = "--population-count", description = "Starting number of Genomes in the population")
-  int starting_population_count = 100;
+  int starting_population_count = 10;
 
   @Parameter(names = "--max-num-blocks", description = "Maximum number of blocks for a creature")
   int max_num_blocks = 10;
@@ -113,6 +113,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private Nifty nifty;
 
   private boolean isRunning = true;
+  //TODO will perform crossover if this is true.  Need a command line arg to set
+  //if we're doing just hill climb.
+  private boolean doingCrossover = true;
 
 
   @Override
@@ -353,11 +356,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
           generation_count++;
 
-          if(hillClimbing.isMutationNeeded())
+          //TODO gencount > 10 in here to force crossover for testing
+          if(hillClimbing.isMutationNeeded() || generation_count > 10)
           {
-            //TODO: GA here
+            //TODO GA here
             ArrayList<DNA> tempPop = trimPopulation();
-            //TODO crossover goes here
+            if(doingCrossover)
+            {
+              performCrossover(tempPop);
+            }
             listIntoPopulation(tempPop);
             //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
@@ -411,6 +418,34 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     {
       population.add(new ArrayList<>(Arrays.asList(dna)));
     }
+  }
+
+  /**
+   * Go through 1d array of population and perform crossovers.
+   * @param population        1d array of DNAs
+   */
+  private void performCrossover(ArrayList<DNA> population)
+  {
+    int size = population.size();
+    int count = 0;
+    DNA workingDNA;
+    DNA[] children;
+    //if haven't crossed over entire population and population isn't empty
+    while(count < size && !population.isEmpty())
+    {
+      //if there are at least 2 DNAs in population pull the first two and cross
+      //here for safety.
+      if(population.size() >= 2)
+      {
+        workingDNA = population.remove(0);
+        children = workingDNA.singleCrossover(population.remove(0));
+        population.add(children[0]);
+        population.add(children[1]);
+        count += 2;
+      }
+    }
+    System.out.println("CROSSOVER " +  population.size());
+    population.sort(null);
   }
 
 
