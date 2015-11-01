@@ -200,9 +200,17 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
   private void startSimForCreature(int creature_index) {
-    myCreature = new OurCreature(physicsSpace, rootNode, Iterables.getLast(population.get(creature_index)));
-    myCreature.placeOnGround();
-    elapsedSimulationTime = 0.0f;
+    try
+    {
+      myCreature = new OurCreature(physicsSpace, rootNode, Iterables.getLast(population.get(creature_index)));
+      myCreature.placeOnGround();
+      elapsedSimulationTime = 0.0f;
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+      Iterables.getLast(population.get(creature_index)).storeFitness(0.0f);
+      creature_index++;
+      startSimForCreature(creature_index);
+    }
   }
 
   private void storeFitnessForCurrentCreature() {
