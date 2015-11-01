@@ -334,7 +334,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         System.out.println("current creature fitness: " + myCreature.getFitness());
         storeFitnessForCurrentCreature();
         myCreature.remove();
-        if (current_creature_index < CreatureConstants.MAX_POPULATION) {
+        if (current_creature_index < CreatureConstants.MAX_POPULATION - 1) {
           current_creature_index++;
           startSimForCurrentCreature();
         } else {
