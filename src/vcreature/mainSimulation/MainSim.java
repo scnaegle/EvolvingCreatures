@@ -402,7 +402,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             ArrayList<DNA> tempPop = trimPopulation();
             cullLeastFit(tempPop);
             Collections.sort(tempPop);
-            System.out.println("fit 0 = " + tempPop.get(0).getFitness() + " fit last = " + tempPop.get(tempPop.size() - 1).getFitness());
+            //System.out.println("fit 0 = " + tempPop.get(0).getFitness() + " fit last = " + tempPop.get(tempPop.size() - 1).getFitness());
             if(doingCrossover)
             {
               performCrossover(tempPop);
