@@ -22,7 +22,9 @@
                      <!--forceSelection="true"/>-->
 
             <control name="label" text="Pick Creature to View:" align="center" valign="top" />
-            <control id="creatureViewField" width="90%" align="center" name="textfield" />
+            <control id="creatureViewSelectionBox" width = "90%" align="center" name="dropDown" vertical="optional"
+                     horizontal="optional" displayItems="10" selectionMode="Single" />
+            <!--<control id="creatureViewField" width="90%" align="center" name="textfield" />-->
 
             <!--<control name="label" text="Max Number of Blocks:" align="center" valign="top" />-->
             <!--<control id="maxNumBlocksField" width="90%" align="center" name="textfield" />-->
@@ -30,7 +32,7 @@
             <!--<control name="label" text="Max Population Count:" align="center" valign="top" />-->
             <!--<control id="maxPopulationField" width="90%" align="center" name="textfield" />-->
 
-            <control name="button" label="View Creature" id="submitButton" align="center"/>
+            <!--<control name="button" label="View Creature" id="submitButton" align="center"/>-->
             <!--<control name="button" label="Continue with GA" id="ContinueButton" align="right" />-->
           </panel>
           <panel id="prev_next_buttons" width="100%" height="50%" valign="bottom" childLayout="horizontal">
@@ -39,6 +41,8 @@
           </panel>
         </panel>
         <panel id="fitness_params" width="100%" height="50%" childLayout="vertical" backgroundColor="#00f8">
+          <text text="Crossover Count: 0" id="crossover_text" font="Interface/Fonts/Default.fnt" width="100%" align="left" />
+          <text text="Total Generations: 0" id="total_generation_text" font="Interface/Fonts/Default.fnt" width="100%" align="left" />
           <text text="Generation: 0" id="generation_text" font="Interface/Fonts/Default.fnt" width="100%" align="left" />
           <text text="Creature id: 0" id="creature_id_text" font="Interface/Fonts/Default.fnt" width="100%" align="left" />
           <text text="Fitness: 0.0" id="fitness_text" font="Interface/Fonts/Default.fnt" width="100%" align="left"/>
