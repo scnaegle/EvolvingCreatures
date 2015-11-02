@@ -37,6 +37,7 @@
  import java.io.File;
  import java.util.ArrayList;
  import java.util.Arrays;
+ import java.util.Collections;
  import java.util.List;
 
 //Added 10/14/2015 justin thomas
@@ -400,7 +401,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             //TODO GA here
             ArrayList<DNA> tempPop = trimPopulation();
             cullLeastFit(tempPop);
-            //System.out.println("fit 0 = " + tempPop.get(0).getFitness() + " fit last = " + tempPop.get(tempPop.size() - 1).getFitness());
+            Collections.sort(tempPop);
+            System.out.println("fit 0 = " + tempPop.get(0).getFitness() + " fit last = " + tempPop.get(tempPop.size() - 1).getFitness());
             if(doingCrossover)
             {
               performCrossover(tempPop);
@@ -410,17 +412,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
             generation_count = 0;
           }
-            /*if (hillClimbing.isMutationNeeded())
-            {
-              //TODO: GA here
-              ArrayList<DNA> tempPop = trimPopulation();
-              //TODO crossover goes here
-              listIntoPopulation(tempPop);
-              //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
-              hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
-              generation_count = 0;
-            }*/
-
             startSimForCreature(current_creature_index);
 
           }
@@ -435,7 +426,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    */
   private ArrayList<DNA> trimPopulation()
   {
-    System.out.println("called trim");
+    //System.out.println("called trim");
     ArrayList<DNA> newPop = new ArrayList<>();
     DNA best;
     //For each creature history
@@ -453,7 +444,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       //add to newpop
       newPop.add(best);
     }
-    newPop.sort(null); //sort by fitness
+    //newPop.sort(null); //sort by fitness
     return newPop;
   }
 
@@ -469,7 +460,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     {
       numToCull = 1;
     }
-    System.out.println("Culling " + numToCull);
+    //System.out.println("Culling " + numToCull);
     for(int i = 0; i < numToCull; ++i)
     {
       if(!population.isEmpty())
@@ -521,7 +512,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         count += 2;
       }
     }
-    System.out.println("CROSSOVER " +  population.size());
+    //System.out.println("CROSSOVER " +  population.size());
     population.sort(null);
   }
 

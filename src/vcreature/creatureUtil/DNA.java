@@ -519,6 +519,7 @@ public class DNA implements Comparable
    *                    0 if this fitness is equal to other.
    *                    1 if this fitness is greater than other.
    */
+  @Override
   public int compareTo(Object other)
   {
     DNA o = (DNA)other;
