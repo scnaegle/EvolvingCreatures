@@ -389,12 +389,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           {
             //TODO GA here
             ArrayList<DNA> tempPop = trimPopulation();
-            Collections.sort(tempPop);
-            cullLeastFit(tempPop);
+
             //System.out.println("fit 0 = " + tempPop.get(0).getFitness() + " fit last = " + tempPop.get(tempPop.size() - 1).getFitness());
-            if(doingCrossover)
+            if(doingCrossover)// && if doing cullPopulationSelection
             {
-              performCrossover(tempPop);
+              cullPopulationSelection(tempPop);
             }
             listIntoPopulation(tempPop);
             //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
@@ -407,6 +406,13 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         }
       }
     }
+  }
+
+  private void cullPopulationSelection(ArrayList<DNA> tempPop)
+  {
+    Collections.sort(tempPop);
+    cullLeastFit(tempPop);
+    performCrossover(tempPop);
   }
 
   /**
