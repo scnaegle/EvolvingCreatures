@@ -35,10 +35,7 @@
  import com.jme3.system.AppSettings;
 
  import java.io.File;
- import java.util.ArrayList;
- import java.util.Arrays;
- import java.util.Collections;
- import java.util.List;
+ import java.util.*;
 
 //Added 10/14/2015 justin thomas
  import com.jme3.niftygui.NiftyJmeDisplay;
@@ -390,10 +387,15 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             //TODO GA here
             ArrayList<DNA> tempPop = trimPopulation();
 
-            //System.out.println("fit 0 = " + tempPop.get(0).getFitness() + " fit last = " + tempPop.get(tempPop.size() - 1).getFitness());
+            /*
             if(doingCrossover)// && if doing cullPopulationSelection
             {
               cullPopulationSelection(tempPop);
+            }
+            */
+            if(doingCrossover)//&& if doing tournamentSelection
+            {
+              tempPop = tournamentSelection(tempPop);
             }
             listIntoPopulation(tempPop);
             //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
@@ -408,6 +410,43 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
   }
 
+  /**
+   * Tournament Selection crossover.  Select two creatures at random from the
+   * population.  perform crossover. put into new list. return list to make
+   * new population from
+   * @param tempPop       1d list of the population
+   * @return              new population of crossovered dnas.
+   */
+  private ArrayList<DNA> tournamentSelection(ArrayList<DNA> tempPop)
+  {
+    Random rand = new Random();
+    int size = tempPop.size();
+    int index1, index2;
+    DNA dna1, dna2;
+    DNA fit1, fit2;
+    DNA[] children;
+    ArrayList<DNA> newPop = new ArrayList<>();
+    while(newPop.size() < CreatureConstants.MAX_BLOCKS)
+    {
+      index1 = rand.nextInt(size);
+      index2 = rand.nextInt(size);
+      while(index1 == index2)
+      {
+        index2 = rand.nextInt(size);
+      }
+      dna1 = tempPop.get(index1);
+      dna2 = tempPop.get(index2);
+      fit1 = dna1.getFitness() > dna2.getFitness() ? dna1 : dna2;
+      dna1 = tempPop.get(rand.nextInt(size));
+      dna2 = tempPop.get(rand.nextInt(size));
+      fit2 = dna1.getFitness() > dna2.getFitness() ? dna1 : dna2;
+      children = fit1.singleCrossover(fit2);
+      newPop.add(children[0]);
+      newPop.add(children[1]);
+    }
+    return newPop;
+  }
+
   private void cullPopulationSelection(ArrayList<DNA> tempPop)
   {
     Collections.sort(tempPop);
@@ -416,7 +455,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
   /**
-   * Make and return a list of the best dna from the population
+   * Make and return a list of the best dna from the population.  Gets the best
+   * generation version for each DNA in the population.
    * @return        1D ArrayList of the best dna from the population
    */
   private ArrayList<DNA> trimPopulation()
