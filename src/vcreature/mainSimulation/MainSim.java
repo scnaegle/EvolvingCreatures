@@ -58,9 +58,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = {"-h", "--help"}, description = "Shows the help text", help = true)
   private boolean help;
 
-  @Parameter(names = { "--log", "--verbose" }, description = "Level of verbosity")
-  public static Integer verbose = 1;
-
   @Parameter(names = "--headless", description = "If this flag is present then it will Run the GA in headless mode with no GUI")
   boolean headless = false;
 
@@ -78,12 +75,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
   @Parameter(names = "--speed", description = "Set the speed of the simulation")
   int sim_speed = 1;
-
-  @Parameter(names = "--output-frequency", description = "Defines how often we dump the Genomes to a log defined by number of seconds.")
-  public static int output_frequency = 300;
-
-  @Parameter(names = "--keep-history", description = "Defines how many number of the history iterations you want to keep. This helps limit the storage memory this is being used.")
-  public static int keep_history = 10;
 
   @Parameter(names = "--output", description = "File that you woud like to output to", converter = FileConverter.class)
   public static File output_file = new File("dna_out.txt");
@@ -238,14 +229,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
   private void showSettings() {
-    System.out.println("verbose: " + verbose);
     System.out.println("headless: " + headless);
     System.out.println("speed: " + speed);
     System.out.println("thread_count: " + thread_count);
     System.out.println("viewing_thread: " + viewing_thread);
     System.out.println("starting_population_count: " + starting_population_count);
     System.out.println("max number of blocks:" + max_num_blocks);
-    System.out.println("output frequency: " + output_frequency);
     System.out.println("output file: " + output_file);
     System.out.println("input: " + input_file);
     System.out.println("debug: " + debug);
