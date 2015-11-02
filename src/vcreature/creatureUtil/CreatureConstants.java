@@ -14,4 +14,5 @@ public class CreatureConstants {
   public static final int MAX_NEURON_SECONDS = 9;
   public static final int SIMULATION_TIME = 10;
   public static final int MAX_NEURON_PER_BLOCK = 3;
+  public static final float CULL_PERCENT = 0.2f;
 }

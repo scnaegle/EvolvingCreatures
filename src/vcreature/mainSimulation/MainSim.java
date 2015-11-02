@@ -392,6 +392,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           {
             //TODO GA here
             ArrayList<DNA> tempPop = trimPopulation();
+            cullLeastFit(tempPop);
+            //System.out.println("fit 0 = " + tempPop.get(0).getFitness() + " fit last = " + tempPop.get(tempPop.size() - 1).getFitness());
             if(doingCrossover)
             {
               performCrossover(tempPop);
@@ -401,7 +403,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
             generation_count = 0;
           }
-            if (hillClimbing.isMutationNeeded())
+            /*if (hillClimbing.isMutationNeeded())
             {
               //TODO: GA here
               ArrayList<DNA> tempPop = trimPopulation();
@@ -410,7 +412,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
               //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
               hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
               generation_count = 0;
-            }
+            }*/
 
             startSimForCreature(current_creature_index);
 
@@ -446,9 +448,35 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
     newPop.sort(null); //sort by fitness
     return newPop;
-
   }
 
+  /**
+   * Cull the least fit members of the population and replace with a random
+   * @param population        1d population array.
+   */
+  private void cullLeastFit(ArrayList<DNA> population)
+  {
+    LegCreature creature;
+    int numToCull = (int)(CreatureConstants.MAX_POPULATION * CreatureConstants.CULL_PERCENT);
+    if(numToCull < 1)
+    {
+      numToCull = 1;
+    }
+    System.out.println("Culling " + numToCull);
+    for(int i = 0; i < numToCull; ++i)
+    {
+      if(!population.isEmpty())
+      {
+        population.remove(0);
+      }
+    }
+    while(population.size() < CreatureConstants.MAX_POPULATION)
+    {
+      creature = new LegCreature(physicsSpace, rootNode);
+      population.add(creature.getDNA());
+      creature.remove();
+    }
+  }
   /**
    * Put a 1D arraylist of dna into a population array.
    * @param newPop        1d array of DNA
