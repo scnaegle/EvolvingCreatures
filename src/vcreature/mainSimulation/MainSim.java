@@ -99,7 +99,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private ArrayList<ArrayList<DNA>> population;
   private HillClimbing hillClimbing;
   private int current_creature_index = 0;
+  private int crossover_count = 0;
+  private int generation_total_count = 0;
   private int generation_count = 0;
+  private boolean view_specific_creature = false;
   private int viewing_creature = -1;
   private int currently_displayed_creature = 0;
 
@@ -318,10 +321,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   {
     if (isRunning)
     {
-      if (viewing_creature != -1 && viewing_creature >= 0 && viewing_creature < CreatureConstants.MAX_POPULATION) {
-        myCreature.remove();
-        startSimForCreature(viewing_creature);
-      }
       elapsedSimulationTime += deltaSeconds;
       //print("simpleUpdate() elapsedSimulationTime=", (float)elapsedSimulationTime);
       //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
@@ -351,8 +350,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
       if (elapsedSimulationTime > CreatureConstants.SIMULATION_TIME)
       {
-        if (viewing_creature != -1 && viewing_creature >= 0 && viewing_creature < CreatureConstants.MAX_POPULATION) {
-          myCreature.remove();
+        if (view_specific_creature) {
           startSimForCreature(viewing_creature);
         }
         else
@@ -382,6 +380,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             current_creature_index = 0;
             population = hillClimbing.hillClimb();
 
+            generation_total_count++;
             generation_count++;
 
           //TODO gencount > 10 in here to force crossover for testing
@@ -400,6 +399,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
             generation_count = 0;
+            crossover_count++;
           }
             startSimForCreature(current_creature_index);
 
@@ -509,6 +509,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private void updateGUIText() {
     de.lessvoid.nifty.elements.Element nifty_element;
 
+    nifty_element = nifty.getCurrentScreen().findElementByName("crossover_text");
+    nifty_element.getRenderer(TextRenderer.class).setText("Crossover Count: " + crossover_count);
+
+    nifty_element = nifty.getCurrentScreen().findElementByName("total_generation_text");
+    nifty_element.getRenderer(TextRenderer.class).setText("Total Generations: " + generation_total_count);
+
     nifty_element = nifty.getCurrentScreen().findElementByName("generation_text");
     nifty_element.getRenderer(TextRenderer.class).setText("Generation: " + generation_count);
 
@@ -607,7 +613,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
   public void setViewingCreature(int viewing_creature) {
     System.out.println("Set the viewing creature...");
-    this.viewing_creature = viewing_creature;
+    if (viewing_creature != -1 && viewing_creature >= 0 && viewing_creature < CreatureConstants.MAX_POPULATION) {
+      this.view_specific_creature = true;
+      this.viewing_creature = viewing_creature;
+      startSimForCreature(viewing_creature);
+    } else {
+      this.view_specific_creature = false;
+      startSimForCreature(current_creature_index);
+    }
     System.out.println("viewing creature: " + viewing_creature);
   }
 

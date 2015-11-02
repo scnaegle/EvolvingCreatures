@@ -5,6 +5,7 @@ import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.*;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
+import vcreature.creatureUtil.CreatureConstants;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -52,6 +53,12 @@ public class NiftySelectController implements ScreenController
 
     TextField creature_view_field = screen.findNiftyControl("creatureViewField", TextField.class);
     creature_view_field.setText("");
+
+    DropDown creature_view_box = screen.findNiftyControl("creatureViewSelectionBox", DropDown.class);
+    creature_view_box.addItem("Run GA");
+    for(int i = 0; i <= CreatureConstants.MAX_POPULATION; i++) {
+      creature_view_box.addItem(i);
+    }
   }
 
   @NiftyEventSubscriber(id = "threadCountSelectionBox")
@@ -114,6 +121,22 @@ public class NiftySelectController implements ScreenController
       System.out.println("creature view: " + selection);
     }
     this.viewing_creature = selection;
+  }
+
+  @NiftyEventSubscriber(id = "creatureViewSelectionBox")
+  public void onCreatureSelectBoxChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
+    Object selection = event.getSelection();
+    if (app.debug) {
+      System.out.println("selection class: " + selection.getClass());
+      System.out.println("creature view: " + selection);
+    }
+    int creature_index = 0;
+    if (selection.equals("Run GA")) {
+      creature_index = -1;
+    } else {
+      creature_index = (int)selection;
+    }
+    app.setViewingCreature(creature_index);
   }
 
   @NiftyEventSubscriber(id = "submitButton")
