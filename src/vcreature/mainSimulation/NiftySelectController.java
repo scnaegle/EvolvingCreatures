@@ -121,6 +121,16 @@ public class NiftySelectController implements ScreenController
     app.setViewingCreature(viewing_creature);
   }
 
+  @NiftyEventSubscriber(id = "prevButton")
+  public void onPrevButtonClicked(final String id, final ButtonClickedEvent event) {
+    app.showPreviousCreature();
+  }
+
+  @NiftyEventSubscriber(id = "nextButton")
+  public void onNextButtonClicked(final String id, final ButtonClickedEvent event) {
+    app.showNextCreature();
+  }
+
   @Override
   public void onStartScreen()
   {

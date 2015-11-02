@@ -8,29 +8,35 @@
     <layer id="foreground" backgroundColor="#0000" childLayout="horizontal">
       <panel id="left_side" width="20%" height="100%" childLayout="vertical" backgroundColor="#00f8">
         <panel id="info_panel" width="100%" height="50%" childLayout="vertical" backgroundColor="#00f8" style="padding: 5px;">
-          <text text="GUI Settings" font="Interface/Fonts/Default.fnt" width="100%" valign="top" style="top:0px"/>
+          <panel width="100%" height="50%" childLayout="vertical">
+            <text text="GUI Settings" font="Interface/Fonts/Default.fnt" width="100%" valign="top" style="top:0px"/>
 
-          <!--<control name="label" text="Select number of threads:" align="center" valign="top"/>-->
-          <!--<control id="threadCountSelectionBox" width="90%" align="center" valign="center" name="dropDown"-->
-                   <!--vertical="optional" horizontal="optional" displayItems="6" selectionMode="Single"-->
-                   <!--forceSelection="true"/>-->
+            <!--<control name="label" text="Select number of threads:" align="center" valign="top"/>-->
+            <!--<control id="threadCountSelectionBox" width="90%" align="center" valign="center" name="dropDown"-->
+                     <!--vertical="optional" horizontal="optional" displayItems="6" selectionMode="Single"-->
+                     <!--forceSelection="true"/>-->
 
-          <!--<control name="label" text="Select thread to view:" align="center" valign="top"/>-->
-          <!--<control id="threadViewSelectionBox" width="90%" align="center" valign="center" name="dropDown"-->
-                   <!--vertical="optional" horizontal="optional" displayItems="6" selectionMode="Single"-->
-                   <!--forceSelection="true"/>-->
+            <!--<control name="label" text="Select thread to view:" align="center" valign="top"/>-->
+            <!--<control id="threadViewSelectionBox" width="90%" align="center" valign="center" name="dropDown"-->
+                     <!--vertical="optional" horizontal="optional" displayItems="6" selectionMode="Single"-->
+                     <!--forceSelection="true"/>-->
 
-          <control name="label" text="Pick Creature to View:" align="center" valign="top" />
-          <control id="creatureViewField" width="90%" align="center" name="textfield" />
+            <control name="label" text="Pick Creature to View:" align="center" valign="top" />
+            <control id="creatureViewField" width="90%" align="center" name="textfield" />
 
-          <!--<control name="label" text="Max Number of Blocks:" align="center" valign="top" />-->
-          <!--<control id="maxNumBlocksField" width="90%" align="center" name="textfield" />-->
+            <!--<control name="label" text="Max Number of Blocks:" align="center" valign="top" />-->
+            <!--<control id="maxNumBlocksField" width="90%" align="center" name="textfield" />-->
 
-          <!--<control name="label" text="Max Population Count:" align="center" valign="top" />-->
-          <!--<control id="maxPopulationField" width="90%" align="center" name="textfield" />-->
+            <!--<control name="label" text="Max Population Count:" align="center" valign="top" />-->
+            <!--<control id="maxPopulationField" width="90%" align="center" name="textfield" />-->
 
-          <control name="button" label="View Creature" id="submitButton" align="center"/>
-          <!--<control name="button" label="Continue with GA" id="ContinueButton" align="right" />-->
+            <control name="button" label="View Creature" id="submitButton" align="center"/>
+            <!--<control name="button" label="Continue with GA" id="ContinueButton" align="right" />-->
+          </panel>
+          <panel id="prev_next_buttons" width="100%" height="50%" valign="bottom" childLayout="horizontal">
+            <control name="button" label="Prev Creature" id="prevButton" align="left"/>
+            <control name="button" label="Next Creature" id="nextButton" align="right"/>
+          </panel>
         </panel>
         <panel id="fitness_params" width="100%" height="50%" childLayout="vertical" backgroundColor="#00f8">
           <text text="Generation: 0" id="generation_text" font="Interface/Fonts/Default.fnt" width="100%" align="left" />

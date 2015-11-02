@@ -109,6 +109,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private int current_creature_index = 0;
   private int generation_count = 0;
   private int viewing_creature = -1;
+  private int currently_displayed_creature = 0;
 
   //Nifty gui
   private Nifty nifty;
@@ -168,7 +169,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     if (input_file != null)
     {
+      System.out.println("reading from file: " + input_file);
       DNAio.readPopulation(input_file, population);
+      System.out.println("read in " + population.size() + " creatures");
     } else {
       myCreature = new OurCreature(physicsSpace, rootNode, false);
       population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
@@ -212,8 +215,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
   private void startSimForCreature(int creature_index) {
+    currently_displayed_creature = creature_index;
     try
     {
+      if (myCreature != null) {
+        myCreature.remove();
+      }
       myCreature = new OurCreature(physicsSpace, rootNode, Iterables.getLast(population.get(creature_index)));
       myCreature.placeOnGround();
       elapsedSimulationTime = 0.0f;
@@ -526,7 +533,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     nifty_element.getRenderer(TextRenderer.class).setText("Generation: " + generation_count);
 
     nifty_element = nifty.getCurrentScreen().findElementByName("creature_id_text");
-    nifty_element.getRenderer(TextRenderer.class).setText("Creature id: " + current_creature_index);
+    nifty_element.getRenderer(TextRenderer.class).setText("Creature id: " + currently_displayed_creature);
 
     nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
     nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
@@ -622,6 +629,18 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     System.out.println("Set the viewing creature...");
     this.viewing_creature = viewing_creature;
     System.out.println("viewing creature: " + viewing_creature);
+  }
+
+  public void showPreviousCreature() {
+    System.out.println("showing previous creature...");
+    if(current_creature_index > 0) current_creature_index--;
+    startSimForCreature(current_creature_index);
+  }
+
+  public void showNextCreature() {
+    System.out.println("showing next creature...");
+    if(current_creature_index < CreatureConstants.MAX_POPULATION) current_creature_index++;
+    startSimForCreature(current_creature_index);
   }
 
   public void setSpeed(int speed) {
