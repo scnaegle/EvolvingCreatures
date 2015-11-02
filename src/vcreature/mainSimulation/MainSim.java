@@ -73,6 +73,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--speed", description = "Set the speed of the simulation")
   int sim_speed = 1;
 
+  @Parameter(names = "--tournament-selection", description = "Set the crossover selection to tournament selection instead of culling selection")
+  boolean tournament_selection = false;
+
   @Parameter(names = "--output", description = "File that you woud like to output to", converter = FileConverter.class)
   public static File output_file = new File("dna_out.txt");
 
