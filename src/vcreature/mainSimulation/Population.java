@@ -1,9 +1,11 @@
 package vcreature.mainSimulation;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import vcreature.creatureUtil.DNA;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * Created by scnaegl on 11/2/15.
@@ -24,18 +26,22 @@ public class Population {
   }
 
   public float getTotalRecentFitness() {
+    if (total_recent_fitness == 0) updateFitnessCache();
     return total_recent_fitness;
   }
 
   public float getAverageRecentFitness() {
+    if (avg_recent_fitness == 0) updateFitnessCache();
     return avg_recent_fitness;
   }
 
   public float getTotalBestFitness() {
+    if (total_best_fitness == 0) updateFitnessCache();
     return total_best_fitness;
   }
 
   public float getAverageBestFitness() {
+    if (avg_best_fitness == 0) updateFitnessCache();
     return avg_best_fitness;
   }
 
@@ -53,7 +59,7 @@ public class Population {
     return strands.get(strand_id);
   }
 
-  public void udateFitnessCache() {
+  public void updateFitnessCache() {
     total_recent_fitness = 0;
     total_best_fitness = 0;
     for(Strand strand : strands) {
@@ -75,6 +81,11 @@ public class Population {
   public boolean isEmpty() {
     return strands.isEmpty();
   }
+
+  public ArrayList<DNA> getBestDNAs() {
+    return (ArrayList<DNA>)strands.stream().map(s -> s.getBest()).collect(Collectors.toList());
+  }
+
 
   public class Strand {
     private ArrayList<DNA> generations = new ArrayList<>();
