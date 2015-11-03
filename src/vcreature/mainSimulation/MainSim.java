@@ -389,12 +389,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             //TODO GA here
             ArrayList<DNA> tempPop = trimPopulation();
 
-            /*
-            if(doingCrossover)// && if doing cullPopulationSelection
-            {
-              cullPopulationSelection(tempPop);
-            }
-            */
             if(doingCrossover)//&& if doing tournamentSelection
             {
               tempPop = doCrossovers(tempPop);
@@ -417,6 +411,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
   }
 
+  /**
+   * Assuming crossovers are being done, select and run appropriate crossover.
+   * @param tempPop           1d array of population (from best hillclimbing
+   *                          result).
+   * @return                  1d array of population.
+   */
   private ArrayList<DNA> doCrossovers(ArrayList<DNA> tempPop)
   {
     if(tournament_selection)
@@ -445,41 +445,52 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     DNA dna1, dna2;
     DNA fit1, fit2;
     DNA[] children;
+    //new empty list to hold new population
     ArrayList<DNA> newPop = new ArrayList<>();
-    while(newPop.size() < CreatureConstants.MAX_BLOCKS)
+    //while newpop isn't at new population size
+    while(newPop.size() < CreatureConstants.MAX_POPULATION)
     {
+      //pick two random creatures
       index1 = rand.nextInt(size);
       index2 = rand.nextInt(size);
-      while(index1 == index2)
+      while(index1 == index2)//if same creature is picked for #2 choose another
       {
         index2 = rand.nextInt(size);
       }
       dna1 = tempPop.get(index1);
       dna2 = tempPop.get(index2);
+      //store the fittest of the two
       fit1 = dna1.getFitness() > dna2.getFitness() ? dna1 : dna2;
       index1 = rand.nextInt(size);
       index2 = rand.nextInt(size);
+      //get two more and compare
       while(index1 == index2)
       {
         index2 = rand.nextInt(size);
       }
       dna1 = tempPop.get(index1);
       dna2 = tempPop.get(index2);
+      //store fittest of two.
       fit2 = dna1.getFitness() > dna2.getFitness() ? dna1 : dna2;
+      //crossover the two fittest from comparisons
       children = fit1.singleCrossover(fit2);
+      //add to new population
       newPop.add(children[0]);
       newPop.add(children[1]);
+      //do again
     }
     return newPop;
   }
 
   /**
-   * Cull population and perform crossover
+   * Cull population and perform crossover.
    * @param tempPop       1d list of population.
    */
   private ArrayList<DNA> cullPopulationSelection(ArrayList<DNA> tempPop)
   {
+    //sort by fitness
     Collections.sort(tempPop);
+    //cull least fit
     cullLeastFit(tempPop);
     int size = tempPop.size();
     int count = 0;
