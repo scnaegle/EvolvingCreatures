@@ -559,16 +559,7 @@ public class DNA implements Comparable
     int otherLength = other.getNumBlocks();
     int length, longerDNA;
     //get shortest length.
-    if(thisLength < otherLength)
-    {
-      length = thisLength;
-      longerDNA = OTHER;
-    }
-    else
-    {
-      length = otherLength;
-      longerDNA = THIS;
-    }
+    length = thisLength < otherLength ? thisLength : otherLength;
     //setup output DNAs
     output[THIS] = new DNA();
     output[OTHER] = new DNA();
@@ -588,10 +579,12 @@ public class DNA implements Comparable
     for(int i = 0; i < length; i += 2)
     {
       output[THIS].blockDNAs[i] = new BlockDNA(other.blockDNAs[i]);
-      output[THIS].blockDNAs[i].alterJointA(output[THIS]);
+      //output[THIS].blockDNAs[i].alterJointA(output[THIS]);
       output[OTHER].blockDNAs[i] = new BlockDNA(this.blockDNAs[i]);
-      output[OTHER].blockDNAs[i].alterJointA(output[OTHER]);
+      //output[OTHER].blockDNAs[i].alterJointA(output[OTHER]);
     }
+    output[THIS].alterJoints(1);
+    output[OTHER].alterJoints(1);
     output[THIS].recalculateDNALength();
     output[THIS].calculateNumBlocks();
     output[OTHER].recalculateDNALength();

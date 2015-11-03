@@ -390,7 +390,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             generation_count++;
 
           //TODO gencount > 10 in here to force crossover for testing
-          if(hillClimbing.isMutationNeeded() || generation_count > 10)
+          if(hillClimbing.isMutationNeeded() || generation_count > 0)
           {
             //TODO GA here
             ArrayList<DNA> tempPop = trimPopulation();
