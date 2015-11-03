@@ -48,7 +48,7 @@ Debug mode
 
 Contributions:
 Sean: 
-Justin: 
+Justin: DNA, DNA I/O, Crossover, contributed to OurCreature Wrapper.
 Zach: 
 Julian: Random/Targeted creature generation
 
