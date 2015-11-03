@@ -409,6 +409,18 @@ public class DNA implements Comparable
     }
   }
 
+  public void alterJoints(int id, DNA dna)
+  {
+    if(validateBlockIndex(id))
+    {
+      for(int i = id; i < getNumBlocks(); i++)
+      {
+        blockDNAs[i].alterJointA(dna);//Maybe not needed??
+        blockDNAs[i].alterJointB(dna);
+      }
+    }
+  }
+
   /**
    * Alter neuron's input type.
    * @param blockID       blockID
@@ -583,8 +595,8 @@ public class DNA implements Comparable
       output[OTHER].blockDNAs[i] = new BlockDNA(this.blockDNAs[i]);
       //output[OTHER].blockDNAs[i].alterJointA(output[OTHER]);
     }
-    output[THIS].alterJoints(1);
-    output[OTHER].alterJoints(1);
+    output[THIS].alterJoints(1, output[THIS]);
+    output[OTHER].alterJoints(1, output[OTHER]);
     output[THIS].recalculateDNALength();
     output[THIS].calculateNumBlocks();
     output[OTHER].recalculateDNALength();
