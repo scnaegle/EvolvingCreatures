@@ -399,6 +399,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             {
               tempPop = tournamentSelection(tempPop);
             }
+            for(DNA dna : tempPop)
+            {
+              dna.bumpUp();
+            }
             listIntoPopulation(tempPop);
             //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
