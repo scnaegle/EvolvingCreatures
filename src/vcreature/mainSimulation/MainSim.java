@@ -397,7 +397,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             */
             if(doingCrossover)//&& if doing tournamentSelection
             {
-              tempPop = tournamentSelection(tempPop);
+              tempPop = doCrossovers(tempPop);
             }
             for(DNA dna : tempPop)
             {
@@ -417,16 +417,17 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
   }
 
-  private void doCrossovers(ArrayList<DNA> tempPop)
+  private ArrayList<DNA> doCrossovers(ArrayList<DNA> tempPop)
   {
     if(tournament_selection)
     {
-      tournamentSelection(tempPop);
+      tempPop = tournamentSelection(tempPop);
     }
     else
     {
-      cullPopulationSelection(tempPop);
+      tempPop = cullPopulationSelection(tempPop);
     }
+    return tempPop;
   }
 
   /**
@@ -456,8 +457,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       dna1 = tempPop.get(index1);
       dna2 = tempPop.get(index2);
       fit1 = dna1.getFitness() > dna2.getFitness() ? dna1 : dna2;
-      dna1 = tempPop.get(rand.nextInt(size));
-      dna2 = tempPop.get(rand.nextInt(size));
+      index1 = rand.nextInt(size);
+      index2 = rand.nextInt(size);
+      while(index1 == index2)
+      {
+        index2 = rand.nextInt(size);
+      }
+      dna1 = tempPop.get(index1);
+      dna2 = tempPop.get(index2);
       fit2 = dna1.getFitness() > dna2.getFitness() ? dna1 : dna2;
       children = fit1.singleCrossover(fit2);
       newPop.add(children[0]);
@@ -470,7 +477,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    * Cull population and perform crossover
    * @param tempPop       1d list of population.
    */
-  private void cullPopulationSelection(ArrayList<DNA> tempPop)
+  private ArrayList<DNA> cullPopulationSelection(ArrayList<DNA> tempPop)
   {
     Collections.sort(tempPop);
     cullLeastFit(tempPop);
@@ -479,7 +486,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     DNA workingDNA;
     DNA[] children;
     //if haven't crossed over entire population and population isn't empty
-    while(count < size && !population.isEmpty())
+    while(count < size && !tempPop.isEmpty())
     {
       //if there are at least 2 DNAs in population pull the first two and cross
       //here for safety.
@@ -494,6 +501,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
     //System.out.println("CROSSOVER " +  population.size());
 //    population.sort(null);
+    return tempPop;
   }
 
   /**
