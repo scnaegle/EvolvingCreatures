@@ -104,6 +104,7 @@ public class DNA implements Comparable
       c.populateVectorDNA(i, blockDNAs[i].sizeAndShape);
       blockDNAs[i].setAngles(c.getBlockAngles(i));
     }
+    bumpUp();
   }
 
   /**
@@ -730,6 +731,37 @@ public class DNA implements Comparable
     }
   }
 
+  /**
+   * Change a DNA so that none of the blocks can exist under the floor
+   */
+  public void bumpUp()
+  {
+    float lowestPoint =0;
+    float temp;
+    for (BlockDNA b : blockDNAs)
+    {
+      if (b!=null)
+      {
+        //find the lowest y value in the blockDNAs
+        temp = b.getLowestPoint();
+        if (temp < lowestPoint)
+        {
+          lowestPoint = temp;
+        }
+      }
+    }
+
+    for (BlockDNA b : blockDNAs)
+    {
+      if (b!=null)
+      {
+        //subtract the lowest point all the block centers
+        b.subtractFromCenterY(lowestPoint);
+      }
+    }
+  }
+
+
   //============================Nested BlockDNA================================
   /**
    * The DNA for each individual block.  To be stored in an array in the main
@@ -827,6 +859,20 @@ public class DNA implements Comparable
       this();
       blockID = id;
       parentID = parent;
+    }
+
+    public float getLowestPoint()
+    {
+      return sizeAndShape[0].y - sizeAndShape[1].y;
+    }
+
+    /**
+     * Change the center y value of a block by the passed in amount
+     * @param lowestPoint amount to change block.y center by
+     */
+    public void subtractFromCenterY(float lowestPoint)
+    {
+      sizeAndShape[0].y -= lowestPoint;
     }
 
     /**

@@ -1,11 +1,9 @@
  package vcreature.mainSimulation;
 
- import com.beust.jcommander.IStringConverter;
  import com.beust.jcommander.JCommander;
  import com.beust.jcommander.converters.FileConverter;
  import com.google.common.collect.Iterables;
  import com.jme3.system.JmeContext;
- import com.sun.org.apache.xpath.internal.SourceTree;
  import de.lessvoid.nifty.elements.render.TextRenderer;
  import vcreature.creatureUtil.CreatureConstants;
  import vcreature.hillClimbing.HillClimbing;
@@ -401,6 +399,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             {
               tempPop = tournamentSelection(tempPop);
             }
+            for(DNA dna : tempPop)
+            {
+              dna.bumpUp();
+            }
             listIntoPopulation(tempPop);
             //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
@@ -412,6 +414,18 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           }
         }
       }
+    }
+  }
+
+  private void doCrossovers(ArrayList<DNA> tempPop)
+  {
+    if(tournament_selection)
+    {
+      tournamentSelection(tempPop);
+    }
+    else
+    {
+      cullPopulationSelection(tempPop);
     }
   }
 
@@ -452,11 +466,34 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     return newPop;
   }
 
+  /**
+   * Cull population and perform crossover
+   * @param tempPop       1d list of population.
+   */
   private void cullPopulationSelection(ArrayList<DNA> tempPop)
   {
     Collections.sort(tempPop);
     cullLeastFit(tempPop);
-    performCrossover(tempPop);
+    int size = tempPop.size();
+    int count = 0;
+    DNA workingDNA;
+    DNA[] children;
+    //if haven't crossed over entire population and population isn't empty
+    while(count < size && !population.isEmpty())
+    {
+      //if there are at least 2 DNAs in population pull the first two and cross
+      //here for safety.
+      if(tempPop.size() >= 2)
+      {
+        workingDNA = tempPop.remove(0);
+        children = performCrossover(workingDNA, tempPop.remove(0));
+        tempPop.add(children[0]);
+        tempPop.add(children[1]);
+        count += 2;
+      }
+    }
+    //System.out.println("CROSSOVER " +  population.size());
+    population.sort(null);
   }
 
   /**
@@ -515,6 +552,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       creature.remove();
     }
   }
+
+  private DNA[] performCrossover(DNA dna1, DNA dna2)
+  {
+    //if singleCrossover
+    return dna1.singleCrossover(dna2);
+  }
   /**
    * Put a 1D arraylist of dna into a population array.
    * @param newPop        1d array of DNA
@@ -529,10 +572,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
   /**
+   * @deprecated
    * Go through 1d array of population and perform crossovers.
    * @param population        1d array of DNAs
    */
-  private void performCrossover(ArrayList<DNA> population)
+  private void cullCrossover(ArrayList<DNA> population)
   {
     int size = population.size();
     int count = 0;
