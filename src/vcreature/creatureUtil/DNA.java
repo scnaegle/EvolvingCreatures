@@ -29,6 +29,8 @@ public class DNA implements Comparable
   private DNA[] output;
   private Vector3f tempVec3;
   private float fitness;
+  private String mutationSequence;
+  private int mutationSequenceChance; //1/mutationSequenceChance of following muationSequence
 
   /**
    * Default constructor initializes all values to zero or null.
@@ -41,6 +43,8 @@ public class DNA implements Comparable
     length = 0;
     tempVec3 = new Vector3f();
     fitness = 0;
+    mutationSequence = null;
+    mutationSequenceChance = 10;
   }
 
   /**
@@ -236,6 +240,37 @@ public class DNA implements Comparable
     }
     return -1;
   }
+
+  /**
+   * Gets the sequence of mutations this DNA went under in Hill Climbing
+   * @return String representation of mutation sequence
+   */
+  public String getMutationSequence(){return mutationSequence;}
+
+  /**
+   * Sets the sequence of mutations for this DNA
+   * Called from Hill Climbing
+   * @param sequence String sequence of mutations
+   */
+  public void setMutationSequence(String sequence){mutationSequence = sequence;}
+
+  /**
+   * Gets the chance that Hill Climbing will follow the
+   * mutation sequence of this DNA.
+   * @return chance of following sequence
+   */
+  public int getMutationSequenceChance()
+  {
+    if(mutationSequenceChance < 2) return 2;
+    return mutationSequenceChance;
+  }
+
+  /**
+   * Alter the chance of following the mutation sequence
+   * @param change being add/subtracted to chance of following mutation sequence
+   */
+  public void changeMutationSequenceChance(int change){mutationSequenceChance += change;}
+
   /**
    * Build creature with DNA.  Called from OurCreature constructor when a
    * creature is being built from DNA. What happens:

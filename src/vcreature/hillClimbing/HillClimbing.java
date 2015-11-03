@@ -7,9 +7,23 @@ import vcreature.creatureUtil.DNA;
 import vcreature.phenotype.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 /**
- * Created by zfalgout on 10/15/15.
+ * Hill Climbing picks a random blocks from a DNA to mutate on.
+ * Hill Climbing will then pick to either mutate the size of the block,
+ * or the neurons connected to that block.
+ * If a DNA's fitness is better than the last time,
+ * then there is a chance that Hill Climbing will
+ * follow that same sequence path.  Other wise,
+ * mutations are randomly chosen.
+ * Hill Climbing will set a signal for when a GA mutation is needed.
+ * This happens when the average population fitness isn't better,
+ * or the deviation between the current population's fitness and last
+ * population's fitness is below the threshold, and will set flag when
+ * the number of these occurrences reaches a threshold.
+ *
+ * @author zfalgout 
  */
 public class HillClimbing
 {
@@ -23,8 +37,14 @@ public class HillClimbing
           EnumNeuronInput.CONSTANT, EnumNeuronInput.TIME};
   private final int NEURON_COUNT = NEURON_INPUT.length;
   private boolean mutationNeeded;
+  private String mutationSequence = "";
+  private boolean followPathSequence;
+  private LinkedList<String> pathSequence;
 
-  //TODO: javadoc here
+  /**
+   * Sets up Hill Climbing to perform Hill Climbing on the DNA population
+   * @param population ArrayList of ArrayList of DNAs, to keep track of fitness history
+   */
   public HillClimbing(ArrayList<ArrayList<DNA>> population)
   {
     this.population = population;
@@ -68,7 +88,14 @@ public class HillClimbing
 
     if(sizeChange == 0.0) sizeChange += .1;
 
-    boolean addOp = generator.nextBoolean();
+    boolean addOp;
+
+    if(followPathSequence) addOp = Boolean.parseBoolean(pathSequence.remove());
+    else addOp = generator.nextBoolean();
+
+    mutationSequence = mutationSequence + addOp;
+
+
     boolean sizeNot10 = size.getX() < CreatureConstants.MAX_BLOCK_SIZE && size.getY() < CreatureConstants.MAX_BLOCK_SIZE && size.getZ() < CreatureConstants.MAX_BLOCK_SIZE;
     boolean sizeNot1 = size.getX() > CreatureConstants.MIN_BLOCK_SIZE && size.getY() > CreatureConstants.MIN_BLOCK_SIZE && size.getZ() > CreatureConstants.MIN_BLOCK_SIZE;
 
@@ -145,7 +172,13 @@ public class HillClimbing
     if(mutatingConstant != -1)
     {
       float mutateChange = generator.nextFloat();
-      boolean addOp = generator.nextBoolean();
+      boolean addOp;
+
+      if(followPathSequence) addOp = Boolean.parseBoolean(pathSequence.remove());
+      else addOp = generator.nextBoolean();
+
+      mutationSequence = mutationSequence + " " + addOp;
+
 
       if(addOp) mutatingConstant += mutateChange;
       else if((mutatingConstant -= mutateChange) < 0) mutatingConstant = 0;
@@ -205,8 +238,18 @@ public class HillClimbing
   private void mutateBlockNeuron(DNA mutatedDNA, int blockID)
   {
     int numOfNeurons = mutatedDNA.getNumRules(blockID);
-    int neuronID = generator.nextInt(numOfNeurons);
-    int mutationType = generator.nextInt(4);
+    int neuronID;
+
+    if(followPathSequence) neuronID = Integer.parseInt(pathSequence.remove());
+    else neuronID= generator.nextInt(numOfNeurons);
+
+    mutationSequence = mutationSequence + neuronID + " ";
+
+    int mutationType;
+    if(followPathSequence) mutationType = Integer.parseInt(pathSequence.remove());
+    else mutationType = generator.nextInt(4);
+
+    mutationSequence = mutationSequence + mutationType;
 
     switch(mutationType)
     {
@@ -238,6 +281,9 @@ public class HillClimbing
     Vector3f size = new Vector3f(originalDNA.getBlockSize(targetBlockID));
 
     if(targetBlockID == 0) mutationType = 1;
+
+    mutationSequence = mutationSequence + mutationType + " ";
+
 
     switch (mutationType)
     {
@@ -296,12 +342,13 @@ public class HillClimbing
     DNA mutatedDNA;
 
     overallAvgFitness = 0f;
-    //TODO: need to keep track of what mutations were done, want to try to repeat if fitnessTest is true
 
     for(int i = 0; i < totalNumDNA; i++)
     {
       dna = Iterables.getLast(population.get(i));
       dnaListSize = population.get(i).size();
+      pathSequence = new LinkedList<String>();
+      followPathSequence = false;
       if(dnaListSize > 1) previousDNA = Iterables.get(population.get(i), dnaListSize - 2);
       else previousDNA = null;
 
@@ -309,19 +356,40 @@ public class HillClimbing
 
       if(fitnessTest(dna, previousDNA))
       {
-        blockID = generator.nextInt(MAX_NUM_BLOCKS);//TODO: weighted selection
+        if(dna.getMutationSequence() != null && generator.nextInt(dna.getMutationSequenceChance()) == 0)
+        {
+          followPathSequence = true;
+          String[] path = dna.getMutationSequence().split(" ");
+          for(String item : path) pathSequence.add(item);
+        }
+        dna.changeMutationSequenceChance(-2);
+
+
+        if(followPathSequence) blockID = Integer.parseInt(pathSequence.remove());
+        else blockID = generator.nextInt(MAX_NUM_BLOCKS);
+
+
+
         mutatedDNA = new DNA(dna);
       }
       else
       {
+        dna.changeMutationSequenceChance(+2);
         mutatedDNA = new DNA(previousDNA);
-        population.get(i).remove(dnaListSize-1);
+        followPathSequence = false;
+        population.get(i).remove(dnaListSize - 1);
         blockID = generator.nextInt(MAX_NUM_BLOCKS);
       }
 
-      mutationType = generator.nextInt(2);
+      mutationSequence = blockID + " ";
+
+      if(followPathSequence) mutationType = Integer.parseInt(pathSequence.remove());
+      else mutationType = generator.nextInt(2);
+
 
       mutateBlock(dna, mutatedDNA, blockID, mutationType);
+
+      mutatedDNA.setMutationSequence(mutationSequence);
       population.get(i).add(mutatedDNA);
 
     }
@@ -329,7 +397,7 @@ public class HillClimbing
     overallAvgFitness /= totalNumDNA;
     checkAvgFitnessDeviation();
     previousOverallAvgFitness = overallAvgFitness;
-    System.out.println("Overall Fitness: " + overallAvgFitness);
+
     return population;
   }
 }
