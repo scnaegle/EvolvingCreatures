@@ -3,6 +3,7 @@ package vcreature.creatureUtil;
 import com.google.common.collect.Iterables;
 import com.jme3.math.Vector3f;
 import vcreature.mainSimulation.MainSim;
+import vcreature.mainSimulation.Population;
 import vcreature.phenotype.Neuron;
 
 import java.io.File;
@@ -21,13 +22,13 @@ public class DNAio
    * Take an array of the population's DNA and write to a file.
    * @param population        Array List of DNA objects.
    */
-  public static void writePopulation(ArrayList<ArrayList<DNA>> population)
+  public static void writePopulation(Population population)
   {
     StringBuilder outString = new StringBuilder();
     DNA dna;
-    for(ArrayList<DNA> generations : population)
+    for(Population.Strand strand : population.getStrands())
     {
-      dna = getBestGeneration(generations);
+      dna = strand.getBest();
       outString.append(dna);
     }
     //System.out.println("outString" + outString);
@@ -59,7 +60,7 @@ public class DNAio
    * @param f                 File input.
    * @param population        Population arraylist to fill.
    */
-  public static void readPopulation(File f, ArrayList<ArrayList<DNA>> population)
+  public static void readPopulation(File f, Population population)
   {
     try
     {
@@ -81,7 +82,7 @@ public class DNAio
    * @return
    * @throws IOException    IOExceptions handled in readPopulation
    */
-  private static boolean parseInput(File f, ArrayList<ArrayList<DNA>> population) throws IOException
+  private static boolean parseInput(File f, Population population) throws IOException
   {
     int numBlocks, numNeurons;
     int id, parentID, neuronInputType, neuronBlockID;
@@ -98,7 +99,7 @@ public class DNAio
         //for numblocks
         numBlocks = s.nextInt();
         DNA dnaIn = new DNA(numBlocks);
-        population.add(new ArrayList<DNA>(Arrays.asList(dnaIn)));
+        population.add(dnaIn);
 
         for (int i = 0; i < numBlocks; ++i)
         {

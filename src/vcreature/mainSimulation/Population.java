@@ -64,6 +64,13 @@ public class Population {
     avg_best_fitness = total_best_fitness / strands.size();
   }
 
+  public int size() {
+    return strands.size();
+  }
+
+  public void remove(int index) {
+    strands.remove(index);
+  }
 
   public class Strand {
     private ArrayList<DNA> generations = new ArrayList<>();
@@ -82,16 +89,25 @@ public class Population {
       return avg_fitness;
     }
 
+    public ArrayList<DNA> getGenerations() {
+      return generations;
+    }
+
     public void add(DNA dna) {
       generations.add(dna);
     }
 
-    public void get(int dna_id) {
-      generations.get(dna_id);
+    public DNA get(int dna_id) {
+      return generations.get(dna_id);
     }
 
     public void updateFitness(int dna_id, float fitness) {
       generations.get(dna_id).storeFitness(fitness);
+      updateFitnessCache();
+    }
+
+    public void updateLastFitness(float fitness) {
+      Iterables.getLast(generations).storeFitness(fitness);
       updateFitnessCache();
     }
 
@@ -118,5 +134,12 @@ public class Population {
       return Iterables.getLast(generations);
     }
 
+    public int size() {
+      return generations.size();
+    }
+
+    public void remove(int index) {
+      generations.remove(index);
+    }
   }
 }

@@ -96,7 +96,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private boolean isCameraRotating = true;
 
   private OurCreature myCreature;
-  private ArrayList<ArrayList<DNA>> population;
+//  private ArrayList<ArrayList<DNA>> population;
   private HillClimbing hillClimbing;
   private int current_creature_index = 0;
   private int crossover_count = 0;
@@ -105,6 +105,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private boolean view_specific_creature = false;
   private int viewing_creature = -1;
   private int currently_displayed_creature = 0;
+
+  private Population population;
 
   //Nifty gui
   private Nifty nifty;
@@ -160,7 +162,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     Block.initStaticMaterials(assetManager);
 
-    population = new ArrayList<>();
+    population = new Population();
 
     if (input_file != null)
     {
@@ -169,10 +171,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       System.out.println("read in " + population.size() + " creatures");
     } else {
       myCreature = new OurCreature(physicsSpace, rootNode, false);
-      population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
+      population.add(myCreature.getDNA());
       myCreature.remove();
       myCreature = new OurCreature(physicsSpace, rootNode, true);
-      population.add(new ArrayList<DNA>(Arrays.asList(myCreature.getDNA())));
+      population.add(myCreature.getDNA());
       myCreature.remove();
 
 
@@ -182,7 +184,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       {
         //creature = new RandCreature(physicsSpace, rootNode, true);
         creature = new LegCreature(physicsSpace, rootNode);
-        population.add(new ArrayList<DNA>(Arrays.asList(creature.getDNA())));
+        population.add(creature.getDNA());
         //creature.remove();
         creature.removeAll();
       }
@@ -216,19 +218,19 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       if (myCreature != null) {
         myCreature.remove();
       }
-      myCreature = new OurCreature(physicsSpace, rootNode, Iterables.getLast(population.get(creature_index)));
+      myCreature = new OurCreature(physicsSpace, rootNode, population.get(creature_index).getLast());
       myCreature.placeOnGround();
       elapsedSimulationTime = 0.0f;
     } catch (IllegalArgumentException e) {
       e.printStackTrace();
-      Iterables.getLast(population.get(creature_index)).storeFitness(0.0f);
+      population.get(creature_index).updateLastFitness(0.0f);
       creature_index++;
       startSimForCreature(creature_index);
     }
   }
 
   private void storeFitnessForCurrentCreature() {
-    Iterables.getLast(population.get(current_creature_index)).storeFitness(myCreature.getFitness());
+    population.get(current_creature_index).updateLastFitness(myCreature.getFitness());
   }
 
   private void showSettings() {
@@ -373,7 +375,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
               System.out.println("All Fitnesses: ");
               for (int i = 0; i < CreatureConstants.MAX_POPULATION; i++)
               {
-                System.out.format("%d: %f\n", i, Iterables.getLast(population.get(i)).getFitness());
+                System.out.format("%d: %f\n", i, population.get(i).getLast().getFitness());
               }
             }
 
@@ -468,11 +470,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     ArrayList<DNA> newPop = new ArrayList<>();
     DNA best;
     //For each creature history
-    for(ArrayList<DNA> creature : population)
+    for(Population.Strand strand : population.getStrands())
     {
-      best = creature.get(0);
+      best = strand.get(0);
       //Choose the best fit dna
-      for(DNA dna : creature)
+      for(DNA dna : strand.getGenerations())
       {
         if(dna.getFitness() >= best.getFitness())
         {
@@ -519,10 +521,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    */
   private void listIntoPopulation(ArrayList<DNA> newPop)
   {
-    population = new ArrayList<>();
+    population = new Population();
     for(DNA dna : newPop)
     {
-      population.add(new ArrayList<>(Arrays.asList(dna)));
+      population.add(dna);
     }
   }
 
@@ -730,7 +732,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   {
     File f = new File("dna_out.txt");
     DNAio.writePopulation(population);
-    population = new ArrayList<>();
+    population = new Population();
     File g = new File("dna_out.txt");
     DNAio.readPopulation(g, population);
     System.out.println("Pop Size " + population.size());

@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import com.jme3.math.Vector3f;
 import vcreature.creatureUtil.CreatureConstants;
 import vcreature.creatureUtil.DNA;
+import vcreature.mainSimulation.Population;
 import vcreature.phenotype.*;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import java.util.Random;
  */
 public class HillClimbing
 {
-  private ArrayList<ArrayList<DNA>> population;
+  private Population population;
   private Random generator;
   private float overallAvgFitness;
   private float previousOverallAvgFitness;
@@ -45,7 +46,7 @@ public class HillClimbing
    * Sets up Hill Climbing to perform Hill Climbing on the DNA population
    * @param population ArrayList of ArrayList of DNAs, to keep track of fitness history
    */
-  public HillClimbing(ArrayList<ArrayList<DNA>> population)
+  public HillClimbing(Population population)
   {
     this.population = population;
     generator = new Random();
@@ -331,7 +332,7 @@ public class HillClimbing
   /**
    * Will perform the hill climbing on the given population when called.
    */
-  public ArrayList<ArrayList<DNA>> hillClimb() {
+  public Population hillClimb() {
     int blockID;
     int dnaListSize;
     int mutationType; //0 for neuron mutation, else size mutation of block
@@ -345,11 +346,11 @@ public class HillClimbing
 
     for(int i = 0; i < totalNumDNA; i++)
     {
-      dna = Iterables.getLast(population.get(i));
+      dna = population.get(i).getLast();
       dnaListSize = population.get(i).size();
       pathSequence = new LinkedList<String>();
       followPathSequence = false;
-      if(dnaListSize > 1) previousDNA = Iterables.get(population.get(i), dnaListSize - 2);
+      if(dnaListSize > 1) previousDNA = population.get(i).get(dnaListSize - 2);
       else previousDNA = null;
 
       final int MAX_NUM_BLOCKS = dna.getNumBlocks();
