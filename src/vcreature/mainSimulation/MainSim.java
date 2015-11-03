@@ -71,6 +71,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--speed", description = "Set the speed of the simulation")
   int sim_speed = 1;
 
+  @Parameter(names = "--hill-climb-only", description = "Run without crossover")
+  boolean doing_crossover = true;
+
+  @Parameter(names = "--uniform-crossover", description = "Use uniform crossover")
+  boolean uniform_crossover = false;
+
   @Parameter(names = "--tournament-selection", description = "Set the crossover selection to tournament selection instead of culling selection")
   boolean tournament_selection = false;
 
@@ -112,7 +118,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private boolean isRunning = true;
   //TODO will perform crossover if this is true.  Need a command line arg to set
   //if we're doing just hill climb.
-  private boolean doingCrossover = true;
+  //private boolean doingCrossover = true;
 
 
   @Override
@@ -389,7 +395,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             //TODO GA here
             ArrayList<DNA> tempPop = trimPopulation();
 
-            if(doingCrossover)//&& if doing tournamentSelection
+            if(doing_crossover)//&& if doing tournamentSelection
             {
               tempPop = doCrossovers(tempPop);
             }
@@ -473,7 +479,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       //store fittest of two.
       fit2 = dna1.getFitness() > dna2.getFitness() ? dna1 : dna2;
       //crossover the two fittest from comparisons
-      children = fit1.singleCrossover(fit2);
+      children = performCrossover(dna1, dna2);
       //add to new population
       newPop.add(children[0]);
       newPop.add(children[1]);
@@ -572,10 +578,23 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
   }
 
+  /**
+   * Perform appropriate crossover.
+   * @param dna1
+   * @param dna2
+   * @return
+   */
   private DNA[] performCrossover(DNA dna1, DNA dna2)
   {
     //if singleCrossover
-    return dna1.singleCrossover(dna2);
+    if(!uniform_crossover)
+    {
+      return dna1.singleCrossover(dna2);
+    }
+    else
+    {
+      return dna1.uniformCrossover(dna2);
+    }
   }
   /**
    * Put a 1D arraylist of dna into a population array.

@@ -547,6 +547,57 @@ public class DNA implements Comparable
     return output;
   }
 
+  /**
+   * Swap every other block until one runs out of blocks
+   * @param other       DNA to cross with.
+   * @return
+   */
+  public DNA[] uniformCrossover(DNA other)
+  {
+    //get length
+    int thisLength = this.getNumBlocks();
+    int otherLength = other.getNumBlocks();
+    int length, longerDNA;
+    //get shortest length.
+    if(thisLength < otherLength)
+    {
+      length = thisLength;
+      longerDNA = OTHER;
+    }
+    else
+    {
+      length = otherLength;
+      longerDNA = THIS;
+    }
+    //setup output DNAs
+    output[THIS] = new DNA();
+    output[OTHER] = new DNA();
+    //initialize outputDNAs
+    for(int i = 0; i < CreatureConstants.MAX_BLOCKS; ++i)
+    {
+      if(this.blockDNAs[i] != null)
+      {
+        output[THIS].blockDNAs[i] = new BlockDNA(this.blockDNAs[i]);
+      }
+      if(other.blockDNAs[i] != null)
+      {
+        output[OTHER].blockDNAs[i] = new BlockDNA(other.blockDNAs[i]);
+      }
+    }
+    //while interation < shortest length swap every other block.
+    for(int i = 0; i < length; i += 2)
+    {
+      output[THIS].blockDNAs[i] = new BlockDNA(other.blockDNAs[i]);
+      output[THIS].blockDNAs[i].alterJointA(output[THIS]);
+      output[OTHER].blockDNAs[i] = new BlockDNA(this.blockDNAs[i]);
+      output[OTHER].blockDNAs[i].alterJointA(output[OTHER]);
+    }
+    output[THIS].recalculateDNALength();
+    output[THIS].calculateNumBlocks();
+    output[OTHER].recalculateDNALength();
+    output[OTHER].calculateNumBlocks();
+    return output;
+  }
 
   /**
    * Implement comparable.  DNA compares on fitness.
