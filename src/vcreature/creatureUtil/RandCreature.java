@@ -22,6 +22,8 @@ import vcreature.phenotype.*;
  * Intended use is to make a RandCreature in the physics space
  * save it into DNA by making a new DNA object with the RandCreature in its parameter
  * and immediately remove the RandCreature from the physics space (RandCreature.removeAll())
+ *
+ * This class is used by HillClimbing and MainSim when they create a population of creatures
  */
 
 public class RandCreature
@@ -45,17 +47,12 @@ public class RandCreature
     jMonkeyRootNode = null;
   }
 
-  public void setPhysicsAndRoot(PhysicsSpace physicsSpace, Node jMonkeyRootNode)
-  {
-    this.physicsSpace = physicsSpace;
-    this.jMonkeyRootNode = jMonkeyRootNode;
-  }
-
 
   /**
-   * Constructor for a RandomCreature
+   * Constructor to create a RandomCreature
    * @param physicsSpace physics space to simulate in
    * @param jMonkeyRootNode RootNode of physics space to build in
+   * @param smartEdges true if you want blocks to be added edge-to-edge, false if you want blocks added anywhere
    */
   public RandCreature(PhysicsSpace physicsSpace, Node jMonkeyRootNode, boolean smartEdges)
   {
@@ -66,7 +63,7 @@ public class RandCreature
     int parentBlockSurface;
     int parentBlockEdge;
 
-
+    //arrays which hold the creature properties which will be saved in DNA
     blockProperties = new ArrayList<>();
     blockAngles = new ArrayList<>();
 
@@ -82,16 +79,21 @@ public class RandCreature
     {
       while (getNumberOfBodyBlocks() < blockNumber)
       {
+        //choose a parent block
         parentBlockID = rand.nextInt(getNumberOfBodyBlocks());
+        //choose a random surface
         parentBlockSurface = rand.nextInt(6);
+        //choose a random edge
         parentBlockEdge = rand.nextInt(4);
 
         IdSurfaceEdge test = new IdSurfaceEdge(parentBlockID, parentBlockSurface, parentBlockEdge);
 
+        //make sure you aren't adding to an edge which already has a block spawned
         if (!addedLocations.contains(test))
         {
           addedLocations.add(test);
           Block parent = body.get(parentBlockID);
+          //add a random block to the random parent
           addRandomBlockSmart(parent, parentBlockSurface, parentBlockEdge);
         }
       }
@@ -116,15 +118,15 @@ public class RandCreature
 
     }
 
-    //make creature rest on the ground
-    bumpUp();
+    //make creature rest on the ground when it is spawned in the physics engine
+    //bumpUp();
   }
 
 
 
   /**
    *
-   * @return number of body blocks
+   * @return number of body blocks in the creature
    */
   public int getNumberOfBodyBlocks()
   {
@@ -141,29 +143,34 @@ public class RandCreature
   }
 
   /**
-   * Makes a random root block with random x,y,z values
-   * Axis alligned
-   * @return
+   * Makes a root block with random x,y,z values
+   * This rootblock will be axis alligned
+   * @return the Block which will serve as the creatures root
    */
   public Block makeRandomRoot()
   {
+    //make the root's center at 0,0,0 in the physics space
     Vector3f rootCenter = new Vector3f(0f,0f,0f);
     Vector3f rootSize = new Vector3f(0f,0f,0f);
 
+    //make a the root a random size
     rootSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     rootSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     rootSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
 
+    //add the root's properties to the arrays which hold the information for DNA creation
     blockProperties.add(makeBlockVectorArray(rootCenter, rootSize));
     blockAngles.add(Arrays.copyOf(axisAligned, axisAligned.length));
 
+    //add the root block to the physics space
     return addRoot(rootCenter, rootSize, axisAligned);
   }
 
   /**
-   * Method which tries to add a random block to the passed in parent
-   * Block will have random x,y,z values and a random number of removes attached to it
-   * Will be removed if collided with another block on spawn
+   * Method which tries to attach a random block to a parent block
+   * Block will have random x,y,z values and a random number of neurons attached to it
+   * Chooses a point on the parent block and tries to attach a block to that point
+   * Will be removed if collided with another block
    * @param parent Block to add to
    */
   private void addRandomBlock(Block parent, int parentSurface)
@@ -178,30 +185,43 @@ public class RandCreature
     Vector3f childJoint = new Vector3f(0f,0f,0f);
 
     Vector3f rotationAxis = new Vector3f(0f,0f,0f);
-    Vector3f trashAxis = new Vector3f(0f,0f,0f);
 
-
-
+    //Choose a random size for the child block
     childSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     childSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     childSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
 
+    //find the corresponding surface of the child based on the parent's surface
+    //for example, if attaching to the parents +y surface, the -y surface of the child needs to be chosen
     childSurface = correspondingChildSurface(parentSurface);
+    //choose a random edge of the child which whill attach to the parent's surface
     childEdge = rand.nextInt(4);
 
+    //find a random vector the parent's surface in the parent's local coordinates
     findSurfaceVector(parentJoint, parentSurface, parentSize);
+    //find a random vector to the child's surface in the child's local coordinates
     findSurfaceVectorEdge(childSurface, childEdge, childJoint, childSize, rotationAxis);
 
+    //make a block which will be attached to the parent
     Block newBlock = addBlock(axisAligned, childSize, parent, parentJoint, childJoint, rotationAxis);
 
-    if (!removeIfIntersection())
+    if (!removeIfIntersection()) //if the child does not intersect with anything other than its parent
     {
-      addRandomNeurons(newBlock);
+      addRandomNeurons(newBlock); //add new neurons to the block
+      //save the child's properties in the DNA information array
       blockProperties.add(makeBlockVectorArray(newBlock, childSize, rotationAxis, rotationAxis));
       blockAngles.add(Arrays.copyOf(axisAligned, axisAligned.length));
     }
   }
 
+  /**
+   * Adds a random block smartly to the creature
+   * Instead of adding a random block anywhere on the surface of a parent, adds the block it connects to its parent
+   * edge to edge
+   * @param parent to connect a child block to
+   * @param parentSurface parent surface to add to
+   * @param parentEdge parent edge to add to
+   */
   private void addRandomBlockSmart(Block parent, int parentSurface, int parentEdge)
   {
     int childSurface;
@@ -214,26 +234,33 @@ public class RandCreature
     Vector3f childJoint = new Vector3f(0f,0f,0f);
 
     Vector3f rotationAxis = new Vector3f(0f,0f,0f);
-    Vector3f trashAxis = new Vector3f(0f,0f,0f);
+    Vector3f trashAxis = new Vector3f(0f,0f,0f); //temp axis we don't need
 
-
+    //make a random sized child
     childSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     childSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
     childSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
 
+    //choose the child's surface and edge to make a joint to based on the parent's surface and edge
     childSurface = correspondingChildSurface(parentSurface);
     childEdge = correspondingChildEdge(parentEdge);
 
+    //make a joint on a random point of the parent's edge to add a child to
     findSurfaceVectorEdge(parentSurface, parentEdge, parentJoint, parentSize, trashAxis);
+    //make a joint on a random point of the child's edge
     findSurfaceVectorEdge(childSurface, childEdge, childJoint, childSize, trashAxis);
 
+    //smartly choose a rotationAxis based on the surface and edge we're adding to
     findRotationAxis(rotationAxis, parentSurface, parentEdge);
 
+    //add a new block to the creature
     Block newBlock = addBlock(axisAligned, childSize, parent, parentJoint, childJoint, rotationAxis);
 
-    if (!removeIfIntersection())
+    if (!removeIfIntersection()) //if the new block doesn't intersect
     {
-      addRandomNeurons(newBlock);
+      addRandomNeurons(newBlock); //add random neurons to the block
+
+      //save the block data in DNA accesible arrays
       blockProperties.add(makeBlockVectorArray(newBlock, childSize, rotationAxis, rotationAxis));
       blockAngles.add(Arrays.copyOf(axisAligned, axisAligned.length));
     }
@@ -241,16 +268,20 @@ public class RandCreature
 
   /**
    * Add a random number of neurons to a block
-   * @param block
+   * @param block to add Neurons to
    */
   private void addRandomNeurons(Block block)
   {
+    //choose a random number of neurons to add to a block
     int numberNeurons = rand.nextInt(CreatureConstants.MAX_NEURON_PER_BLOCK)+1;
+    //get the maxImpulse available to the block
     float maxImpulse = block.getJointMaxImpulse();
     Neuron n;
     for (int i = 0; i <= numberNeurons; ++i)
     {
+      //make a randomNeuron
       n = makeRandomNeuron(maxImpulse);
+      //add it to the block
       block.addNeuron(n);
     }
   }
@@ -258,16 +289,19 @@ public class RandCreature
   /**
    * Makes a Neuron with a randomly chosen negative/positive max impulse
    * and randomly chosen firing time
-   * @param maxImpulse
-   * @return
+   * @param maxImpulse that the neuron can fire
+   * @return neuron to add to the block
    */
   private Neuron makeRandomNeuron(float maxImpulse)
   {
+    //seconds at which the neuron fires
     float seconds = rand.nextInt(CreatureConstants.MAX_NEURON_SECONDS - CreatureConstants.MIN_NEURON_SECONDS) + CreatureConstants.MIN_NEURON_SECONDS;
     seconds += rand.nextFloat();
     float impulse = maxImpulse;
+    //randomly choose negative or positive impulse
     int sign = rand.nextInt(2);
 
+    //make a new neuron
     Neuron n = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT, EnumNeuronInput.CONSTANT, null);
 
     if (sign == 1)
@@ -275,6 +309,7 @@ public class RandCreature
       impulse = -impulse;
     }
 
+    //
     n.setInputValue(Neuron.C, seconds);
     n.setInputValue(Neuron.D, impulse);
 
@@ -382,18 +417,21 @@ public class RandCreature
    */
   public boolean removeIfIntersection()
   {
+    //get the most recently added block
     int newBlockID = getNumberOfBodyBlocks()-1;
     CollisionResults collisionResults = new CollisionResults();
 
     Block newBlock = body.get(newBlockID);
     Block compareBlock;
 
+    //compare newest added block to all other blocks in the creature
     for (int i = 0 ; i < newBlockID; ++i)
     {
       compareBlock = body.get(i);
       BoundingBox box = (BoundingBox) compareBlock.getGeometry().getWorldBound();
       newBlock.getGeometry().collideWith(box, collisionResults);
 
+      //ignore if intersecting with parent
       if ((newBlock.getIdOfParent() != compareBlock.getID()) && collisionResults.size() > 0)
       {
         removeBlock(newBlockID);
@@ -405,6 +443,15 @@ public class RandCreature
     return false;
   }
 
+  /**
+   * Simple function which finds an edge of a child based on the passed in edge of the parent
+   * for example, if the parentEdge is the top of the surface, then the child's edge should be the top edge of the child's
+   * surface or the bottom edge of the child's surface
+   *
+   *
+   * @param parentEdge
+   * @return
+   */
   private int correspondingChildEdge(int parentEdge)
   {
     int or = rand.nextInt(2);

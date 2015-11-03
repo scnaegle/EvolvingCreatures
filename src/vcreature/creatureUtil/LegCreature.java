@@ -40,7 +40,7 @@ public class LegCreature extends RandCreature
       addMirroredBlocks(edgeAddTo);
     }
 
-    bumpUp();
+    //bumpUp();
   }
 
   public void addMirroredBlocks(IdSurfaceEdge edgeAddTo)
