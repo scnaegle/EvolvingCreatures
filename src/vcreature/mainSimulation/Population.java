@@ -72,6 +72,10 @@ public class Population {
     strands.remove(index);
   }
 
+  public boolean isEmpty() {
+    return strands.isEmpty();
+  }
+
   public class Strand {
     private ArrayList<DNA> generations = new ArrayList<>();
     private float total_fitness = 0;
