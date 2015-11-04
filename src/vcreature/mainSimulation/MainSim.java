@@ -648,7 +648,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         count += 2;
       }
     }
-    //System.out.println("CROSSOVER " +  population.size());
     population.sort(null);
   }
 

@@ -384,7 +384,6 @@ public class OurCreature extends Creature
         otherBound = other.getGeometry().getWorldBound();
         if(thisBound.intersects(otherBound))
         {
-          System.out.println("Intersect" + other.getID());
           return false;
         }
       }
