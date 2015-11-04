@@ -109,6 +109,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private boolean view_specific_creature = false;
   private int viewing_creature = -1;
   private int currently_displayed_creature = 0;
+  private Random rand =  new Random();
 
   private Population population;
 
@@ -181,15 +182,20 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       population.add(myCreature.getDNA());
       myCreature.remove();
 
-
-      //RandCreature creature;
-      LegCreature creature;
+      RandCreature creature;
+      boolean leg;
       while (population.size() < CreatureConstants.MAX_POPULATION)
       {
-        //creature = new RandCreature(physicsSpace, rootNode, true);
-        creature = new LegCreature(physicsSpace, rootNode);
+        leg = rand.nextBoolean();
+        if (leg)
+        {
+          creature = new LegCreature(physicsSpace, rootNode);
+        }
+        else
+        {
+          creature = new RandCreature(physicsSpace, rootNode);
+        }
         population.add(creature.getDNA());
-        //creature.remove();
         creature.removeAll();
       }
     }
@@ -592,7 +598,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     {
       creature = new LegCreature(physicsSpace, rootNode);
       population.add(creature.getDNA());
-      creature.remove();
+      creature.removeAll();
     }
   }
 

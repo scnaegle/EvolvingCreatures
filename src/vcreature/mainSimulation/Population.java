@@ -144,6 +144,7 @@ public class Population {
       avg_fitness = total_fitness / generations.size();
     }
 
+
     public DNA getBest() {
       DNA best;
       best = Iterables.getLast(generations);
@@ -156,6 +157,7 @@ public class Population {
     }
 
     public DNA getLast() {
+      Iterables.getLast(generations).bumpUp();
       return Iterables.getLast(generations);
     }
 

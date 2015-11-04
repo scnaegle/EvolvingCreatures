@@ -11,7 +11,6 @@ import java.util.Random;
 
 import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.material.Material;
 import com.jme3.math.Transform;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Geometry;
@@ -37,7 +36,8 @@ public class RandCreature
   public static Random rand = new Random();
   public Vector3f tmpVec3 = new Vector3f();
 
-  public ArrayList<IdSurfaceEdge> addedLocations;
+  public ArrayList<IdSurfaceEdge> availableLocations;
+  public IdSurfaceEdge currentISE;
 
   private float elapsedSimulationTime;
 
@@ -47,27 +47,21 @@ public class RandCreature
     jMonkeyRootNode = null;
   }
 
-
   /**
    * Constructor to create a RandomCreature
    * @param physicsSpace physics space to simulate in
    * @param jMonkeyRootNode RootNode of physics space to build in
-   * @param smartEdges true if you want blocks to be added edge-to-edge, false if you want blocks added anywhere
    */
-  public RandCreature(PhysicsSpace physicsSpace, Node jMonkeyRootNode, boolean smartEdges)
+  public RandCreature(PhysicsSpace physicsSpace, Node jMonkeyRootNode)
   {
     this.physicsSpace = physicsSpace;
     this.jMonkeyRootNode = jMonkeyRootNode;
-
-    int parentBlockID;
-    int parentBlockSurface;
-    int parentBlockEdge;
 
     //arrays which hold the creature properties which will be saved in DNA
     blockProperties = new ArrayList<>();
     blockAngles = new ArrayList<>();
 
-    addedLocations = new ArrayList<>();
+    availableLocations = new ArrayList<>();
 
     //choose random number of blocks
     int blockNumber = rand.nextInt(CreatureConstants.MAX_BLOCKS-2)+2;
@@ -75,62 +69,14 @@ public class RandCreature
     //make a random sized root
     makeRandomRoot();
 
-    if (smartEdges)
+    while (getNumberOfBodyBlocks() < blockNumber && !availableLocations.isEmpty())
     {
-      while (getNumberOfBodyBlocks() < blockNumber)
-      {
-        //choose a parent block
-        parentBlockID = rand.nextInt(getNumberOfBodyBlocks());
-        //choose a random surface
-        parentBlockSurface = rand.nextInt(6);
-        //choose a random edge
-        parentBlockEdge = rand.nextInt(4);
+      int randomPlace = rand.nextInt(availableLocations.size());
+      currentISE = availableLocations.get(randomPlace);
 
-        IdSurfaceEdge test = new IdSurfaceEdge(parentBlockID, parentBlockSurface, parentBlockEdge);
-
-        //make sure you aren't adding to an edge which already has a block spawned
-        if (!addedLocations.contains(test))
-        {
-          addedLocations.add(test);
-          Block parent = body.get(parentBlockID);
-          //add a random block to the random parent
-          addRandomBlockSmart(parent, parentBlockSurface, parentBlockEdge);
-        }
-      }
+      Block parent = body.get(currentISE.id);
+      addRandomBlock(parent, currentISE.surface, currentISE.edge);
     }
-
-    else {
-      while (getNumberOfBodyBlocks() < blockNumber)
-      {
-        parentBlockID = rand.nextInt(getNumberOfBodyBlocks());
-        parentBlockSurface = rand.nextInt(6);
-        parentBlockEdge = rand.nextInt(4);
-
-        IdSurfaceEdge test = new IdSurfaceEdge(parentBlockID, parentBlockSurface, parentBlockEdge);
-
-        if (!addedLocations.contains(test))
-        {
-          addedLocations.add(test);
-          Block parent = body.get(parentBlockID);
-          addRandomBlock(parent, parentBlockSurface);
-        }
-      }
-
-    }
-
-    //make creature rest on the ground when it is spawned in the physics engine
-    //bumpUp();
-  }
-
-
-
-  /**
-   *
-   * @return number of body blocks in the creature
-   */
-  public int getNumberOfBodyBlocks()
-  {
-    return body.size();
   }
 
   /**
@@ -140,6 +86,15 @@ public class RandCreature
   public DNA getDNA()
   {
     return new DNA(this);
+  }
+
+  /**
+   *
+   * @return number of body blocks in the creature
+   */
+  public int getNumberOfBodyBlocks()
+  {
+    return body.size();
   }
 
   /**
@@ -162,56 +117,10 @@ public class RandCreature
     blockProperties.add(makeBlockVectorArray(rootCenter, rootSize));
     blockAngles.add(Arrays.copyOf(axisAligned, axisAligned.length));
 
+    addAvailableEdges(0);
+
     //add the root block to the physics space
     return addRoot(rootCenter, rootSize, axisAligned);
-  }
-
-  /**
-   * Method which tries to attach a random block to a parent block
-   * Block will have random x,y,z values and a random number of neurons attached to it
-   * Chooses a point on the parent block and tries to attach a block to that point
-   * Will be removed if collided with another block
-   * @param parent Block to add to
-   */
-  private void addRandomBlock(Block parent, int parentSurface)
-  {
-    int childSurface;
-    int childEdge;
-
-    Vector3f childSize = new Vector3f(0f,0f,0f);
-    Vector3f parentSize = new Vector3f(parent.getSizeX()/2, parent.getSizeY()/2, parent.getSize()/2);
-
-    Vector3f parentJoint = new Vector3f(0f,0f,0f);
-    Vector3f childJoint = new Vector3f(0f,0f,0f);
-
-    Vector3f rotationAxis = new Vector3f(0f,0f,0f);
-
-    //Choose a random size for the child block
-    childSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
-    childSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
-    childSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
-
-    //find the corresponding surface of the child based on the parent's surface
-    //for example, if attaching to the parents +y surface, the -y surface of the child needs to be chosen
-    childSurface = correspondingChildSurface(parentSurface);
-    //choose a random edge of the child which whill attach to the parent's surface
-    childEdge = rand.nextInt(4);
-
-    //find a random vector the parent's surface in the parent's local coordinates
-    findSurfaceVector(parentJoint, parentSurface, parentSize);
-    //find a random vector to the child's surface in the child's local coordinates
-    findSurfaceVectorEdge(childSurface, childEdge, childJoint, childSize, rotationAxis);
-
-    //make a block which will be attached to the parent
-    Block newBlock = addBlock(axisAligned, childSize, parent, parentJoint, childJoint, rotationAxis);
-
-    if (!removeIfIntersection()) //if the child does not intersect with anything other than its parent
-    {
-      addRandomNeurons(newBlock); //add new neurons to the block
-      //save the child's properties in the DNA information array
-      blockProperties.add(makeBlockVectorArray(newBlock, childSize, rotationAxis, rotationAxis));
-      blockAngles.add(Arrays.copyOf(axisAligned, axisAligned.length));
-    }
   }
 
   /**
@@ -222,7 +131,7 @@ public class RandCreature
    * @param parentSurface parent surface to add to
    * @param parentEdge parent edge to add to
    */
-  private void addRandomBlockSmart(Block parent, int parentSurface, int parentEdge)
+  private void addRandomBlock(Block parent, int parentSurface, int parentEdge)
   {
     int childSurface;
     int childEdge;
@@ -234,7 +143,6 @@ public class RandCreature
     Vector3f childJoint = new Vector3f(0f,0f,0f);
 
     Vector3f rotationAxis = new Vector3f(0f,0f,0f);
-    Vector3f trashAxis = new Vector3f(0f,0f,0f); //temp axis we don't need
 
     //make a random sized child
     childSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
@@ -245,13 +153,10 @@ public class RandCreature
     childSurface = correspondingChildSurface(parentSurface);
     childEdge = correspondingChildEdge(parentEdge);
 
-    //make a joint on a random point of the parent's edge to add a child to
-    findSurfaceVectorEdge(parentSurface, parentEdge, parentJoint, parentSize, trashAxis);
-    //make a joint on a random point of the child's edge
-    findSurfaceVectorEdge(childSurface, childEdge, childJoint, childSize, trashAxis);
 
-    //smartly choose a rotationAxis based on the surface and edge we're adding to
-    findRotationAxis(rotationAxis, parentSurface, parentEdge);
+    findVectorToEdge(parentSize, parentEdge, parentSurface, parentJoint, rotationAxis);
+    findVectorToEdge(childSize, childEdge, childSurface, childJoint, rotationAxis);
+
 
     //add a new block to the creature
     Block newBlock = addBlock(axisAligned, childSize, parent, parentJoint, childJoint, rotationAxis);
@@ -259,6 +164,7 @@ public class RandCreature
     if (!removeIfIntersection()) //if the new block doesn't intersect
     {
       addRandomNeurons(newBlock); //add random neurons to the block
+      addAvailableEdges(getNumberOfBodyBlocks()-1);
 
       //save the block data in DNA accesible arrays
       blockProperties.add(makeBlockVectorArray(newBlock, childSize, rotationAxis, rotationAxis));
@@ -309,13 +215,11 @@ public class RandCreature
       impulse = -impulse;
     }
 
-    //
     n.setInputValue(Neuron.C, seconds);
     n.setInputValue(Neuron.D, impulse);
 
     return n;
   }
-
 
   /**
    * This method adds the root block to this creature. The root block is different from all other
@@ -435,6 +339,7 @@ public class RandCreature
       if ((newBlock.getIdOfParent() != compareBlock.getID()) && collisionResults.size() > 0)
       {
         removeBlock(newBlockID);
+        availableLocations.remove(currentISE);
         return true;
       }
 
@@ -448,9 +353,8 @@ public class RandCreature
    * for example, if the parentEdge is the top of the surface, then the child's edge should be the top edge of the child's
    * surface or the bottom edge of the child's surface
    *
-   *
-   * @param parentEdge
-   * @return
+   * @param parentEdge to connect child block to
+   * @return edge of child to connect to parent
    */
   private int correspondingChildEdge(int parentEdge)
   {
@@ -497,7 +401,7 @@ public class RandCreature
    * @param parentSurface
    * @return
    */
-  private int correspondingChildSurface(int parentSurface)
+  public int correspondingChildSurface(int parentSurface)
   {
     int childSurface = -1;
     switch (parentSurface) {
@@ -517,342 +421,115 @@ public class RandCreature
     return childSurface;
   }
 
-  private void findRotationAxis(Vector3f rotationAxis, int parentSurface, int parentEdge)
-  {
-    if (parentSurface == 0 || parentSurface == 1)
-    {
-      if (parentEdge == 0 || parentEdge == 2) rotationAxis.set(Vector3f.UNIT_X);
-      else rotationAxis.set(Vector3f.UNIT_Z);
-    }
-    else if (parentSurface == 2 || parentSurface == 3)
-    {
-      if (parentEdge == 0 || parentEdge == 2) rotationAxis.set(Vector3f.UNIT_Z);
-      else rotationAxis.set(Vector3f.UNIT_Y);
-    }
-    else if (parentSurface == 4 || parentSurface == 5)
-    {
-      if (parentEdge == 0 || parentEdge == 2) rotationAxis.set(Vector3f.UNIT_X);
-      else rotationAxis.set(Vector3f.UNIT_Y);
-    }
-    else
-    {
-      rotationAxis.set(Vector3f.ZERO);
-    }
-  }
-
-  private void findSurfaceVector(Vector3f joint, int surface, Vector3f pSize)
-  {
-    switch (surface) {
-      case 0: joint.y = pSize.y;
-        joint.x = randomSurfacePoint(pSize.x);
-        joint.z = randomSurfacePoint(pSize.z);
-        break;
-      case 1: joint.y = -pSize.y;
-        joint.x = randomSurfacePoint(pSize.x);
-        joint.z = randomSurfacePoint(pSize.z);
-        break;
-      case 2: joint.x = pSize.x;
-        joint.y = randomSurfacePoint(pSize.y);
-        joint.z = randomSurfacePoint(pSize.z);
-        break;
-      case 3: joint.x = -pSize.x;
-        joint.y = randomSurfacePoint(pSize.y);
-        joint.z = randomSurfacePoint(pSize.z);
-        break;
-      case 4: joint.z = pSize.z;
-        joint.x = randomSurfacePoint(pSize.x);
-        joint.y = randomSurfacePoint(pSize.y);
-        break;
-      case 5: joint.z = -pSize.z;
-        joint.x = randomSurfacePoint(pSize.x);
-        joint.y = randomSurfacePoint(pSize.y);
-        break;
-      default:
-        break;
-    }
-  }
-
-  private void findSurfaceVectorEdge(int childSurface, int childEdge, Vector3f joint, Vector3f cSize, Vector3f rAxis)
-  {
-    if (childSurface == 0)
-    {
-      switch (childEdge) {
-        case 0:
-          joint.x = randomSurfacePoint(cSize.x);
-          joint.y = cSize.y;
-          joint.z = -cSize.z;
-          randXorY(rAxis);
-          break;
-        case 1:
-          joint.x = cSize.x;
-          joint.y = cSize.y;
-          joint.z = randomSurfacePoint(cSize.z);
-          randYorZ(rAxis);
-          //ZorY
-
-          break;
-        case 2:
-          joint.x = randomSurfacePoint(cSize.x);
-          joint.y = cSize.y;
-          joint.z = cSize.z;
-          randXorY(rAxis);
-          //XorY
-
-          break;
-        case 3:
-          joint.x = -cSize.x;
-          joint.y = cSize.y;
-          joint.z = randomSurfacePoint(cSize.z);
-          randYorZ(rAxis);
-          //ZorY
-
-          break;
-        default:
-          break;
-      }
-    }
-
-    else if (childSurface == 1)
-    {
-      switch (childEdge) {
-        case 0:
-          joint.x = randomSurfacePoint(cSize.x);
-          joint.y = -cSize.y;
-          joint.z = -cSize.z;
-          randXorY(rAxis);
-          //XorY
-
-          break;
-        case 1:
-          joint.x = cSize.x;
-          joint.y = -cSize.y;
-          joint.z = randomSurfacePoint(cSize.z);
-          randYorZ(rAxis);
-          //ZorY
-
-          break;
-        case 2:
-          joint.x = randomSurfacePoint(cSize.x);
-          joint.y = -cSize.y;
-          joint.z = cSize.z;
-          randXorY(rAxis);
-          //XorY
-
-          break;
-        case 3:
-          joint.x = -cSize.x;
-          joint.y = -cSize.y;
-          joint.z = randomSurfacePoint(cSize.z);
-          randYorZ(rAxis);
-          //ZorY
-
-          break;
-        default:
-          break;
-      }
-    }
-
-    //+x
-    else if (childSurface == 2)
-    {
-      switch (childEdge) {
-        case 0:
-          joint.x = cSize.x;
-          joint.y = cSize.y;
-          joint.z = randomSurfacePoint(cSize.z);
-          randXorZ(rAxis);
-          //ZorX
-
-          break;
-        case 1:
-          joint.x = cSize.x;
-          joint.y = randomSurfacePoint(cSize.y);
-          joint.z = -cSize.z;
-          randXorY(rAxis);
-          //YorX
-
-          break;
-        case 2:
-          joint.x = cSize.x;
-          joint.y = -cSize.y;
-          joint.z = randomSurfacePoint(cSize.z);
-          randXorZ(rAxis);
-          //ZorX
-          break;
-
-        case 3:
-          joint.x = cSize.x;
-          joint.y = randomSurfacePoint(cSize.y);
-          joint.z = cSize.z;
-          randXorY(rAxis);
-          //YorX
-
-          break;
-        default:
-          break;
-      }
-    }
-
-    else if (childSurface == 3)
-    {
-      switch (childEdge) {
-        case 0:
-          joint.x = -cSize.x;
-          joint.y = cSize.y;
-          joint.z = randomSurfacePoint(cSize.z);
-          randXorZ(rAxis);
-          //ZorX
-          break;
-        case 1:
-          joint.x = -cSize.x;
-          joint.y = randomSurfacePoint(cSize.y);
-          joint.z = -cSize.z;
-          randXorY(rAxis);
-          //YorX
-          break;
-        case 2:
-          joint.x = -cSize.x;
-          joint.y = -cSize.y;
-          joint.z = randomSurfacePoint(cSize.z);
-          randXorZ(rAxis);
-          //ZorX
-
-          break;
-        case 3:
-          joint.x = -cSize.x;
-          joint.y = randomSurfacePoint(cSize.y);
-          joint.z = cSize.z;
-          randXorY(rAxis);
-          //YorX
-          break;
-        default:
-          break;
-      }
-    }
-
-    //+z surface
-    else if (childSurface == 4)
-    {
-      switch (childEdge) {
-        case 0:
-          joint.x = randomSurfacePoint(cSize.x);
-          joint.y = cSize.y;
-          joint.z = cSize.z;
-          randXorZ(rAxis);
-          //XorZ
-          break;
-        case 1:
-          joint.x = cSize.x;
-          joint.y = randomSurfacePoint(cSize.y);
-          joint.z = cSize.z;
-          randYorZ(rAxis);
-          //YorZ
-          break;
-        case 2:
-          joint.x = randomSurfacePoint(cSize.x);
-          joint.y = -cSize.y;
-          joint.z = cSize.z;
-          randXorZ(rAxis);
-          //XorZ
-          break;
-        case 3:
-          joint.x = -cSize.x;
-          joint.y = randomSurfacePoint(cSize.y);
-          joint.z = cSize.z;
-          randYorZ(rAxis);
-          //YorZ
-          break;
-        default:
-          break;
-      }
-    }
-
-    //-z surface
-    else
-    {
-      switch (childEdge) {
-        case 0:
-          joint.x =randomSurfacePoint(cSize.x);
-          joint.y = cSize.y;
-          joint.z = -cSize.z;
-          randXorZ(rAxis);
-          //XorZ
-          break;
-        case 1:
-          joint.x = cSize.x;
-          joint.y = randomSurfacePoint(cSize.y);
-          joint.z = -cSize.z;
-          randYorZ(rAxis);
-          //YorZ
-          break;
-        case 2:
-          joint.x = randomSurfacePoint(cSize.x);
-          joint.y = -cSize.y;
-          joint.z = -cSize.z;
-          randXorZ(rAxis);
-          //XorZ
-          break;
-        case 3:
-          joint.x = -cSize.x;
-          joint.y = randomSurfacePoint(cSize.y);
-          joint.z = -cSize.z;
-          randYorZ(rAxis);
-          //YorZ
-          break;
-        default:
-          break;
-      }
-    }
-  }
-
   /**
-   * Choose X or Z axis randomly
-   * @param rAxis
+   *
+   * @param size of block you're adding a joint to (half vector)
+   * @param edge of block you're adding a joint to
+   * @param surface of block you're adding a joint to
+   * @param joint to make
+   * @param rotationAxis axis of rotation the joint should turn around
    */
-  private void randXorZ(Vector3f rAxis)
+  public void findVectorToEdge(Vector3f size, int edge, int surface, Vector3f joint, Vector3f rotationAxis)
   {
-    int randI = rand.nextInt(2);
-    if (randI == 0)
+    int sign = 1;
+    if (surface == 1 || surface == 0)
     {
-      rAxis.set(Vector3f.UNIT_X);
+      if (surface == 1) sign = -1;
+      switch (edge)
+      {
+        case 0:
+          joint.x = randomSurfacePoint(size.x);
+          joint.y = size.y*(sign);
+          joint.z = -size.z;
+          rotationAxis.set(Vector3f.UNIT_X);
+          break;
+        case 1:
+          joint.x = size.x;
+          joint.y = size.y*(sign);
+          joint.z = randomSurfacePoint(size.z);
+          rotationAxis.set(Vector3f.UNIT_Z);
+          break;
+        case 2:
+          joint.x = randomSurfacePoint(size.x);
+          joint.y = size.y*(sign);
+          joint.z = size.z;
+          rotationAxis.set(Vector3f.UNIT_X);
+          break;
+        case 3:
+          joint.x = -size.x;
+          joint.y = size.y*(sign);
+          joint.z = randomSurfacePoint(size.z);
+          rotationAxis.set(Vector3f.UNIT_Z);
+          break;
+        default:
+          break;
+      }
     }
-    else
+    else if (surface == 2 || surface == 3)
     {
-      rAxis.set(Vector3f.UNIT_Z);
+      if (surface == 3) sign = -1;
+      switch (edge)
+      {
+        case 0:
+          joint.x = size.x*(sign);
+          joint.y = size.y;
+          joint.z = randomSurfacePoint(size.z);
+          rotationAxis.set(Vector3f.UNIT_Z);
+          break;
+        case 1:
+          joint.x = size.x*(sign);
+          joint.y = randomSurfacePoint(size.y);
+          joint.z = -size.z;
+          rotationAxis.set(Vector3f.UNIT_Y);
+          break;
+        case 2:
+          joint.x = size.x*(sign);
+          joint.y = -size.y;
+          joint.z = randomSurfacePoint(size.z);
+          rotationAxis.set(Vector3f.UNIT_Z);
+          break;
+        case 3:
+          joint.x = size.x*(sign);
+          joint.y = randomSurfacePoint(size.y);
+          joint.z = size.z;
+          rotationAxis.set(Vector3f.UNIT_Y);
+          break;
+        default:
+          break;
+      }
     }
-  }
-
-  /**
-   * Chooses Y or Z axis randomly
-   * @param rAxis
-   */
-  private void randYorZ(Vector3f rAxis)
-  {
-    int randI = rand.nextInt(2);
-    if (randI == 0)
+    else if (surface == 4 || surface == 5)
     {
-      rAxis.set(Vector3f.UNIT_Y);
-    }
-    else
-    {
-      rAxis.set(Vector3f.UNIT_Z);
-    }
-  }
-
-  /**
-   * chooses X or Y axis randomly
-   * @param rAxis
-   */
-  private void randXorY(Vector3f rAxis)
-  {
-    int randI = rand.nextInt(2);
-    if (randI == 0)
-    {
-      rAxis.set(Vector3f.UNIT_X);
-    }
-    else
-    {
-      rAxis.set(Vector3f.UNIT_Y);
+      if (surface == 5) sign = -1;
+      switch (edge)
+      {
+        case 0:
+          joint.x = randomSurfacePoint(size.x);
+          joint.y = size.y;
+          joint.z = size.z * sign;
+          rotationAxis.set(Vector3f.UNIT_X);
+          break;
+        case 1:
+          joint.x = size.x;
+          joint.y = randomSurfacePoint(size.y);
+          joint.z = size.z * sign;
+          rotationAxis.set(Vector3f.UNIT_Y);
+          break;
+        case 2:
+          joint.x = randomSurfacePoint(size.x);
+          joint.y = -size.y;
+          joint.z = size.z * sign;
+          rotationAxis.set(Vector3f.UNIT_X);
+          break;
+        case 3:
+          joint.x = -size.x;
+          joint.y = randomSurfacePoint(size.y);
+          joint.z = size.z * sign;
+          rotationAxis.set(Vector3f.UNIT_Z);
+          break;
+        default:
+          break;
+      }
     }
   }
 
@@ -903,27 +580,6 @@ public class RandCreature
     return body.get(id);
   }
 
-  /**
-   * method which returns the lowest point of the creature
-   * @return float value of lowest point of creature
-   */
-  private float getCurrentHeightOfLowestPoint()
-  {
-    float lowestPoint = Float.MAX_VALUE;
-    float testPoint;
-    Vector3f[] tempVecArray;
-    Vector3f tempVecCenter;
-    Vector3f tempVecSize;
-    for (int i = 0; i < getNumberOfBodyBlocks(); ++i)
-    {
-      tempVecArray = blockProperties.get(i);
-      tempVecCenter=tempVecArray[0];
-      tempVecSize=tempVecArray[1];
-      testPoint = tempVecCenter.y - tempVecSize.y;
-      if (testPoint < lowestPoint) lowestPoint = testPoint;
-    }
-    return lowestPoint;
-  }
 
   /**
    * Method which stores the block data into a DNA accesible format
@@ -1019,18 +675,6 @@ public class RandCreature
   }
 
 
-  /**
-   * Method necessary to change all the creatures DNA values if part of the creature spawns under the floor
-   */
-  public void bumpUp()
-  {
-    float lowestPoint = getCurrentHeightOfLowestPoint();
-    for (int i = 0; i < getNumberOfBodyBlocks(); ++i)
-    {
-      blockProperties.get(i)[0].y -= lowestPoint;
-    }
-  }
-
 
   /**
    * A removeAll method which works by removing children first instead of the parent
@@ -1053,6 +697,7 @@ public class RandCreature
     }
   }
 
+  /*
   public void remove()
   {
     if (body.size() > 0)
@@ -1069,11 +714,6 @@ public class RandCreature
 
 
 
-  /**
-   * This method should only be called by itself or remove()
-   * to remove ALL blocks from the creature.
-   * @param block
-   */
   private void removeSubTree(Block block)
   {
     for (Block child : block.getChildList())
@@ -1089,6 +729,17 @@ public class RandCreature
     geometry.removeFromParent();
 
     body.remove(block);
+  }  */
+
+  public void addAvailableEdges(int id)
+  {
+    for (int i = 0; i < 6; ++i)
+    {
+      for (int j = 0; j < 4; ++j)
+      {
+        availableLocations.add(new IdSurfaceEdge(id, i, j));
+      }
+    }
   }
 
   public class IdSurfaceEdge

@@ -15,6 +15,8 @@ import java.util.Arrays;
 public class LegCreature extends RandCreature
 {
   public ArrayList<IdSurfaceEdge> availableEdges;
+  public ArrayList<Integer> numberOfBlocks;
+
 
   public LegCreature(PhysicsSpace physicsSpace, Node rootNode)
   {
@@ -22,32 +24,72 @@ public class LegCreature extends RandCreature
     this.jMonkeyRootNode = rootNode;
 
     availableEdges = new ArrayList<>();
+    numberOfBlocks = new ArrayList<>();
+    fillBlockPossibilities();
 
     blockProperties = new ArrayList<>();
     blockAngles = new ArrayList<>();
 
-    //int numberOfBlocks = ((rand.nextInt(3)+1)*4)+1;
-
-    int numberOfBlocks = 5;
+    int blockCount = numberOfBlocks.get(rand.nextInt(numberOfBlocks.size()));
 
     makeRandomRoot();
+
+    while (body.size() < blockCount && !availableEdges.isEmpty())
+    {
+      currentISE = availableEdges.get(rand.nextInt(availableEdges.size()));
+      addMirroredBlocks(currentISE);
+    }
+  }
+
+  public void fillBlockPossibilities()
+  {
+    int tempInt;
+    if (CreatureConstants.MAX_BLOCKS%2==0)
+    {
+      tempInt = CreatureConstants.MAX_BLOCKS - 1;
+    }
+    else tempInt = CreatureConstants.MAX_BLOCKS;
+
+    for (int i = 3; i <= tempInt; i=i+2)
+    {
+      numberOfBlocks.add(i);
+    }
+  }
+
+  /**
+   * Makes a root block with random x,y,z values
+   * This rootblock will be axis alligned
+   * @return the Block which will serve as the creatures root
+   */
+  @Override
+  public Block makeRandomRoot()
+  {
+    //make the root's center at 0,0,0 in the physics space
+    Vector3f rootCenter = new Vector3f(0f,0f,0f);
+    Vector3f rootSize = new Vector3f(0f,0f,0f);
+
+    //make a the root a random size
+    rootSize.x = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
+    rootSize.y = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
+    rootSize.z = ((rand.nextInt(CreatureConstants.MAX_BLOCK_SIZE)+CreatureConstants.MIN_BLOCK_SIZE) + rand.nextFloat())/2;
+
+    //add the root's properties to the arrays which hold the information for DNA creation
+    blockProperties.add(makeBlockVectorArray(rootCenter, rootSize));
+    blockAngles.add(Arrays.copyOf(axisAligned, axisAligned.length));
+
     addAvailableEdges(0);
 
-    while (body.size() < numberOfBlocks && !availableEdges.isEmpty())
-    {
-      int add = rand.nextInt(availableEdges.size());
-      IdSurfaceEdge edgeAddTo = availableEdges.get(add);
-      addMirroredBlocks(edgeAddTo);
-    }
-
-    //bumpUp();
+    //add the root block to the physics space
+    return addRoot(rootCenter, rootSize, axisAligned);
   }
 
   public void addMirroredBlocks(IdSurfaceEdge edgeAddTo)
   {
     int parentID = edgeAddTo.id;
     int parentEdge = edgeAddTo.edge;
+    int parentSurface= edgeAddTo.surface;
     int childEdge;
+    int childSurface;
     int mirrorParentID = 0;
 
     if (parentID != 0)
@@ -58,6 +100,7 @@ public class LegCreature extends RandCreature
     Block parent = getParentBlock(parentID);
     Block mirrorParent = getParentBlock(mirrorParentID);
 
+    childSurface = correspondingChildSurface(edgeAddTo.surface);
     childEdge = findChildEdge(parentEdge);
 
     Vector3f parentSize = new Vector3f(parent.getSizeX()/2, parent.getSizeY()/2, parent.getSize()/2);
@@ -74,6 +117,9 @@ public class LegCreature extends RandCreature
     Vector3f childMirrorJoint = new Vector3f(0f,0f,0f);
 
     Vector3f rotationAxis = new Vector3f(0f,0f,0f);
+
+    //findVectorToEdge(parentSize, parentEdge, parentSurface, parentJoint, rotationAxis);
+    //findVectorToEdge(childSize, childEdge, childSurface, childJoint, rotationAxis);
 
     findVectorToEdge(parentSize, parentEdge, 1, parentJoint, rotationAxis);
     findVectorToEdge(childSize, childEdge, 0, childJoint, rotationAxis);
@@ -99,7 +145,7 @@ public class LegCreature extends RandCreature
   private void addMirroredNeurons(Block newBlock, Block mirror)
   {
     int numberNeurons = rand.nextInt(CreatureConstants.MAX_NEURON_PER_BLOCK)+1;
-    int sign =0;
+    int sign;
     float seconds;
     float maxImpulse = newBlock.getJointMaxImpulse();
     Neuron n;
@@ -126,41 +172,6 @@ public class LegCreature extends RandCreature
     n.setInputValue(Neuron.C, seconds);
     n.setInputValue(Neuron.D, maxImpulse);
     return n;
-  }
-
-  public void findVectorToEdge(Vector3f size, int edge, int surface, Vector3f joint, Vector3f rotationAxis)
-  {
-    int sign = 1;
-    if (surface == 1) sign = -1;
-      switch (edge)
-      {
-        case 0:
-          joint.x = randomSurfacePoint(size.x);
-          joint.y = size.y*(sign);
-          joint.z = -size.z;
-          rotationAxis.set(Vector3f.UNIT_X);
-          break;
-        case 1:
-          joint.x = size.x;
-          joint.y = size.y*(sign);
-          joint.z = randomSurfacePoint(size.z);
-          rotationAxis.set(Vector3f.UNIT_Z);
-          break;
-        case 2:
-          joint.x = randomSurfacePoint(size.x);
-          joint.y = size.y*(sign);
-          joint.z = size.z;
-          rotationAxis.set(Vector3f.UNIT_X);
-          break;
-        case 3:
-          joint.x = -size.x;
-          joint.y = size.y*(sign);
-          joint.z = randomSurfacePoint(size.z);
-          rotationAxis.set(Vector3f.UNIT_Z);
-          break;
-        default:
-          break;
-      }
   }
 
   public void findMirrorVector(int edgeToMirror,  Vector3f joint, Vector3f mirrorJoint)
@@ -228,6 +239,7 @@ public class LegCreature extends RandCreature
       {
         removeBlock(newBlockID);
         removeBlock(newBlockID-1);
+        availableEdges.remove(currentISE);
         return true;
       }
 
@@ -238,13 +250,16 @@ public class LegCreature extends RandCreature
     return false;
   }
 
+  @Override
   public void addAvailableEdges(int blockID)
   {
-    IdSurfaceEdge temp;
-    for (int i = 0; i <=3; ++i)
+
+    for (int i = 1; i < 6; ++i)
     {
-      temp = new IdSurfaceEdge(blockID, 1, i);
-      availableEdges.add(temp);
+      for (int j = 0; j < 4; ++j)
+      {
+        availableEdges.add(new IdSurfaceEdge(blockID, i, j));
+      }
     }
   }
 
