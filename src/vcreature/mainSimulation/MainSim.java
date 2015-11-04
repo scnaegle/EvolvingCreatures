@@ -354,8 +354,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       myCreature.updateBrain(elapsedSimulationTime);
       if (!validCreature()) {
         population.get(current_creature_index).updateLastFitness(0.0f);
-        current_creature_index++;
-        startSimForCreature(current_creature_index);
+        if(current_creature_index < CreatureConstants.MAX_POPULATION - 1)
+        {
+          current_creature_index++;
+          startSimForCreature(current_creature_index);
+        }
       }
       if (debug) {
         System.out.println("Max Fitness: " + myCreature.getFitness());
@@ -414,7 +417,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             generation_count++;
 
           //TODO gencount > 10 in here to force crossover for testing
-          if(hillClimbing.isMutationNeeded() || generation_count > 10)
+          if(hillClimbing.isMutationNeeded())
           {
             //TODO GA here
             ArrayList<DNA> tempPop = trimPopulation();
