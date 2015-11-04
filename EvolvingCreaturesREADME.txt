@@ -73,6 +73,12 @@ We have included best_creature.txt in our zip file. To load our best creature in
 --input best_creature.txt
 to the command line arguments. 
 
+--leg-creature
+Have a population of only creatures with random legs
+
+--random-creature
+Have a population of only completely random creatures
+
 --debug
 Debug mode
 
