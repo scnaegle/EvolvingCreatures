@@ -321,6 +321,19 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
   }
 
+  //TODO: looks like there are creatures spawning in floor.  Caught one by time test and throwing an exception
+  private boolean validateCreature()
+  {
+    //System.out.println("*******Time passed*********");
+    //System.out.println(elapsedSimulationTime);
+    if(elapsedSimulationTime < 2 && myCreature.getFitness() > 4)
+    {
+      System.err.println("****INVALID CREATURE****");
+      return false;
+     // throw new IllegalStateException();
+    }
+    return true;
+  }
 
   /* Use the main event loop to trigger repeating actions. */
   @Override
@@ -333,7 +346,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
       //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
       myCreature.updateBrain(elapsedSimulationTime);
-
+      validateCreature();
       if (debug) {
         System.out.println("Max Fitness: " + myCreature.getFitness());
       }

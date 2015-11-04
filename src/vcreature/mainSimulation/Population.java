@@ -86,6 +86,16 @@ public class Population {
     return (ArrayList<DNA>)strands.stream().map(s -> s.getBest()).collect(Collectors.toList());
   }
 
+  public DNA getBest() {
+    DNA best = getBestDNAs().get(0);
+    for(DNA dna : getBestDNAs()) {
+      if (dna.getFitness() > best.getFitness()) {
+        best = dna;
+      }
+    }
+    return best;
+  }
+
 
   public class Strand {
     private ArrayList<DNA> generations = new ArrayList<>();

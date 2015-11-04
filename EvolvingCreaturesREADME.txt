@@ -24,6 +24,15 @@ Console Commands
 -h, --help
 Shows the help text
 
+--hill-climb-only
+If this flag is set, the GA will only hillclimb.
+
+--tournament-selection
+If this flag is set, the ga will use tournament selection, otherwise it will cull the least fit and replace with random creatures.
+
+--uniform-crossover
+If this flag is set, the GA will swap every other block on the creature, otherwise it will use single crossover.
+
 --headless
 If this flag is present then EvolvingCreatures will run the Genetic Algorithm in headless mode with no GUI
 
@@ -48,7 +57,7 @@ Debug mode
 
 Contributions:
 Sean: 
-Justin: DNA, DNA I/O, Crossover, contributed to OurCreature Wrapper.
+Justin: DNA Structure, DNA I/O, Crossover, OurCreature(wrapper for Creature) structure.
 Zach: 
 Julian: Random/Targeted creature generation
 
