@@ -1,5 +1,6 @@
 package vcreature.phenotype;
 
+import com.jme3.bounding.BoundingVolume;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.joints.HingeJoint;
@@ -40,6 +41,8 @@ public class OurCreature extends Creature
   private ArrayList<float[]> blockAngles;
   private Vector3f tmpVec3 = new Vector3f();
   private ArrayList<Vector3f[]> blockProperties;
+  private ArrayList<Block> bodyBlocks;
+  private boolean isValid = true;
 
 
 
@@ -56,6 +59,7 @@ public class OurCreature extends Creature
     this.visualWorld = visualWorld;
     blockProperties = new ArrayList<>();
     blockAngles = new ArrayList<>();
+    bodyBlocks = new ArrayList<>();
   }
 
   /**
@@ -158,6 +162,7 @@ public class OurCreature extends Creature
     Block b = super.addRoot(rootCenter, rootSize, angles);
     blockProperties.add(makeBlockVectorArray(rootCenter, rootSize));
     blockAngles.add(Arrays.copyOf(angles, angles.length));
+    bodyBlocks.add(b);
     return b;
   }
 
@@ -187,6 +192,8 @@ public class OurCreature extends Creature
     Block b = super.addBlock(eulerAngles,halfsize,parent,pivotA,pivotB,axisA);
     blockProperties.add(makeBlockVectorArray(b, halfsize, axisA, axisA));
     blockAngles.add(Arrays.copyOf(eulerAngles, eulerAngles.length));
+    bodyBlocks.add(b);
+    isValid = validateBlockPlacement(b);
     return b;
   }
 
@@ -244,6 +251,10 @@ public class OurCreature extends Creature
     return b;
   }
 
+  public boolean isValid()
+  {
+    return isValid;
+  }
   /**
    * Populate the DNA's Size and shape array with all the right vectors.  Pass
    * in block id and vector array.
@@ -352,6 +363,33 @@ public class OurCreature extends Creature
       dna = new DNA(this);
     }
     return dna;
+  }
+
+  /**
+   * Check if bounding volume intersects with any blocks other than the parent.
+   * @param b       block to check
+   * @return        false if invalid placement, else return true.
+   */
+  private boolean validateBlockPlacement(Block b)
+  {
+    BoundingVolume thisBound = b.getGeometry().getWorldBound();
+    BoundingVolume otherBound;
+    int parentID = b.getIdOfParent();
+
+    //check for intersection on everything but parent.
+    for(Block other : bodyBlocks)
+    {
+      if(other.getID() != parentID && other != b)
+      {
+        otherBound = other.getGeometry().getWorldBound();
+        if(thisBound.intersects(otherBound))
+        {
+          System.out.println("Intersect" + other.getID());
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   /**

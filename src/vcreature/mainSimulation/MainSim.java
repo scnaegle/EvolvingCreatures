@@ -224,6 +224,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       }
       myCreature = new OurCreature(physicsSpace, rootNode, population.get(creature_index).getLast());
       myCreature.placeOnGround();
+      System.out.println("Valid " + myCreature.isValid());
       elapsedSimulationTime = 0.0f;
     } catch (IllegalArgumentException e) {
       e.printStackTrace();
