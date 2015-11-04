@@ -331,6 +331,8 @@ public class HillClimbing
 
   /**
    * Will perform the hill climbing on the given population when called.
+   *
+   * @return Returns the mutated population back to the Simulation
    */
   public Population hillClimb() {
     int blockID;

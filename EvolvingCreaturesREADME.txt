@@ -15,6 +15,11 @@ The goal of this program is to find the highest jumping creature in an infinte s
 
 When EvolvingCreatures is started, a population of random creatures are created. Random creatures have a random number of blocks, random block sizes, random joint placements, and random neurons. All blocks that are created are axis aligned and all neurons have the same construction: they try to rotate a block with the maximum impulse allowed around an axis at a certain time. While the original code based allowed for neurons to have much more complexity, we decided to keep the neurons as simple as possible. 
 
+Hill Climbing then will pick a random block of a creature to mutate, and will pick either to mutate the size of the block, or the neurons connected to that block. The neuron mutations Hill Climbing can choose from is,
+mutating the neuron type, mutating the neuron constant, swapping 2 neuron types, or swapping 2 neuron constants. If fitness improves then Hill Climbing with some probability choose to repeat the same mutation sequence.
+If fitness doesn't improve, or the event of repeating the mutation sequence isn't chosen, then it will go back to picking random mutations. Hill Climbing will set a flag when mutation needed threshold is reached, so
+GA can do mutations on the population.  The mutation needed threshold is reached when the overall average population fitness is worse than the last generation's, or when the absolute value of the deviation from the
+current generation's and last generation's is less than 0.2.  Once Hill Climbing is finished going through the entire population of DNAs, it will return the mutated population back to the MainSim.
 
 GUI
 
@@ -58,7 +63,7 @@ Debug mode
 Contributions:
 Sean: 
 Justin: DNA Structure, DNA I/O, Crossover, OurCreature(wrapper for Creature) structure.
-Zach: 
+Zach: Hill Climbing on DNA population
 Julian: Random/Targeted creature generation
 
 Joel: Original API for Evolving Creatures found at https://github.com/castellanos70/CS351_VirtualCreature_API
