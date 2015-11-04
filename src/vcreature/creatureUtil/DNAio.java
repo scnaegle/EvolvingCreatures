@@ -25,10 +25,8 @@ public class DNAio
   public static void writePopulation(Population population)
   {
     StringBuilder outString = new StringBuilder();
-    DNA dna;
-    for(Population.Strand strand : population.getStrands())
+    for(DNA dna : population.getBestDNAs())
     {
-      dna = strand.getBest();
       outString.append(dna);
     }
     //System.out.println("outString" + outString);
@@ -42,17 +40,6 @@ public class DNAio
     {
       System.out.println("Could not write file");
     }
-  }
-
-  private static DNA getBestGeneration(ArrayList<DNA> generations) {
-    DNA best;
-    best = Iterables.getLast(generations);
-    for(DNA dna : generations) {
-      if (dna.getFitness() >= best.getFitness()) {
-        best = dna;
-      }
-    }
-    return best;
   }
 
   /**
