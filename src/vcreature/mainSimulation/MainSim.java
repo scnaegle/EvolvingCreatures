@@ -322,11 +322,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
   //TODO: looks like there are creatures spawning in floor.  Caught one by time test and throwing an exception
-  private boolean validateCreature()
+  private boolean validCreature()
   {
     //System.out.println("*******Time passed*********");
     //System.out.println(elapsedSimulationTime);
-    if(elapsedSimulationTime < 2 && myCreature.getFitness() > 4)
+    if(!myCreature.isValid() || elapsedSimulationTime < 2 && myCreature.getFitness() > 4)
     {
       System.err.println("****INVALID CREATURE****");
       return false;
@@ -346,7 +346,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
       //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
       myCreature.updateBrain(elapsedSimulationTime);
-      if (!validateCreature()) {
+      if (!validCreature()) {
         population.get(current_creature_index).updateLastFitness(0.0f);
         current_creature_index++;
         startSimForCreature(current_creature_index);
