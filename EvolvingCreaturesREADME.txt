@@ -22,6 +22,19 @@ GA can do mutations on the population.  The mutation needed threshold is reached
 current generation's and last generation's is less than 0.2.  Once Hill Climbing is finished going through the entire population of DNAs, it will return the mutated population back to the MainSim.
 
 GUI
+Working the GUI is relatively straightforward and intuitive. The main screen shows physics simulation. It is here that a creature is loaded into the world and tries to jump. 
+
+At the bottom of the main screen is a slider which allows the user to select the speed of the simulation. It should be noted that changing the speed of the simulation will slightly change the fitness of the creature. If a user wants to view the most "real" fitness of a creature, the simulation should be viewed on the lowest speed where the slider is set all the way to the left. 
+
+In the top left corner, a pull down menu allows a user to select an individual creature from a population. If an individual creature is selected, the hillclimbing/genetic algorithm stops and the selected creature is loaded into the simulation for user viewing. In order to return to the hillclimbing/genetic, the user should select the first option on the menu: Run GA
+
+Below the pull down menu are two self explanitory buttons: "Prev Creature" and "Next Creature." Clicking on "Prev Creature" will allow the user to view the previous creature in the population and clicking "Next Creature" will allow the user to view the next creature in the population.
+
+Under these two buttons is where information related to the simulation is output. 
+Crossover Count: How many successful crossovers have occured in this population.
+Total Generations: How many generations this population have gone through.
+Creature id: The number of the creature in the population which is currently in the physics simulator.
+Fitness: The current fitness of the creature which is being simulated. Updated in real time!
 
 
 Console Commands
@@ -55,6 +68,10 @@ File that you would like to output to
 
 --input file
 Input file to start the Genetic Algorithm
+This is how a user should load in any creature he or she saves.
+We have included best_creature.txt in our zip file. To load our best creature into the simulation simply add
+--input best_creature.txt
+to the command line arguments. 
 
 --debug
 Debug mode
