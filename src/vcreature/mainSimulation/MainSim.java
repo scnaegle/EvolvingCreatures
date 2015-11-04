@@ -86,6 +86,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--input", description = "Input file to start the Genetic Algorithm", converter = FileConverter.class)
   public static File input_file = null;
 
+  @Parameter(names = "--leg-creature", description = "Only make leg creatures")
+  boolean leg_creature = false;
+
+  @Parameter(names = "--random-creature", description = "Only make random creatures")
+  boolean random_creature = false;
+
   @Parameter(names = "--debug", description = "Debug mode")
   boolean debug = false;
 
@@ -186,17 +192,33 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       boolean leg;
       while (population.size() < CreatureConstants.MAX_POPULATION)
       {
-        leg = rand.nextBoolean();
-        if (leg)
+        if (leg_creature && !random_creature)
         {
           creature = new LegCreature(physicsSpace, rootNode);
+          population.add(creature.getDNA());
+          creature.removeAll();
         }
-        else
+        else if (random_creature && !leg_creature)
         {
           creature = new RandCreature(physicsSpace, rootNode);
+          population.add(creature.getDNA());
+          creature.removeAll();
         }
-        population.add(creature.getDNA());
-        creature.removeAll();
+
+        else
+        {
+          leg = rand.nextBoolean();
+          if (leg)
+          {
+            creature = new LegCreature(physicsSpace, rootNode);
+          }
+          else
+          {
+            creature = new RandCreature(physicsSpace, rootNode);
+          }
+          population.add(creature.getDNA());
+          creature.removeAll();
+        }
       }
     }
 
