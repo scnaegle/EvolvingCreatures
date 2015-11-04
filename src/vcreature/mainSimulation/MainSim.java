@@ -346,7 +346,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       //print("simpleUpdate() joint1.getHingeAngle()=", joint1.getHingeAngle());
       //TODO put Back: myCreature.updateBrain(elapsedSimulationTime);
       myCreature.updateBrain(elapsedSimulationTime);
-      validateCreature();
+      if (!validateCreature()) {
+        population.get(current_creature_index).updateLastFitness(0.0f);
+        current_creature_index++;
+        startSimForCreature(current_creature_index);
+      }
       if (debug) {
         System.out.println("Max Fitness: " + myCreature.getFitness());
       }
