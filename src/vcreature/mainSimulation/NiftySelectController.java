@@ -7,10 +7,8 @@ import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import vcreature.creatureUtil.CreatureConstants;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by sean on 10/17/15.
@@ -49,7 +47,7 @@ public class NiftySelectController implements ScreenController
     max_num_blocks_field.setText(app.max_num_blocks + "");
 
     TextField max_population_field = screen.findNiftyControl("maxPopulationField", TextField.class);
-    max_population_field.setText(app.starting_population_count + "");
+    max_population_field.setText(app.population_count + "");
 
     TextField creature_view_field = screen.findNiftyControl("creatureViewField", TextField.class);
     creature_view_field.setText("");

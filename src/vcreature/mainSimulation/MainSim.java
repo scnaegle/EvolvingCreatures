@@ -2,7 +2,6 @@
 
  import com.beust.jcommander.JCommander;
  import com.beust.jcommander.converters.FileConverter;
- import com.google.common.collect.Iterables;
  import com.jme3.system.JmeContext;
  import de.lessvoid.nifty.elements.render.TextRenderer;
  import vcreature.creatureUtil.CreatureConstants;
@@ -62,11 +61,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--viewing-thread", description = "What thread you are currently viewing")
   public static int viewing_thread = 1;
 
-  @Parameter(names = "--population-count", description = "Starting number of Genomes in the population")
-  int starting_population_count = 10;
+  @Parameter(names = "--max-population", description = "Maximum number of Genomes in the population")
+  int population_count = -1;
 
   @Parameter(names = "--max-num-blocks", description = "Maximum number of blocks for a creature")
-  int max_num_blocks = 10;
+  int max_num_blocks = -1;
 
   @Parameter(names = "--speed", description = "Set the speed of the simulation")
   int sim_speed = 1;
@@ -179,6 +178,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     {
       System.out.println("reading from file: " + input_file);
       DNAio.readPopulation(input_file, population);
+      if(population_count == -1) population_count = population.size();
       System.out.println("read in " + population.size() + " creatures");
     } else {
       myCreature = new OurCreature(physicsSpace, rootNode, false);
@@ -271,7 +271,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     System.out.println("speed: " + speed);
     System.out.println("thread_count: " + thread_count);
     System.out.println("viewing_thread: " + viewing_thread);
-    System.out.println("starting_population_count: " + starting_population_count);
+    System.out.println("population_count: " + population_count);
     System.out.println("max number of blocks:" + max_num_blocks);
     System.out.println("output file: " + output_file);
     System.out.println("input: " + input_file);
@@ -282,8 +282,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   
 
   private void setCreatureConstants() {
-    CreatureConstants.MAX_BLOCKS = max_num_blocks;
-    CreatureConstants.MAX_POPULATION = starting_population_count;
+    if (max_num_blocks != -1) CreatureConstants.MAX_BLOCKS = max_num_blocks;
+    if (population_count != -1) CreatureConstants.MAX_POPULATION = population_count;
   }
 
   private void initLighting()
@@ -831,7 +831,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
   public void setMaxPopulation(int max_population) {
-    this.starting_population_count = max_population;
+    this.population_count = max_population;
     setCreatureConstants();
   }
 
