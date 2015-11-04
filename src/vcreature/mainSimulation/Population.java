@@ -157,7 +157,7 @@ public class Population {
     }
 
     public DNA getLast() {
-      Iterables.getLast(generations).bumpUp();
+      Iterables.getLast(generations).bumpUp(); //This probably shouldn't go here. Talk tomorrow about where to put it
       return Iterables.getLast(generations);
     }
 
