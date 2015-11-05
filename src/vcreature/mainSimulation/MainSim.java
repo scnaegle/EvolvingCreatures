@@ -737,6 +737,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
   private void updateGUICurrentStatsText() {
     if (headless) {
+      System.out.println("**********************************************************");
       System.out.println("Total Fitness: " + population.getTotalRecentFitness());
       System.out.println("Avg Fitness: " + population.getAverageRecentFitness());
       System.out.println("Change from last Generation: " + population.changeInTotalFitness(-2, -1));
