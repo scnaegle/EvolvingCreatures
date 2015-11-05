@@ -46,23 +46,23 @@
         </panel>
         <panel id="gui_settings" width="100%" height="10%" childLayout="vertical" backgroundColor="#00f8">
           <text text="GA Settings:" font="Interface/Fonts/Default.fnt" align="center"/>
-          <text text="Max Population: 10" id="max_population_text" font="Interface/Fonts/Default.fnt" align="left"/>
-          <text text="Max Blocks: 10" id="max_blocks_text" font="Interface/Fonts/Default.fnt" align="left" />
+          <text text="Max Population: 10" id="max_population_text" font="Interface/Fonts/Default.fnt" width="100%"/>
+          <text text="Max Blocks: 10" id="max_blocks_text" font="Interface/Fonts/Default.fnt" width="100%" />
         </panel>
         <panel id="fitness_params" width="100%" height="20%" childLayout="vertical" backgroundColor="#00f8">
           <text text="Current Info:" font="Interface/Fonts/Default.fnt" align="center"/>
-          <text text="Crossover Count: 0" id="crossover_text" font="Interface/Fonts/Default.fnt" width="100%" align="left" />
-          <text text="Total Generations: 0" id="total_generation_text" font="Interface/Fonts/Default.fnt" width="100%" align="left" />
-          <text text="Generation: 0" id="generation_text" font="Interface/Fonts/Default.fnt" width="100%" align="left" />
-          <text text="Creature id: 0" id="creature_id_text" font="Interface/Fonts/Default.fnt" width="100%" align="left" />
-          <text text="Fitness: 0.0" id="fitness_text" font="Interface/Fonts/Default.fnt" width="100%" align="left"/>
+          <text text="Crossover Count: 0" id="crossover_text" font="Interface/Fonts/Default.fnt" width="100%"  />
+          <text text="Total Generations: 0" id="total_generation_text" font="Interface/Fonts/Default.fnt" width="100%"  />
+          <text text="Generation: 0" id="generation_text" font="Interface/Fonts/Default.fnt" width="100%"  />
+          <text text="Creature id: 0" id="creature_id_text" font="Interface/Fonts/Default.fnt" width="100%"  />
+          <text text="Fitness: 0.0" id="fitness_text" font="Interface/Fonts/Default.fnt" width="100%" />
         </panel>
         <panel id="current_stats" width="100%" height="50%" childLayout="vertical" backgroundColor="#00f8">
           <text text="Current Stats:" font="Interface/Fonts/Default.fnt" align="center"/>
-          <text text="Total Fitness: " id="total_fitness_text" font="Interface/Fonts/Default.fnt" align="left"/>
-          <text text="Avg Fitness: " id="avg_fitness_text" font="Interface/Fonts/Default.fnt" align="left"/>
-          <text text="Change From last Gen: " id="change_from_last_generation_text" align="left"/>
-          <text text="Total Change from start: " id="total_change_from_start_text" align="left"/>
+          <text text="Total Fitness: " id="total_fitness_text" font="Interface/Fonts/Default.fnt" width="100%"/>
+          <text text="Avg Fitness: " id="avg_fitness_text" font="Interface/Fonts/Default.fnt" width="100%"/>
+          <text text="Change From last Gen: " id="change_from_last_generation_text" font="Interface/Fonts/Default.fnt" width="100%"/>
+          <text text="Total Change from start: " id="total_change_from_start_text" font="Interface/Fonts/Default.fnt" width="100%"/>
         </panel>
       </panel>
 
