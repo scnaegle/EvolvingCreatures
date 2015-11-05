@@ -44,7 +44,9 @@ the second parent. Crossover points are randomly selected. One of the selection 
 selection. In tournament selection, creatures are selected at random from the population and put into a
 "tournament." The winner (highest fitness) of each tournament is selected for crossover. The other selection
 heuristic is culling selection. In culling selection, only the fitest x% of a population is retained from generation
-to generation. The population number is then restored with new creatures.
+to generation. The population number is then restored with new creatures. As a default, EvolvingCreature runs with 
+single crossover and culling selection heuristics. The user can change which heuristics are used by using the
+command lind. 
 
 GUI
 Working the GUI is relatively straightforward and intuitive. The main screen shows physics simulation. It is here that a creature is loaded into the world and tries to jump. 
