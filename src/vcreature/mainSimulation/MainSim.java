@@ -344,25 +344,31 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     return true;
   }
 
+  /**
+   * makes and returns the DNA of a randomly generated creature
+   * @return DNA of a randomly generated creature
+   */
   private DNA makeAndGetRandomDNA()
   {
     RandCreature creature;
     DNA dna;
     boolean leg;
 
+    //if only creating leg creatures
     if (leg_creature && !random_creature)
     {
       creature = new LegCreature(physicsSpace, rootNode);
       dna = creature.getDNA();
       creature.removeAll();
     }
+    //if only creating random creatures
     else if (random_creature && !leg_creature)
     {
       creature = new RandCreature(physicsSpace, rootNode);
       dna = creature.getDNA();
       creature.removeAll();
     }
-
+    //else randomly choose to make a random or leg creature
     else
     {
       leg = rand.nextBoolean();
