@@ -45,6 +45,14 @@ public class Population {
     return avg_best_fitness;
   }
 
+  public float getTotalFitness(int strand_index) {
+    return getWithRolloverIndex(strand_index).getTotalFitness();
+  }
+
+  public float getAverageFitness(int strand_index) {
+    return getWithRolloverIndex(strand_index).getAverageFitness();
+  }
+
   public void add(DNA dna) {
     Strand gen = new Strand();
     gen.add(dna);
@@ -96,6 +104,29 @@ public class Population {
     return best;
   }
 
+  public float changeInTotalFitness(int index1, int index2) {
+    try {
+      return getTotalFitness(index2) - getTotalFitness(index1);
+    } catch (IndexOutOfBoundsException e) {
+      return 0;
+    }
+  }
+
+  public float changeInAverageFitness(int strand1, int strand2) {
+    try {
+      return getAverageFitness(strand2) - getAverageFitness(strand1);
+    } catch (IndexOutOfBoundsException e) {
+      return 0;
+    }
+  }
+
+  private Strand getWithRolloverIndex(int index) {
+    if (index < 0) {
+      return get(size() - index);
+    } else {
+      return get(index);
+    }
+  }
 
   public class Strand {
     private ArrayList<DNA> generations = new ArrayList<>();

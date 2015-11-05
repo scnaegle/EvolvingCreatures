@@ -2,11 +2,14 @@
 
  import com.beust.jcommander.JCommander;
  import com.beust.jcommander.converters.FileConverter;
+ import com.jme3.renderer.Renderer;
  import com.jme3.system.JmeContext;
  import de.lessvoid.nifty.elements.render.TextRenderer;
+ import de.lessvoid.nifty.layout.align.HorizontalAlign;
  import vcreature.creatureUtil.CreatureConstants;
  import vcreature.hillClimbing.HillClimbing;
  import vcreature.creatureUtil.*;
+ import vcreature.phenotype.Creature;
  import vcreature.phenotype.OurCreature;
  import vcreature.phenotype.PhysicsConstants;
  import vcreature.phenotype.Block;
@@ -114,6 +117,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private boolean view_specific_creature = false;
   private int viewing_creature = -1;
   private int currently_displayed_creature = 0;
+  private float start_total_fitness = 0;
   private Random rand =  new Random();
 
   private Population population;
@@ -387,7 +391,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       }
       if (!headless)
       {
-        updateGUIText();
+        updateGUIFitnessParamsText();
       }
 
       if (isCameraRotating)
@@ -422,6 +426,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           {
             DNAio.writePopulation(population);
 
+            if (crossover_count == 0 && generation_count == 0) {
+              start_total_fitness = population.getTotalRecentFitness();
+            }
+            updateGUICurrentStatsText();
             if (debug)
             {
               // Show all fitnesses
@@ -687,26 +695,38 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
 
-  private void updateGUIText() {
-    de.lessvoid.nifty.elements.Element nifty_element;
-
-    nifty_element = nifty.getCurrentScreen().findElementByName("crossover_text");
-    nifty_element.getRenderer(TextRenderer.class).setText("Crossover Count: " + crossover_count);
-
-    nifty_element = nifty.getCurrentScreen().findElementByName("total_generation_text");
-    nifty_element.getRenderer(TextRenderer.class).setText("Total Generations: " + generation_total_count);
-
-    nifty_element = nifty.getCurrentScreen().findElementByName("generation_text");
-    nifty_element.getRenderer(TextRenderer.class).setText("Generation: " + generation_count);
-
-    nifty_element = nifty.getCurrentScreen().findElementByName("creature_id_text");
-    nifty_element.getRenderer(TextRenderer.class).setText("Creature id: " + currently_displayed_creature);
-
-    nifty_element = nifty.getCurrentScreen().findElementByName("fitness_text");
-    nifty_element.getRenderer(TextRenderer.class).setText("Fitness: " + myCreature.getFitness());
+  private void updateGUIFitnessParamsText() {
+    setTextForElement("crossover_text", "Crossover Count: " + crossover_count);
+    setTextForElement("total_generation_text", "Total Generations: " + generation_total_count);
+    setTextForElement("generation_text", "Generation: " + generation_count);
+    setTextForElement("creature_id_text", "Creature id: " + currently_displayed_creature);
+    setTextForElement("fitness_text", "Fitness: " + myCreature.getFitness());
   }
 
+  private void updateGUISettingsText() {
+    setTextForElement("max_population_text", "Max Population: " + CreatureConstants.MAX_POPULATION);
+    setTextForElement("max_blocks_text", "Max Blocks" + CreatureConstants.MAX_BLOCKS);
+  }
 
+  private void updateGUICurrentStatsText() {
+    setTextForElement("total_fitness_text", "Total Fitness: " + population.getTotalRecentFitness());
+    setTextForElement("avg_fitness_text", "Avg Fitness: " + population.getAverageRecentFitness());
+    System.out.println("change in fitness: " + population.changeInTotalFitness(-2, -1));
+    setTextForElement("change_from_last_generation_text", "Change from last Gen: " + population.changeInTotalFitness(-2, -1));
+    setTextForElement("total_change_from_start_text", "Total Change from start: " + totalFitnessChangeFromStart());
+  }
+
+  private float totalFitnessChangeFromStart() {
+    return population.getTotalRecentFitness() - start_total_fitness;
+  }
+
+  private void setTextForElement(String element, String text) {
+    de.lessvoid.nifty.elements.Element nifty_element = nifty.getCurrentScreen().findElementByName(element);
+    TextRenderer renderer = nifty_element.getRenderer(TextRenderer.class);
+    renderer.setText(text);
+    renderer.setTextHAlign(HorizontalAlign.left);
+    renderer.setLineWrapping(true);
+  }
 
   private void print(String msg, float x)
   {
@@ -778,6 +798,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
     // attach the nifty display to the gui view port as a processor
     guiViewPort.addProcessor(niftyDisplay);
+    if (!headless) {
+      updateGUISettingsText();
+      updateGUICurrentStatsText();
+    }
   }
 
   public void updateSettings() {
