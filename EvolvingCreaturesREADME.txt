@@ -105,7 +105,8 @@ Fitness: The current fitness of the creature which is being simulated.
 Current Stats:
 Total Fitness: The sum of all fitnesses of all creatures in the last completed generation
 Average Fitness: The average fitness of the creatures in the last completed generation
-
+Change from last Gen: The total of all fitnesses in the last generation subtracted from the total of all fitness in the gernation before that
+Total Change from start:
 
 Console Commands
 
@@ -139,8 +140,8 @@ File that you would like to output to
 --input file
 Input file to start the Genetic Algorithm
 This is how a user should load in any creature he or she saves.
-We have included best_creature.txt in our zip file. To load our best creature into the simulation simply add
---input best_creature.txt
+We have included creature.txt in our zip file. To load our best creature into the simulation simply add
+--input creature.txt
 to the command line arguments. 
 
 --leg-creature
