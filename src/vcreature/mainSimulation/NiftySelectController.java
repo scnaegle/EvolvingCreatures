@@ -30,27 +30,27 @@ public class NiftySelectController implements ScreenController
   @Override
   public void bind(Nifty nifty, Screen screen)
   {
-    thread_count_box = screen.findNiftyControl("threadCountSelectionBox", DropDown.class);
-    for(int t : thread_count_selections) {
-      thread_count_box.addItem(t);
-    }
-    thread_view_box = screen.findNiftyControl("threadViewSelectionBox", DropDown.class);
-    for(int i = 1; i <= app.thread_count; i++) {
-      thread_view_box.addItem(i);
-    }
+//    thread_count_box = screen.findNiftyControl("threadCountSelectionBox", DropDown.class);
+//    for(int t : thread_count_selections) {
+//      thread_count_box.addItem(t);
+//    }
+//    thread_view_box = screen.findNiftyControl("threadViewSelectionBox", DropDown.class);
+//    for(int i = 1; i <= app.thread_count; i++) {
+//      thread_view_box.addItem(i);
+//    }
     Slider speed_slider = screen.findNiftyControl("speedSlider", Slider.class);
     speed_slider.setMin(1);
     speed_slider.setMax(50);
     speed_slider.setButtonStepSize(5);
 
-    TextField max_num_blocks_field = screen.findNiftyControl("maxNumBlocksField", TextField.class);
-    max_num_blocks_field.setText(app.max_num_blocks + "");
+//    TextField max_num_blocks_field = screen.findNiftyControl("maxNumBlocksField", TextField.class);
+//    max_num_blocks_field.setText(app.max_num_blocks + "");
+//
+//    TextField max_population_field = screen.findNiftyControl("maxPopulationField", TextField.class);
+//    max_population_field.setText(app.population_count + "");
 
-    TextField max_population_field = screen.findNiftyControl("maxPopulationField", TextField.class);
-    max_population_field.setText(app.population_count + "");
-
-    TextField creature_view_field = screen.findNiftyControl("creatureViewField", TextField.class);
-    creature_view_field.setText("");
+//    TextField creature_view_field = screen.findNiftyControl("creatureViewField", TextField.class);
+//    creature_view_field.setText("");
 
     DropDown creature_view_box = screen.findNiftyControl("creatureViewSelectionBox", DropDown.class);
     creature_view_box.addItem("Run GA");
