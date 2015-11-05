@@ -140,7 +140,7 @@ File that you would like to output to
 --input file
 Input file to start the Genetic Algorithm
 This is how a user should load in any creature he or she saves.
-We have included creature.txt in our zip file. To load our best creature into the simulation simply add
+We have included creature.txt in our zip file. To load this creature into the simulation simply add
 --input creature.txt
 to the command line arguments. 
 
