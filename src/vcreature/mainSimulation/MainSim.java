@@ -448,7 +448,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             {
               bestFitnessSoFar = population.getBest().getFitness();
             }
-            System.out.println("BEST FITNESS SO FAR: " + bestFitnessSoFar);
+            if (headless) {
+              System.out.println("BEST FITNESS SO FAR: " + bestFitnessSoFar);
+            }
             //DNAio.writePop(bestCreature.getDNA());
             DNAio.writePopulation(population);
 
@@ -734,10 +736,18 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   }
 
   private void updateGUICurrentStatsText() {
-    setTextForElement("total_fitness_text", "Total Fitness: " + population.getTotalRecentFitness());
-    setTextForElement("avg_fitness_text", "Avg Fitness: " + population.getAverageRecentFitness());
-    setTextForElement("change_from_last_generation_text", "Change from last Gen: " + population.changeInTotalFitness(-2, -1));
-    setTextForElement("total_change_from_start_text", "Total Change from start: " + totalFitnessChangeFromStart());
+    if (headless) {
+      System.out.println("Total Fitness: " + population.getTotalRecentFitness());
+      System.out.println("Avg Fitness: " + population.getAverageRecentFitness());
+      System.out.println("Change from last Generation: " + population.changeInTotalFitness(-2, -1));
+      System.out.println("Total Change from start:" + totalFitnessChangeFromStart());
+    } else {
+      setTextForElement("total_fitness_text", "Total Fitness: " + population.getTotalRecentFitness());
+      setTextForElement("avg_fitness_text", "Avg Fitness: " + population.getAverageRecentFitness());
+      setTextForElement("change_from_last_generation_text", "Change from last Gen: " + population.changeInTotalFitness(-2, -1));
+      setTextForElement("total_change_from_start_text", "Total Change from start: " + totalFitnessChangeFromStart());
+      setTextForElement("best_fitness_text", "Best fitness so far: " + bestFitnessSoFar);
+    }
   }
 
   private float totalFitnessChangeFromStart() {

@@ -63,6 +63,7 @@
           <text text="Avg Fitness: " id="avg_fitness_text" font="Interface/Fonts/Default.fnt" width="100%"/>
           <text text="Change From last Gen: " id="change_from_last_generation_text" font="Interface/Fonts/Default.fnt" width="100%"/>
           <text text="Total Change from start: " id="total_change_from_start_text" font="Interface/Fonts/Default.fnt" width="100%"/>
+          <text text="Best fitness so far: " id="best_fitness_text" font="Interface/Fonts/Default.fnt" width="100%"/>
         </panel>
       </panel>
 
