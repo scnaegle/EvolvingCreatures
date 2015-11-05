@@ -180,7 +180,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       System.out.println("reading from file: " + input_file);
       DNAio.readPopulation(input_file, population);
       System.out.println("read in " + population.size() + " creatures");
-    } else {
+    } else
+    {
       myCreature = new OurCreature(physicsSpace, rootNode, false);
       population.add(myCreature.getDNA());
       myCreature.remove();
@@ -188,37 +189,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       population.add(myCreature.getDNA());
       myCreature.remove();
 
-      RandCreature creature;
-      boolean leg;
       while (population.size() < CreatureConstants.MAX_POPULATION)
       {
-        if (leg_creature && !random_creature)
-        {
-          creature = new LegCreature(physicsSpace, rootNode);
-          population.add(creature.getDNA());
-          creature.removeAll();
-        }
-        else if (random_creature && !leg_creature)
-        {
-          creature = new RandCreature(physicsSpace, rootNode);
-          population.add(creature.getDNA());
-          creature.removeAll();
-        }
-
-        else
-        {
-          leg = rand.nextBoolean();
-          if (leg)
-          {
-            creature = new LegCreature(physicsSpace, rootNode);
-          }
-          else
-          {
-            creature = new RandCreature(physicsSpace, rootNode);
-          }
-          population.add(creature.getDNA());
-          creature.removeAll();
-        }
+        population.add(makeAndGetRandomDNA());
       }
     }
 
@@ -361,6 +334,43 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
      // throw new IllegalStateException();
     }
     return true;
+  }
+
+  private DNA makeAndGetRandomDNA()
+  {
+    RandCreature creature;
+    DNA dna;
+    boolean leg;
+
+    if (leg_creature && !random_creature)
+    {
+      creature = new LegCreature(physicsSpace, rootNode);
+      dna = creature.getDNA();
+      creature.removeAll();
+    }
+    else if (random_creature && !leg_creature)
+    {
+      creature = new RandCreature(physicsSpace, rootNode);
+      dna = creature.getDNA();
+      creature.removeAll();
+    }
+
+    else
+    {
+      leg = rand.nextBoolean();
+      if (leg)
+      {
+        creature = new LegCreature(physicsSpace, rootNode);
+        dna = creature.getDNA();
+      }
+      else
+      {
+        creature = new RandCreature(physicsSpace, rootNode);
+        dna = creature.getDNA();
+      }
+      creature.removeAll();
+    }
+    return dna;
   }
 
   /* Use the main event loop to trigger repeating actions. */
@@ -605,7 +615,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    */
   private void cullLeastFit(ArrayList<DNA> population)
   {
-    LegCreature creature;
+    RandCreature creature;
     int numToCull = (int)(CreatureConstants.MAX_POPULATION * CreatureConstants.CULL_PERCENT);
     if(numToCull < 1)
     {
@@ -621,9 +631,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
     while(population.size() < CreatureConstants.MAX_POPULATION)
     {
-      creature = new LegCreature(physicsSpace, rootNode);
-      population.add(creature.getDNA());
-      creature.removeAll();
+      population.add(makeAndGetRandomDNA());
     }
   }
 
