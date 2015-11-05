@@ -467,7 +467,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             generation_total_count++;
             generation_count++;
 
-          //TODO gencount > 10 in here to force crossover for testing
+          //limiting number of hillclimb generations to limit runaway hillclimb
+            //sessions.
           if(hillClimbing.isMutationNeeded() || generation_count > 100)
           {
             //TODO GA here
