@@ -10,7 +10,7 @@ import com.jme3.material.Material;
 import com.jme3.math.Transform;
 import com.jme3.math.Quaternion;
 import com.jme3.scene.Geometry;
-
+import vcreature.mainSimulation.MainSim;
 
 
 /**
@@ -254,7 +254,8 @@ public class Creature
     }
     
     elapsedSimulationTime  = 0;
-    System.out.println("Creature.placeOnGround() shift:"+ -currentHeightOfLowestPoint);
+
+    //System.out.println("Creature.placeOnGround() shift:"+ -currentHeightOfLowestPoint);
   }
 
   
@@ -399,7 +400,7 @@ public class Creature
     { 
       physicsSpace.update(0);
       maxHeightOfLowestPoint = 0;
-      System.out.println("Creature.updateBrain() start");
+      //System.out.println("Creature.updateBrain() start");
       this.elapsedSimulationTime = elapsedSimulationTime;
       return 0;
     }

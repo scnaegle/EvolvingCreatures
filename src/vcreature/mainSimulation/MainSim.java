@@ -82,8 +82,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--tournament-selection", description = "Set the crossover selection to tournament selection instead of culling selection")
   boolean tournament_selection = false;
 
-  @Parameter(names = "--output", description = "File that you woud like to output to", converter = FileConverter.class)
+  @Parameter(names = "--output", description = "File that you would like to output to", converter = FileConverter.class)
   public static File output_file = new File("dna_out.txt");
+
+  @Parameter(names = "--output-best", description = "File that you would like to output the best creature to", converter = FileConverter.class)
+  public static File output_best_creature = new File("best_creature.txt");
 
   @Parameter(names = "--input", description = "Input file to start the Genetic Algorithm", converter = FileConverter.class)
   public static File input_file = null;
@@ -119,6 +122,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private int currently_displayed_creature = 0;
   private float start_total_fitness = 0;
   private Random rand =  new Random();
+  private float bestFitnessSoFar;
 
   private Population population;
 
@@ -186,12 +190,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       System.out.println("read in " + population.size() + " creatures");
     } else
     {
-      myCreature = new OurCreature(physicsSpace, rootNode, false);
-      population.add(myCreature.getDNA());
-      myCreature.remove();
-      myCreature = new OurCreature(physicsSpace, rootNode, true);
-      population.add(myCreature.getDNA());
-      myCreature.remove();
+      //myCreature = new OurCreature(physicsSpace, rootNode, false);
+      //population.add(myCreature.getDNA());
+      //myCreature.remove();
+      //myCreature = new OurCreature(physicsSpace, rootNode, true);
+      //population.add(myCreature.getDNA());
+      //myCreature.remove();
 
       while (population.size() < CreatureConstants.MAX_POPULATION)
       {
@@ -229,7 +233,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       }
       myCreature = new OurCreature(physicsSpace, rootNode, population.get(creature_index).getLast());
       myCreature.placeOnGround();
-      System.out.println("Valid " + myCreature.isValid());
+      //System.out.println("Valid " + myCreature.isValid());
       elapsedSimulationTime = 0.0f;
     } catch (IllegalArgumentException e) {
       e.printStackTrace();
@@ -424,7 +428,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
         }
         else
         {
-          System.out.println("current creature fitness: " + myCreature.getFitness());
+          //System.out.println("current creature fitness: " + myCreature.getFitness());
           storeFitnessForCurrentCreature();
           myCreature.remove();
           if (current_creature_index < CreatureConstants.MAX_POPULATION - 1)
@@ -434,6 +438,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           }
           else
           {
+            if (bestFitnessSoFar < population.getBest().getFitness())
+            {
+              bestFitnessSoFar = population.getBest().getFitness();
+            }
+            System.out.println("BEST FITNESS SO FAR: " + bestFitnessSoFar);
+            //DNAio.writeBestCreature(bestCreature.getDNA());
             DNAio.writePopulation(population);
 
             if (crossover_count == 0 && generation_count == 0) {
@@ -623,7 +633,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
    */
   private void cullLeastFit(ArrayList<DNA> population)
   {
-    RandCreature creature;
     int numToCull = (int)(CreatureConstants.MAX_POPULATION * CreatureConstants.CULL_PERCENT);
     if(numToCull < 1)
     {
@@ -780,6 +789,46 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       app.start();
     }
   }
+
+  /**
+  public class BestCreature
+  {
+    DNA bestDNASoFar;
+    float fitness;
+
+    public BestCreature()
+    {
+      bestDNASoFar = null;
+    }
+
+    public DNA getDNA()
+    {
+      return bestDNASoFar;
+    }
+
+    public float getFitness()
+    {
+      return fitness;
+    }
+
+    public void setBestDNA(DNA toCompare)
+    {
+      if (bestDNASoFar == null)
+      {
+        bestDNASoFar = new DNA(toCompare);
+        fitness = toCompare.getFitness();
+      }
+      else
+      {
+        if (toCompare.getFitness() > fitness)
+        {
+          bestDNASoFar = new DNA(toCompare);
+          fitness = toCompare.getFitness();
+        }
+      }
+    }
+  }*/
+
 
   //============GUI Stuff======================================================
 
