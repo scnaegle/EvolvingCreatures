@@ -112,7 +112,7 @@ Make sure that the creatures are valid (e.g. no blocks made within each other, n
 Blocks can somtimes have a large amount of space between them.
 
 Contributions:
-Sean: GUI and all around BOSS
+Sean: GUI, simulation master, and all around BOSS
 Justin: DNA Structure, DNA I/O, Crossover, OurCreature(wrapper for Creature) structure.
 Zach: Hill Climbing on DNA population
 Julian: Random/Targeted creature generation
