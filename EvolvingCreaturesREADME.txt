@@ -43,10 +43,26 @@ then the offspring has approximately half of the genes from the first parent and
 the second parent. Crossover points are randomly selected. One of the selection heuristics used is tournament
 selection. In tournament selection, creatures are selected at random from the population and put into a
 "tournament." The winner (highest fitness) of each tournament is selected for crossover. The other selection
-heuristic is culling selection. In culling selection, only the fitest x% of a population is retained from generation
-to generation. The population number is then restored with new creatures. As a default, EvolvingCreature runs with 
-single crossover and culling selection heuristics. The user can change which heuristics are used by using the
-command lind. 
+heuristic is truncation (referred to as culling in the code) selection. In truncation selection, only the fitest x% of a
+population is retained from generation to generation. The population number is then restored with new creatures. As a
+default, EvolvingCreature runs with single crossover and truncation selection heuristics. The user can change which 
+heuristics are used by using the command line.
+
+OurCreature
+OurCreature is a wrapper class for the Creature class.  Where necessary, it intercepts and stores copies of the information
+needed to create the DNA.  OurCreature contains constructors for making an empty creature, making a creature from a 
+DNA object, and two prefabs; FlappyBird and a four legged variant of flappy bird.
+
+DNA
+The DNA class is a numerical parallel to the OurCreature class, and by extension the provided Creature class.  Its nested
+classes, BlockDNA and NeuronDNA, similarly parallel Block and Neuron.  These classes provide numerical and vector
+representations of a creature, accessors and mutators for the creature's properties, and instructions and methods for
+instantiating a creature from the DNA. In addition, DNA implements comparable, and is sorted on the fitness value.  It's
+toString method creates a linear representation of the values used for construction for file i/o.
+
+DNAio
+DNAio contains static methods for reading and writing DNA .txt files.  It writes DNA's toString to a .txt file and parses
+and constructs DNA from a DNA input file.
 
 GUI
 Working the GUI is relatively straightforward and intuitive. The main screen shows physics simulation. It is here that a creature is loaded into the world and tries to jump. 
