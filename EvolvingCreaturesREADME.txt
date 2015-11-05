@@ -53,6 +53,15 @@ OurCreature is a wrapper class for the Creature class.  Where necessary, it inte
 needed to create the DNA.  OurCreature contains constructors for making an empty creature, making a creature from a 
 DNA object, and two prefabs; FlappyBird and a four legged variant of flappy bird.
 
+RandCreature
+RandCreature is the class which is responsible for generating a creature of random number of blocks, random block sizes,
+and random block locations. Every block in RandCreature is connected edge-to-edge
+
+LegCreature
+Leg creature is the class which is responsible for generating a creature which has symmetric legs. Random blocks are
+generated and added symmetrically to the root or other previously added blocks. This creates a creature with legs
+sprouting from the root.
+
 DNA
 The DNA class is a numerical parallel to the OurCreature class, and by extension the provided Creature class.  Its nested
 classes, BlockDNA and NeuronDNA, similarly parallel Block and Neuron.  These classes provide numerical and vector
@@ -65,19 +74,37 @@ DNAio contains static methods for reading and writing DNA .txt files.  It writes
 and constructs DNA from a DNA input file.
 
 GUI
-Working the GUI is relatively straightforward and intuitive. The main screen shows physics simulation. It is here that a creature is loaded into the world and tries to jump. 
+Working the GUI is relatively straightforward and intuitive. The main screen shows physics simulation. It is here
+that a creature is loaded into the world and tries to jump. 
 
-At the bottom of the main screen is a slider which allows the user to select the speed of the simulation. It should be noted that changing the speed of the simulation will slightly change the fitness of the creature. If a user wants to view the most "real" fitness of a creature, the simulation should be viewed on the lowest speed where the slider is set all the way to the left. 
+At the bottom of the main screen is a slider which allows the user to select the speed of the simulation. It should
+be noted that changing the speed of the simulation will slightly change the fitness of the creature. If a user wants
+to view the most "real" fitness of a creature, the simulation should be viewed on the lowest speed where the slider
+is set all the way to the left. 
 
-In the top left corner, a pull down menu allows a user to select an individual creature from a population. If an individual creature is selected, the hillclimbing/genetic algorithm stops and the selected creature is loaded into the simulation for user viewing. In order to return to the hillclimbing/genetic, the user should select the first option on the menu: Run GA
+In the top left corner, a pull down menu allows a user to select an individual creature from a population. If an
+individual creature is selected, the hillclimbing/genetic algorithm stops and the selected creature is loaded into
+the simulation for user viewing. In order to return to the hillclimbing/genetic, the user should select the first
+option on the menu: Run GA
 
-Below the pull down menu are two self explanitory buttons: "Prev Creature" and "Next Creature." Clicking on "Prev Creature" will allow the user to view the previous creature in the population and clicking "Next Creature" will allow the user to view the next creature in the population.
+Below the pull down menu are two self explanitory buttons: "Prev Creature" and "Next Creature." Clicking on "Prev
+Creature" will allow the user to view the previous creature in the population and clicking "Next Creature" will
+allow the user to view the next creature in the population.
 
-Under these two buttons is where information related to the simulation is output. 
-Crossover Count: How many successful crossovers have occured in this population.
-Total Generations: How many generations this population have gone through.
-Creature id: The number of the creature in the population which is currently in the physics simulator.
-Fitness: The current fitness of the creature which is being simulated. Updated in real time!
+Under these two buttons begins where statistics about the simulation are output.
+GA Settings:
+Max Population: How many creatures are allowed in the population
+Max Blocks: The maximum number of Blocks a creature is allowed to have
+
+Current Info:
+Crossover Count: How many crossovers ahve occured in this population
+Total Generations: How many generations this population has gone through
+Creature id: the number of the creature in the population which is currently in the simulator.
+Fitness: The current fitness of the creature which is being simulated.
+
+Current Stats:
+Total Fitness: The sum of all fitnesses of all creatures in the last completed generation
+Average Fitness: The average fitness of the creatures in the last completed generation
 
 
 Console Commands
