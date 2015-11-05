@@ -11,15 +11,40 @@ Julian Weisburd
 
 
 Welcome to EvolvingCreatures!
-The goal of this program is to find the highest jumping creature in an infinte search space through a combination of hillclimbing search and genetic alogirthms.Each creature is a series of block. When a block is added to a creature it is added to a parent block. The point at which each block is connected to its parent is called a joint. Blocks can rotate about these joints. The jumping functionality comes from a series of neurons which each block has. When a neuron is fired, blocks try to rotate about their joint axes with a force dependant on their parent block's volume. Creatures live in a physics simulator which applies gravity and collision tests to the creature. So, in order to jump, the overall force that is created by the creatures rotating blocks must be upwards and greater than the force of gravity.
 
-When EvolvingCreatures is started, a population of random creatures are created. Random creatures have a random number of blocks, random block sizes, random joint placements, and random neurons. All blocks that are created are axis aligned and all neurons have the same construction: they try to rotate a block with the maximum impulse allowed around an axis at a certain time. While the original code based allowed for neurons to have much more complexity, we decided to keep the neurons as simple as possible. 
+The goal of this program is to find the highest jumping creature in an infinte search space through a combination of
+hillclimbing search and genetic alogirthms.Each creature is a series of block. When a block is added to a creature it is added to a parent block. The point at which each block is connected to its parent is called a joint. 
+Blocks can rotate about these joints. The jumping functionality comes from a series of neurons which each block has.
+When a neuron is fired, blocks try to rotate about their joint axes with a force dependant on their parent block's
+volume. Creatures live in a physics simulator which applies gravity and collision tests to the creature. So, in
+order to jump, the overall force that is created by the creatures rotating blocks must be upwards and greater than
+the force of gravity.
+
+When EvolvingCreatures is started, a population of random creatures are created. Random creatures have a random
+number of blocks, random block sizes, random joint placements, and random neurons. All blocks that are created are
+axis aligned and all neurons have the same construction: they try to rotate a block with the maximum impulse allowed
+around an axis at a certain time. While the original code based allowed for neurons to have much more complexity, we
+decided to keep the neurons as simple as possible. 
 
 Hill Climbing then will pick a random block of a creature to mutate, and will pick either to mutate the size of the block, or the neurons connected to that block. The neuron mutations Hill Climbing can choose from is,
 mutating the neuron type, mutating the neuron constant, swapping 2 neuron types, or swapping 2 neuron constants. If fitness improves then Hill Climbing with some probability choose to repeat the same mutation sequence.
 If fitness doesn't improve, or the event of repeating the mutation sequence isn't chosen, then it will go back to picking random mutations. Hill Climbing will set a flag when mutation needed threshold is reached, so
-GA can do mutations on the population.  The mutation needed threshold is reached when the overall average population fitness is worse than the last generation's, or when the absolute value of the deviation from the
+the Genetic Algorithm can do mutations on the population. The mutation needed threshold is reached when the overall average population fitness is worse than the last generation's, or when the absolute value of the deviation from the
 current generation's and last generation's is less than 0.2.  Once Hill Climbing is finished going through the entire population of DNAs, it will return the mutated population back to the MainSim.
+
+If the Genetic Algorithm is called into action to act on the population when Hill Climbing stalls out, then it will
+attempt to produce creatures with better fitness by performing cross overs on the DNA of the creatures in the
+population. EvolvingCreatures implements two differnt crossover heuristics and two different selection heuristics.
+One of the crossover heuristics is single crossover. In single crossover, a single crossover point on both parents'
+organism DNA strings is selected. All data beyond that point in either organism DNA is swapped between the two
+parent organisms. The other crossover heuristic is uniform crossover. In uniform crossover, a fixed mixing
+ration between two parents dictates how many crossover events take place. For example, if the mixing ration is 0.5
+then the offspring has approximately half of the genes from the first parent and the other half of the genes from
+the second parent. Crossover points are randomly selected. One of the selection heuristics used is tournament
+selection. In tournament selection, creatures are selected at random from the population and put into a
+"tournament." The winner (highest fitness) of each tournament is selected for crossover. The other selection
+heuristic is culling selection. In culling selection, only the fitest x% of a population is retained from generation
+to generation. The population number is then restored with new creatures.
 
 GUI
 Working the GUI is relatively straightforward and intuitive. The main screen shows physics simulation. It is here that a creature is loaded into the world and tries to jump. 
@@ -73,12 +98,21 @@ We have included best_creature.txt in our zip file. To load our best creature in
 --input best_creature.txt
 to the command line arguments. 
 
+--leg-creature
+Have a population of only creatures with random legs
+
+--random-creature
+Have a population of only completely random creatures
+
 --debug
 Debug mode
 
+Bugs:
+Make sure that the creatures are valid (e.g. no blocks made within each other, no creature made in the floor) isn't perfect.
+Blocks can somtimes have a large amount of space between them.
 
 Contributions:
-Sean: 
+Sean: GUI, simulation master, and all around BOSS
 Justin: DNA Structure, DNA I/O, Crossover, OurCreature(wrapper for Creature) structure.
 Zach: Hill Climbing on DNA population
 Julian: Random/Targeted creature generation
