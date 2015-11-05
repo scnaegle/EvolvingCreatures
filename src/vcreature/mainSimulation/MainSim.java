@@ -436,6 +436,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           {
             DNAio.writePopulation(population);
 
+            population.updateFitnessCache();
             if (crossover_count == 0 && generation_count == 0) {
               start_total_fitness = population.getTotalRecentFitness();
             }
@@ -719,7 +720,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private void updateGUICurrentStatsText() {
     setTextForElement("total_fitness_text", "Total Fitness: " + population.getTotalRecentFitness());
     setTextForElement("avg_fitness_text", "Avg Fitness: " + population.getAverageRecentFitness());
-    System.out.println("change in fitness: " + population.changeInTotalFitness(-2, -1));
     setTextForElement("change_from_last_generation_text", "Change from last Gen: " + population.changeInTotalFitness(-2, -1));
     setTextForElement("total_change_from_start_text", "Total Change from start: " + totalFitnessChangeFromStart());
   }

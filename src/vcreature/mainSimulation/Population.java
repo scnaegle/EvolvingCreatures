@@ -53,6 +53,18 @@ public class Population {
     return getWithRolloverIndex(strand_index).getAverageFitness();
   }
 
+  public float getTotalGenerationFitness(int gen_index) {
+    float total = 0;
+    for(Strand strand : strands) {
+      total += strand.getWithRolloverIndex(gen_index).getFitness();
+    }
+    return total;
+  }
+
+  public float getAverageGenerationFitness(int gen_index) {
+    return getTotalGenerationFitness(gen_index) / size();
+  }
+
   public void add(DNA dna) {
     Strand gen = new Strand();
     gen.add(dna);
@@ -104,19 +116,27 @@ public class Population {
     return best;
   }
 
-  public float changeInTotalFitness(int index1, int index2) {
+  public float changeInTotalFitness(int gen1, int gen2) {
     try {
-      return getTotalFitness(index2) - getTotalFitness(index1);
+      return getTotalGenerationFitness(gen2) - getTotalGenerationFitness(gen1);
     } catch (IndexOutOfBoundsException e) {
-      return 0;
+      try {
+        return getTotalGenerationFitness(gen2);
+      } catch (IndexOutOfBoundsException e2) {
+        return 0;
+      }
     }
   }
 
-  public float changeInAverageFitness(int strand1, int strand2) {
+  public float changeInAverageFitness(int gen1, int gen2) {
     try {
-      return getAverageFitness(strand2) - getAverageFitness(strand1);
+      return getAverageGenerationFitness(gen2) - getAverageGenerationFitness(gen1);
     } catch (IndexOutOfBoundsException e) {
-      return 0;
+      try {
+        return getAverageGenerationFitness(gen2);
+      } catch (IndexOutOfBoundsException e2) {
+        return 0;
+      }
     }
   }
 
@@ -198,6 +218,14 @@ public class Population {
 
     public void remove(int index) {
       generations.remove(index);
+    }
+
+    private DNA getWithRolloverIndex(int index) {
+      if (index < 0) {
+        return get(size() + index);
+      } else {
+        return get(index);
+      }
     }
   }
 }
