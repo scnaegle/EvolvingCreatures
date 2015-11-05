@@ -2,6 +2,7 @@ package vcreature.creatureUtil;
 
 import com.google.common.collect.Iterables;
 import com.jme3.math.Vector3f;
+import sun.applet.Main;
 import vcreature.mainSimulation.MainSim;
 import vcreature.mainSimulation.Population;
 import vcreature.phenotype.Neuron;
@@ -41,6 +42,27 @@ public class DNAio
       System.out.println("Could not write file");
     }
   }
+
+  /**
+   * Take a creature's DNA and write to a file
+   * @param bestCreature  creature you want to save
+   */
+  public static void writeSingleCreture(DNA bestCreature)
+  {
+    StringBuilder outString = new StringBuilder();
+    outString.append(bestCreature);
+    try
+    {
+      FileWriter writer = new FileWriter(MainSim.output_best_creature);
+      writer.write(outString.toString());
+      writer.close();
+    }
+    catch(IOException e)
+    {
+      System.out.println("Could not write file");
+    }
+  }
+
 
   /**
    * Create DNAs from file
