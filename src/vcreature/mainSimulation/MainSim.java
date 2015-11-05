@@ -723,7 +723,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
   private void updateGUISettingsText() {
     setTextForElement("max_population_text", "Max Population: " + CreatureConstants.MAX_POPULATION);
-    setTextForElement("max_blocks_text", "Max Blocks" + CreatureConstants.MAX_BLOCKS);
+    setTextForElement("max_blocks_text", "Max Blocks: " + CreatureConstants.MAX_BLOCKS);
   }
 
   private void updateGUICurrentStatsText() {
