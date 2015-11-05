@@ -43,7 +43,11 @@ public class DNAio
     }
   }
 
-  public static void writeBestCreature(DNA bestCreature)
+  /**
+   * Take a creature's DNA and write to a file
+   * @param bestCreature  creature you want to save
+   */
+  public static void writeSingleCreture(DNA bestCreature)
   {
     StringBuilder outString = new StringBuilder();
     outString.append(bestCreature);

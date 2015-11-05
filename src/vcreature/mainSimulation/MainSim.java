@@ -443,7 +443,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
               bestFitnessSoFar = population.getBest().getFitness();
             }
             System.out.println("BEST FITNESS SO FAR: " + bestFitnessSoFar);
-            //DNAio.writeBestCreature(bestCreature.getDNA());
+            //DNAio.writePop(bestCreature.getDNA());
             DNAio.writePopulation(population);
 
             if (crossover_count == 0 && generation_count == 0) {
