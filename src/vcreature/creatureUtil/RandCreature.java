@@ -22,7 +22,7 @@ import vcreature.phenotype.*;
  * save it into DNA by making a new DNA object with the RandCreature in its parameter
  * and immediately remove the RandCreature from the physics space (RandCreature.removeAll())
  *
- * This class is used by HillClimbing and MainSim when they create a population of creatures
+ * This class is used by MainSim when a population is initialized by a number of random creatures
  */
 
 public class RandCreature

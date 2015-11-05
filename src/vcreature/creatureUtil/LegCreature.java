@@ -12,6 +12,13 @@ import vcreature.phenotype.Neuron;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Class responsible for making a valid, random creature with symmetrical legs
+ * Intended use is to make LegCreature in the physics space, save it into DNA immediately
+ * and remove LegCreature from the world (removeAll()).
+ *
+ * This class is used by MainSim when a population is initialized by a number of random creatures
+ */
 public class LegCreature extends RandCreature
 {
   public ArrayList<IdSurfaceEdge> availableEdges;
@@ -30,18 +37,24 @@ public class LegCreature extends RandCreature
     blockProperties = new ArrayList<>();
     blockAngles = new ArrayList<>();
 
+    //find a random number of blocks to construct the creature with
     int blockCount = numberOfBlocks.get(rand.nextInt(numberOfBlocks.size()));
 
     makeRandomRoot();
 
+    //while you can still add blocks and you haven't tried to add a block att all the edges
     while (body.size() < blockCount && !availableEdges.isEmpty())
     {
+      //select a random parent, surface, and edge to add to from the available edges list
       currentISE = availableEdges.get(rand.nextInt(availableEdges.size()));
-      addMirroredBlocks(currentISE);
+      addMirroredBlocks(currentISE); //add blocks
     }
   }
 
-  public void fillBlockPossibilities()
+  /**
+   * Find all the odd numbers from 3 up to the max number of blocks
+   */
+  private void fillBlockPossibilities()
   {
     int tempInt;
     if (CreatureConstants.MAX_BLOCKS%2==0)
@@ -83,6 +96,10 @@ public class LegCreature extends RandCreature
     return addRoot(rootCenter, rootSize, axisAligned);
   }
 
+  /**
+   * Takes the passed in Id+surface+edge of a parent block and tries to add a child to that location
+   * @param edgeAddTo id+surface+edge of parent block you want to add a child to
+   */
   public void addMirroredBlocks(IdSurfaceEdge edgeAddTo)
   {
     int parentID = edgeAddTo.id;
@@ -92,6 +109,7 @@ public class LegCreature extends RandCreature
     int childSurface;
     int mirrorParentID = 0;
 
+    //if the parent is the root, then both children will be children of the root
     if (parentID != 0)
     {
       mirrorParentID = parentID + 1;
@@ -101,6 +119,7 @@ public class LegCreature extends RandCreature
     Block mirrorParent = getParentBlock(mirrorParentID);
 
     childSurface = correspondingChildSurface(edgeAddTo.surface);
+    //find the an edge on the child block to make a joint to
     childEdge = findChildEdge(parentEdge);
 
     Vector3f parentSize = new Vector3f(parent.getSizeX()/2, parent.getSizeY()/2, parent.getSize()/2);
@@ -121,19 +140,25 @@ public class LegCreature extends RandCreature
     //findVectorToEdge(parentSize, parentEdge, parentSurface, parentJoint, rotationAxis);
     //findVectorToEdge(childSize, childEdge, childSurface, childJoint, rotationAxis);
 
+    //find a joint for the parent and child so that the blocks can connect
     findVectorToEdge(parentSize, parentEdge, 1, parentJoint, rotationAxis);
     findVectorToEdge(childSize, childEdge, 0, childJoint, rotationAxis);
 
+    //mirror the joints so that you can add a mirrored block to the otherside of the creature
     findMirrorVector(parentEdge, parentJoint, parentMirrorJoint);
     findMirrorVector(childEdge, childJoint, childMirrorJoint);
 
     Block newBlock = addBlock(axisAligned, childSize, parent, parentJoint, childJoint, rotationAxis);
     Block mirrorNewBlock = addBlock(axisAligned, childSize, mirrorParent, parentMirrorJoint, childMirrorJoint, rotationAxis);
 
+    //if adding blocks doesn't make a collision
     if (!removeIfIntersection())
     {
+      //add the new childs available edges to list of possible edges to add a new block to
       addAvailableEdges(newBlock.getID());
+      //add neurons to the new blocks
       addMirroredNeurons(newBlock, mirrorNewBlock);
+      //copy the Block's information for DNA creation
       blockProperties.add(makeBlockVectorArray(newBlock, childSize, rotationAxis, rotationAxis));
       blockAngles.add(Arrays.copyOf(axisAligned, axisAligned.length));
       blockProperties.add(makeBlockVectorArray(mirrorNewBlock, childSize, rotationAxis, rotationAxis));
@@ -142,6 +167,12 @@ public class LegCreature extends RandCreature
   }
 
 
+  /**
+   * Add mirrored neurons to the two blocks passed in
+   * if one block gets a neuron with +impulse, then the other block will get the same neuron but with -impulse
+   * @param newBlock
+   * @param mirror
+   */
   private void addMirroredNeurons(Block newBlock, Block mirror)
   {
     int numberNeurons = rand.nextInt(CreatureConstants.MAX_NEURON_PER_BLOCK)+1;
@@ -152,6 +183,7 @@ public class LegCreature extends RandCreature
     Neuron m;
     for (int i = 0; i <= numberNeurons; ++i)
     {
+      //select random time for neuron firing
       seconds = rand.nextInt(CreatureConstants.MAX_NEURON_SECONDS - CreatureConstants.MIN_NEURON_SECONDS) + CreatureConstants.MIN_NEURON_SECONDS;
       seconds += rand.nextFloat();
       sign = rand.nextInt(2);
@@ -159,6 +191,8 @@ public class LegCreature extends RandCreature
       {
         maxImpulse = -maxImpulse;
       }
+      //if one neuron's impulse is + then the other should be -
+      //both should fire at the same time
       n = makeNewNeuron(maxImpulse, seconds);
       m = makeNewNeuron(-maxImpulse, seconds);
       newBlock.addNeuron(n);
@@ -166,7 +200,13 @@ public class LegCreature extends RandCreature
     }
   }
 
-  public Neuron makeNewNeuron(float maxImpulse, float seconds)
+  /**
+   * Makes a new neuron that will fire at the passed in time with the passed in impulse
+   * @param maxImpulse impulse to fire with
+   * @param seconds time to fire
+   * @return
+   */
+  private Neuron makeNewNeuron(float maxImpulse, float seconds)
   {
     Neuron n = new Neuron(EnumNeuronInput.TIME, null, EnumNeuronInput.CONSTANT, EnumNeuronInput.CONSTANT, null);
     n.setInputValue(Neuron.C, seconds);
@@ -174,6 +214,12 @@ public class LegCreature extends RandCreature
     return n;
   }
 
+  /**
+   * Mirrors a vector about the X axis
+   * @param edgeToMirror edge of a block which the vector is pointing to
+   * @param joint joint you want to mirror
+   * @param mirrorJoint mirrored joint you want to create
+   */
   public void findMirrorVector(int edgeToMirror,  Vector3f joint, Vector3f mirrorJoint)
   {
       if (edgeToMirror == 0 || edgeToMirror == 2)
@@ -190,7 +236,11 @@ public class LegCreature extends RandCreature
       }
   }
 
-
+  /**
+   * Get the parent block of the id of the block passed in
+   * @param idOfParent
+   * @return
+   */
   public Block getParentBlock(int idOfParent)
   {
     if (idOfParent == 0)
@@ -203,6 +253,11 @@ public class LegCreature extends RandCreature
     }
   }
 
+  /**
+   * Based in the edge of the parent passed in, chooses an appropriate edge on the child to attach to the parent
+   * @param parentEdge
+   * @return edge of child to connect to parent
+   */
   public int findChildEdge(int parentEdge)
   {
     int childEdge = 0;
@@ -220,6 +275,11 @@ public class LegCreature extends RandCreature
     return childEdge;
   }
 
+  /**
+   * Checks to see if the newly added blocks cause a collision with the existing blocks on the creature
+   * If yes, removes both of the newly added blocks
+   * @return true if there was an intersection, false if not
+   */
   @Override
   public boolean removeIfIntersection()
   {
@@ -246,10 +306,13 @@ public class LegCreature extends RandCreature
       collisionResults.clear();
     }
 
-
     return false;
   }
 
+  /**
+   * add to the list of edges available to add blocks to when a new block is added to the creature
+   * @param blockID ID of block just added to creature
+   */
   @Override
   public void addAvailableEdges(int blockID)
   {
