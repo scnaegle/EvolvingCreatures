@@ -4,6 +4,7 @@ package vcreature.creatureUtil;
 import com.jme3.math.Vector3f;
 import jogamp.opengl.util.av.NullGLMediaPlayer;
 import vcreature.mainSimulation.MainSim;
+import vcreature.mainSimulation.Population;
 import vcreature.phenotype.*;
 
 import java.util.ArrayList;
@@ -703,6 +704,53 @@ public class DNA implements Comparable
       }
     }
     return stringOut;
+  }
+
+  /**
+   * Diff check dna blocks.  For each other block in each dna check if blocks are
+   * same or not
+   * @param pop       1d array of population
+   * @return          return number of differences found.
+   */
+  public static int numDifferences(ArrayList<DNA> pop)
+  {
+    int differences = 0;
+    int popSize = pop.size();
+    DNA current, different;
+    BlockDNA currentBlock, otherBlock;
+    boolean isNull1, isNull2, foundDifference;
+    //for each dna until second to last
+    for(int i = 0; i < popSize - 1; ++i)
+    {
+      current = pop.get(i);
+      //for each dna beyond this in the list
+      for(int j = i + 1; j < popSize; ++j)
+      {
+        different = pop.get(j);
+        //for each block
+        for(int k = 0; k < CreatureConstants.MAX_BLOCKS; ++k)
+        {
+          foundDifference = false;
+          //check if same
+          currentBlock = current.getBlockDNA(k);
+          otherBlock = different.getBlockDNA(k);
+          if((currentBlock == null && otherBlock != null) ||
+              currentBlock != null && otherBlock == null)
+          {
+            foundDifference = true;
+          }
+          if(!foundDifference && currentBlock != null)
+          {
+            foundDifference = !currentBlock.valuesAreSame(otherBlock);
+          }
+          if(foundDifference)
+          {
+            differences++;
+          }
+        }
+      }
+    }
+    return differences;
   }
 
   /**

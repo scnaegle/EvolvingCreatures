@@ -90,8 +90,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--avg-output", description = "Output file for average fitness")
   public static File avg_out = new File("avg_out.csv");
 
-  @Parameter(names = "--best-output", description = "Output file for average fitness")
+  @Parameter(names = "--best-output", description = "Output file for best fitness")
   public static File best_out = new File("best_out.csv");
+
+  @Parameter(names = "--diff-output", description = "Output file for best fitness")
+  public static File diff_out = new File("diff_out.csv");
 
   @Parameter(names = "--output-best", description = "File that you would like to output the best creature to", converter = FileConverter.class)
   public static File output_best_creature = new File("best_creature.txt");
@@ -133,6 +136,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private float bestFitnessSoFar;
   private StringBuilder averageFitnesses;
   private StringBuilder bestFitnesses;
+  private StringBuilder differences;
 
   private Population population;
 
@@ -230,6 +234,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
     averageFitnesses = new StringBuilder();
     bestFitnesses = new StringBuilder();
+    differences = new StringBuilder();
   }
 
   private void startSimForCreature(int creature_index) {
@@ -504,6 +509,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             {
               dna.bumpUp();
             }
+            diversityCheck(tempPop);
             listIntoPopulation(tempPop);
             //may want to reset population after GA to free up memory from keeping track of mutation history of DNAs before GA
             hillClimbing = new HillClimbing(population); //if population isn't reset, then this can be removed
@@ -515,6 +521,22 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           }
         }
       }
+    }
+  }
+
+  private void diversityCheck(ArrayList<DNA> tempPop)
+  {
+    differences.append(DNA.numDifferences(tempPop));
+    differences.append(',');
+    try
+    {
+      FileWriter writer = new FileWriter(diff_out);
+      writer.write(differences.toString());
+      writer.close();
+    }
+    catch(IOException e)
+    {
+      System.out.println("Failed writing differences");
     }
   }
 
@@ -580,7 +602,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       //store fittest of two.
       fit2 = dna1.getFitness() > dna2.getFitness() ? dna1 : dna2;
       //crossover the two fittest from comparisons
-      children = performCrossover(dna1, dna2);
+      children = performCrossover(fit1, fit2);
       //add to new population
       newPop.add(children[0]);
       newPop.add(children[1]);
