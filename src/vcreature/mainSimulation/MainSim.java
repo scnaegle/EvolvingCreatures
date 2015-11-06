@@ -186,6 +186,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     Block.initStaticMaterials(assetManager);
 
+    setCreatureConstants();
     population = new Population();
 
     if (input_file != null)
@@ -193,6 +194,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       System.out.println("reading from file: " + input_file);
       DNAio.readPopulation(input_file, population);
       if(population_count == -1) population_count = population.size();
+      setCreatureConstants();
       System.out.println("read in " + population.size() + " creatures");
     } else
     {
@@ -209,6 +211,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       }
     }
 
+    System.out.println("Starting with a population of " + population.size());
+
     //testOut();
     hillClimbing = new HillClimbing(population);
 
@@ -222,7 +226,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
     flyCam.setDragToRotate(true);
 
-    setCreatureConstants();
     setSpeed(sim_speed);
 
     if (debug) {
@@ -781,6 +784,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private void updateGUICurrentStatsText() {
     if (headless) {
       System.out.println("**********************************************************");
+      System.out.println("Crossover Count: " + crossover_count);
+      System.out.println("Total Generations: " + generation_total_count);
+      System.out.println("Generation: " + generation_count);
       System.out.println("Total Fitness: " + population.getTotalRecentFitness());
       System.out.println("Avg Fitness: " + population.getAverageRecentFitness());
       System.out.println("Change from last Generation: " + population.changeInTotalFitness(-2, -1));
