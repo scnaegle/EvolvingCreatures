@@ -35,6 +35,8 @@
  import com.jme3.system.AppSettings;
 
  import java.io.File;
+ import java.io.FileWriter;
+ import java.io.IOException;
  import java.util.*;
 
 //Added 10/14/2015 justin thomas
@@ -85,6 +87,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--output", description = "File that you would like to output to", converter = FileConverter.class)
   public static File output_file = new File("dna_out.txt");
 
+  @Parameter(names = "--avg-output", description = "Output file for average fitness")
+  public static File avg_out = new File("avg_out.csv");
+
+  @Parameter(names = "--best-output", description = "Output file for average fitness")
+  public static File best_out = new File("best_out.csv");
+
   @Parameter(names = "--output-best", description = "File that you would like to output the best creature to", converter = FileConverter.class)
   public static File output_best_creature = new File("best_creature.txt");
 
@@ -123,6 +131,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private float start_total_fitness = 0;
   private Random rand =  new Random();
   private float bestFitnessSoFar;
+  private StringBuilder averageFitnesses;
+  private StringBuilder bestFitnesses;
 
   private Population population;
 
@@ -130,10 +140,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private Nifty nifty;
 
   private boolean isRunning = true;
-  //TODO will perform crossover if this is true.  Need a command line arg to set
-  //if we're doing just hill climb.
-  //private boolean doingCrossover = true;
-
 
   @Override
   public void simpleInitApp()
@@ -222,6 +228,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     if (debug) {
       showSettings();
     }
+    averageFitnesses = new StringBuilder();
+    bestFitnesses = new StringBuilder();
   }
 
   private void startSimForCreature(int creature_index) {
@@ -330,7 +338,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     }
   }
 
-  //TODO: looks like there are creatures spawning in floor.  Caught one by time test and throwing an exception
   private boolean validCreature()
   {
     //System.out.println("*******Time passed*********");
@@ -453,6 +460,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             }
             //DNAio.writePop(bestCreature.getDNA());
             DNAio.writePopulation(population);
+            //TODO FitnessIO goes here
+            writeFitnesses();
+
 
             population.updateFitnessCache();
             if (crossover_count == 0 && generation_count == 0) {
@@ -471,7 +481,11 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
             current_creature_index = 0;
             population = hillClimbing.hillClimb();
-
+            //TODO Store fitness information here
+            averageFitnesses.append(population.getAverageRecentFitness());
+            averageFitnesses.append(',');
+            bestFitnesses.append(population.getBest().getFitness());
+            bestFitnesses.append(',');
             generation_total_count++;
             generation_count++;
 
@@ -719,6 +733,35 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       }
     }
     population.sort(null);
+  }
+
+  //=============================FITNESS I/O===============================
+
+  /**
+   * Write StringBuilders averageFitnesses and bestFitnesses to output strings
+   */
+  private void writeFitnesses()
+  {
+    try
+    {
+      FileWriter writer = new FileWriter(avg_out);
+      writer.write(averageFitnesses.toString());
+      writer.close();
+    }
+    catch(IOException e)
+    {
+      System.out.println("Failed writing average fitness");
+    }
+    try
+    {
+      FileWriter writer = new FileWriter(best_out);
+      writer.write(bestFitnesses.toString());
+      writer.close();
+    }
+    catch(IOException e)
+    {
+      System.out.println("Failed writing best fitness");
+    }
   }
 
 
