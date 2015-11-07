@@ -140,6 +140,8 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
   private Population population;
 
+  private ArrayList<Float> generation_fitness = new ArrayList<>();
+
   //Nifty gui
   private Nifty nifty;
 
@@ -476,6 +478,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             if (crossover_count == 0 && generation_count == 0) {
               start_total_fitness = population.getTotalRecentFitness();
             }
+            generation_fitness.add(population.getTotalRecentFitness());
             updateGUICurrentStatsText();
             if (debug)
             {
@@ -811,14 +814,26 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       System.out.println("Generation: " + generation_count);
       System.out.println("Total Fitness: " + population.getTotalRecentFitness());
       System.out.println("Avg Fitness: " + population.getAverageRecentFitness());
-      System.out.println("Change from last Generation: " + population.changeInTotalFitness(-2, -1));
+      System.out.println("Change from last Generation: " + getChangeInGenerationFitness());
       System.out.println("Total Change from start:" + totalFitnessChangeFromStart());
     } else {
       setTextForElement("total_fitness_text", "Total Fitness: " + population.getTotalRecentFitness());
       setTextForElement("avg_fitness_text", "Avg Fitness: " + population.getAverageRecentFitness());
-      setTextForElement("change_from_last_generation_text", "Change from last Gen: " + population.changeInTotalFitness(-2, -1));
+      setTextForElement("change_from_last_generation_text", "Change from last Gen: " + getChangeInGenerationFitness());
       setTextForElement("total_change_from_start_text", "Total Change from start: " + totalFitnessChangeFromStart());
       setTextForElement("best_fitness_text", "Best fitness so far: " + bestFitnessSoFar);
+    }
+  }
+
+  private float getChangeInGenerationFitness() {
+    try {
+      return generation_fitness.get(generation_fitness.size() - 1) - generation_fitness.get(generation_fitness.size() - 2);
+    } catch (IndexOutOfBoundsException e) {
+      try {
+        return generation_fitness.get(generation_fitness.size() - 1);
+      } catch (IndexOutOfBoundsException e2) {
+        return 0;
+      }
     }
   }
 
