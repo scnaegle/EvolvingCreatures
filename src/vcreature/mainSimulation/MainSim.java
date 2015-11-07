@@ -470,9 +470,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             }
             //DNAio.writePop(bestCreature.getDNA());
             DNAio.writePopulation(population);
-            //TODO FitnessIO goes here
-            writeFitnesses();
-
 
             population.updateFitnessCache();
             if (crossover_count == 0 && generation_count == 0) {
@@ -492,11 +489,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
 
             current_creature_index = 0;
             population = hillClimbing.hillClimb();
-            //TODO Store fitness information here
-            averageFitnesses.append(population.getAverageRecentFitness());
-            averageFitnesses.append(',');
-            bestFitnesses.append(population.getBest().getFitness());
-            bestFitnesses.append(',');
+
             generation_total_count++;
             generation_count++;
 
@@ -504,7 +497,12 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             //sessions.
           if(hillClimbing.isMutationNeeded() || generation_count > 100)
           {
-            //TODO GA here
+            averageFitnesses.append(population.getAverageRecentFitness());
+            averageFitnesses.append(',');
+            bestFitnesses.append(population.getBest().getFitness());
+            bestFitnesses.append(',');
+            writeFitnesses();
+
             ArrayList<DNA> tempPop = trimPopulation();
 
             if(doing_crossover)//&& if doing tournamentSelection
