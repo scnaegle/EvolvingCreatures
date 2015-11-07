@@ -465,9 +465,6 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             {
               bestFitnessSoFar = population.getBest().getFitness();
             }
-            if (headless) {
-              System.out.println("BEST FITNESS SO FAR: " + bestFitnessSoFar);
-            }
             //DNAio.writePop(bestCreature.getDNA());
             DNAio.writePopulation(population);
 
@@ -814,6 +811,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       System.out.println("Avg Fitness: " + population.getAverageRecentFitness());
       System.out.println("Change from last Generation: " + getChangeInGenerationFitness());
       System.out.println("Total Change from start:" + totalFitnessChangeFromStart());
+      System.out.println("BEST FITNESS SO FAR: " + bestFitnessSoFar);
     } else {
       setTextForElement("total_fitness_text", "Total Fitness: " + population.getTotalRecentFitness());
       setTextForElement("avg_fitness_text", "Avg Fitness: " + population.getAverageRecentFitness());
