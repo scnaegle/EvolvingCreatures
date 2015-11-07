@@ -141,6 +141,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   private Population population;
 
   private ArrayList<Float> generation_fitness = new ArrayList<>();
+  private DNA best_creature = null;
 
   //Nifty gui
   private Nifty nifty;
@@ -463,9 +464,10 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
           {
             if (bestFitnessSoFar < population.getBest().getFitness())
             {
+              best_creature = population.getBest();
               bestFitnessSoFar = population.getBest().getFitness();
             }
-            //DNAio.writePop(bestCreature.getDNA());
+            DNAio.writeSingleCreature(best_creature);
             DNAio.writePopulation(population);
 
             population.updateFitnessCache();
