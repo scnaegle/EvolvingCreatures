@@ -256,6 +256,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
       elapsedSimulationTime = 0.0f;
     } catch (IllegalArgumentException e) {
       e.printStackTrace();
+      System.err.println("****INVALID CREATURE****");
       population.get(creature_index).updateLastFitness(0.0f);
       creature_index++;
       startSimForCreature(creature_index);
@@ -277,6 +278,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
     System.out.println("input: " + input_file);
     System.out.println("debug: " + debug);
     System.out.println("settings: " + settings);
+    System.out.println("physics Accuracy: " + physicsSpace.getAccuracy());
   }
 
   
@@ -353,9 +355,14 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   {
     //System.out.println("*******Time passed*********");
     //System.out.println(elapsedSimulationTime);
-    if(!myCreature.isValid() || elapsedSimulationTime < 2 && myCreature.getFitness() > 4)
+    if(!myCreature.isValid() || elapsedSimulationTime < CreatureConstants.VALID_SECONDS_CUTOFF &&
+        myCreature.getFitness() > CreatureConstants.VALID_FITNESS_CUTOFF)
     {
       System.err.println("****INVALID CREATURE****");
+      if (debug) {
+        System.err.format("Creature[%d] had a fitness of %f after only %f seconds\n", currently_displayed_creature,
+            myCreature.getFitness(), elapsedSimulationTime);
+      }
       return false;
      // throw new IllegalStateException();
     }
@@ -1003,6 +1010,7 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   public void setSpeed(int speed) {
     this.speed = speed;
     physicsSpace.setMaxSubSteps(speed * 4);
+    physicsSpace.setAccuracy(1 / (speed * 60f));
     settings.setFrequency(speed * 60);
     this.setSettings(settings);
     this.restart();
