@@ -60,6 +60,9 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
   @Parameter(names = "--headless", description = "If this flag is present then it will Run the GA in headless mode with no GUI")
   boolean headless = false;
 
+  @Parameter(names = "--view-only", description = "If this flag is present then it not run the GA, just loop through the creatures as they are.")
+  boolean view_only = false;
+
   @Parameter(names = "--thread-count", description = "Number of threads to use, defaults to 1")
   public static int thread_count = 1;
 
@@ -494,14 +497,17 @@ public class MainSim extends SimpleApplication implements ActionListener, Screen
             }
 
             current_creature_index = 0;
-            population = hillClimbing.hillClimb();
+            if (!view_only)
+            {
+              population = hillClimbing.hillClimb();
 
-            generation_total_count++;
-            generation_count++;
+              generation_total_count++;
+              generation_count++;
+            }
 
           //limiting number of hillclimb generations to limit runaway hillclimb
             //sessions.
-          if(hillClimbing.isMutationNeeded() || generation_count > 100)
+          if(!view_only && (hillClimbing.isMutationNeeded() || generation_count > 100))
           {
             averageFitnesses.append(population.getAverageRecentFitness());
             averageFitnesses.append(',');
